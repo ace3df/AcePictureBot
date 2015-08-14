@@ -22,17 +22,17 @@ def file_to_list(file):
     return to_list
 
 
-def short_str(str, cap=30):
-    if not str:
-        return str
+def short_str(string, cap=30):
+    if not string:
+        return string
     try:
         count = 0
-        if str[cap + 5]:
-            for char in str:
+        if string[cap + 5]:
+            for char in string:
                 count += 1
-                if count >= cap and not char:
+                if count >= cap or not char:
                     break
-            str = str[:count].strip()
-            return str + "[...]"
+            string = string[:count].strip()
+            return string + "[...]"
     except:
-        return str.strip()
+        return string.strip()

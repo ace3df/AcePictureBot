@@ -55,14 +55,24 @@ def status_account(api):
 
         msg_url = entry.find(find_xml['link_id']).get('href')
         msg_msg = re.sub('<[^<]+?>', '', entry.findtext(find_xml['msg_id']))
-        msg_msg = pre_msg + utils.short_str(
-                re.sub(' +', ' ', os.linesep.join(
-                    [s for s in msg_msg.splitlines() if s])).lstrip(), 90)
-        print(current_id)
-        print(msg_url)
-        print(msg_msg)
+        msg_msg = re.sub(' +', ' ', os.linesep.join(
+                    [s for s in msg_msg.splitlines() if s])).lstrip()
+        msg = "{0}{1}\n{3}".format(pre_msg,
+                                   utils.short_str(msg_msg, 90),
+                                   msg_url)
+        print(msg)
+        #functions.status_tweet(STATUS_API, msg)
 
     while True:
+        url = "http://ace3df.github.io/AcePictureBot/feed.xml"
+        name = "BlogHistory.txt"
+        pre_msg = "[Blog Entry]]\n"
+        find_xml = {"entries_in": 0,
+                    "entry_id": "{http://www.w3.org/2005/Atom}id",
+                    "link_id": "{http://www.w3.org/2005/Atom}link",
+                    "msg_id": "title"}
+        read_rss(url, name, pre_msg, find_xml)
+        time.sleep(60)
         url = "https://github.com/ace3df/AcePictureBot/commits/master.atom"
         name = "GitCommit.txt"
         pre_msg = "[Git Commit]\n"
@@ -72,6 +82,7 @@ def status_account(api):
                     "msg_id": "{http://www.w3.org/2005/Atom}content"}
         read_rss(url, name, pre_msg, find_xml)
         time.sleep(60)
+
 
 
 def start_stream(SAPI=None):

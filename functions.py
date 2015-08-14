@@ -29,3 +29,14 @@ def login(REST=True, status=False):
         return api, auth
     else:
         return auth
+
+
+def status_tweet(api, status, media=False):
+    try:
+        if media:
+            api.update_with_media(media, status=status)
+        else:
+            api.update_status(status=status)
+    except:
+        # Don't catch anything for now.
+        pass
