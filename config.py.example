@@ -1,0 +1,38 @@
+credentials = dict(
+    consumer_key='',
+    consumer_secret='',
+    access_token='',
+    access_token_secret='',
+)
+
+status_credentials = dict(
+    consumer_key='',
+    consumer_secret='',
+    access_token='',
+    access_token_secret='',
+)
+
+settings = dict(
+    twitter_track=['AcePictureBot', 'AceYaoiBot', 'AceYuriBot',
+                   'AceEcchiBot', 'AceNSFWBot'],
+    image_loc='',
+    list_loc='',
+    cookie_loc='',
+    ignore_loc='',
+    count_on=True,
+    count_file='count.ini',
+    ignore_tags=['Pony'],
+    webm_on=True,
+    webm_script='script.bat',
+)
+
+extra_api_keys = dict(
+    pastebin='',
+    pasteee='',
+    google='',
+)
+
+website_logins = dict(
+    sankakucomplex_username='',
+    sankakucomplex_password='',
+)

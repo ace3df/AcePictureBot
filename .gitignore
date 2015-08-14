@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+
+ignore_lists/
+lists/
+
+config.py
+
+blocked_waifus.txt
+blocked_users.txt
