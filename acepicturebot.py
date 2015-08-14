@@ -7,6 +7,7 @@ import xml.etree.ElementTree as etree
 import time
 import os
 import re
+import sys
 
 __program__ = "AcePictureBot"
 __version__ = "2.0.0"
@@ -43,7 +44,11 @@ def status_account(api):
                          name), 'r').read()
         rss = urllib.request.urlopen(url).read().decode("utf-8")
         xml = etree.fromstring(rss)
-        entry = xml[find_xml['entries_in']]
+
+        if bool(find_xml['sub_listing']):
+            entry = xml[0][find_xml['entries_in']]
+        else:
+            entry = xml[find_xml['entries_in']]
         current_id = entry.findtext(
             find_xml['entry_id'])
 
@@ -53,11 +58,15 @@ def status_account(api):
         with open(os.path.join(settings['ignore_loc'], name), "w") as f:
             f.write(current_id)
 
-        msg_url = entry.find(find_xml['link_id']).get('href')
+        if bool(find_xml['get_href']):
+            msg_url = entry.find(find_xml['link_id']).get('href')
+        else:
+            msg_url = entry.findtext(find_xml['link_id'])
+
         msg_msg = re.sub('<[^<]+?>', '', entry.findtext(find_xml['msg_id']))
         msg_msg = re.sub(' +', ' ', os.linesep.join(
                     [s for s in msg_msg.splitlines() if s])).lstrip()
-        msg = "{0}{1}\n{3}".format(pre_msg,
+        msg = "{0}{1}\n{2}".format(pre_msg,
                                    utils.short_str(msg_msg, 90),
                                    msg_url)
         print(msg)
@@ -67,18 +76,22 @@ def status_account(api):
         url = "http://ace3df.github.io/AcePictureBot/feed.xml"
         name = "BlogHistory.txt"
         pre_msg = "[Blog Entry]]\n"
-        find_xml = {"entries_in": 0,
-                    "entry_id": "{http://www.w3.org/2005/Atom}id",
-                    "link_id": "{http://www.w3.org/2005/Atom}link",
+        find_xml = {"sub_listing": True,
+                    "entries_in": 7,
+                    "entry_id": "guid",
+                    "link_id": "guid",
+                    "get_href": False,
                     "msg_id": "title"}
         read_rss(url, name, pre_msg, find_xml)
-        time.sleep(60)
+        time.sleep(5)
         url = "https://github.com/ace3df/AcePictureBot/commits/master.atom"
         name = "GitCommit.txt"
         pre_msg = "[Git Commit]\n"
-        find_xml = {"entries_in": 5,
+        find_xml = {"sub_listing": False,
+                    "entries_in": 5,
                     "entry_id": "{http://www.w3.org/2005/Atom}id",
                     "link_id": "{http://www.w3.org/2005/Atom}link",
+                    "get_href": True,
                     "msg_id": "{http://www.w3.org/2005/Atom}content"}
         read_rss(url, name, pre_msg, find_xml)
         time.sleep(60)
