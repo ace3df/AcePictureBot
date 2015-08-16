@@ -1,3 +1,7 @@
+from config import settings
+import os
+
+
 def file_to_list(file):
     lines = list(filter(None,
                  open(file, 'r', encoding='utf-8').read().splitlines()))
@@ -36,3 +40,20 @@ def short_str(string, cap=30):
             return string + "[...]"
     except:
         return string.strip()
+
+
+def get_command(string):
+    string = string.lower()
+    string = string.replace("waifu", "{GENDER}")
+    string = string.replace("husbando", "{GENDER}")
+    triggers = file_to_list(
+                    os.path.join(settings['list_loc'],
+                                 "commands.txt"))
+    command = [s for s in triggers if str(s).lower() in string.lower()]
+    if not command:
+        return False
+    else:
+        command = command[0]
+        if type(command) is bool:
+            return False
+    return command
