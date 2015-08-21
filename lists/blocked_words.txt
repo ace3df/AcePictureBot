@@ -1,0 +1,2 @@
+# List of words that are mostly bots and should be ignored. Type=None
+[My Best Fans]

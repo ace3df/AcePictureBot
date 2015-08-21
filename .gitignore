@@ -2,9 +2,16 @@ __pycache__/
 *.py[cod]
 
 ignore_lists/
-lists/
+FFmpeg/
+images/
 
 config.py
 
 blocked_waifus.txt
 blocked_users.txt
+sankakucomplex.txt
+users_waifus.json
+users_husbandos.json
+count.ini
+
+palette.png

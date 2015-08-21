@@ -407,7 +407,8 @@ def otp(args):
         otp_anime = "({0})".format(one_series)
     else:
         otp_anime = "({0} / {1})".format(one_series, two_series)
-
+    one_name = re.sub(r' \([^)]*\)', '', one_name)
+    two_name = re.sub(r' \([^)]*\)', '', two_name)
     m = "Your {0}OTP is {1} and {2} {3}".format(otp_msg, one_name,
                                                 two_name, otp_anime)
 

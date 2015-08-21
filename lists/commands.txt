@@ -1,0 +1,21 @@
+# List of commands. Type=None
+My{GENDER}
+{GENDER}Register
+{GENDER}Remove
+SetBirthday
+Spoiler
+Shipgirl
+Touhou
+Bocaloid
+Imouto
+Idol
+Shota
+Onii
+Onee
+Sensei
+{GENDER}
+OTP
+Airing
+Source
+!Level
+Monstergirl
