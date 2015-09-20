@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+from utils import get_image_online
 from utils import file_to_list
-from utils import make_paste
 from utils import scrape_site
+from utils import make_paste
+from slugify import slugify
 from config import settings
+from string import capwords
 import configparser
 import json
 import re
@@ -17,6 +20,7 @@ class WaifuRegisterClass(object):
         self.username = username
         self.original_name = name
         self.name = name.replace(" ", "_").lower()
+        self.STOP = False
 
         if gender == 0:
             self.end_tags_main = "+solo+1girl"
@@ -29,7 +33,7 @@ class WaifuRegisterClass(object):
             self.end_tags = "+solo+-1girl+-female"
             self.gender = "husbando"
             self.filename = "users_husbandos.json"
-            self.pic_limit = 8
+            self.pic_limit = 15
 
         self.subscribe = False
         self.override = False
@@ -37,12 +41,17 @@ class WaifuRegisterClass(object):
 
         self.name = self.clean_name(name)
 
-        blocked_waifus = file_to_list(
-                        os.path.join(settings['list_loc'],
-                                     'blocked_waifus.txt'))
+        # Only way to really do this
+        if gender == 0:
+            if "brando" in self.name:
+                self.STOP = True
 
-        self.STOP = any([
-            True for i in blocked_waifus if i in self.name])
+        if not self.STOP:
+            blocked_waifus = file_to_list(
+                            os.path.join(settings['list_loc'],
+                                         'Blocked Waifus.txt'))
+            self.STOP = any([
+                True for i in blocked_waifus if i in self.name])
 
         user_waifus_file = open(
             os.path.join(settings['list_loc'], self.filename), 'r',
@@ -60,7 +69,9 @@ class WaifuRegisterClass(object):
 
         # Quick name corrections
         self.known = [["anarchy_stocking", "stocking_(psg)"],
-                      ["hestia", "hestia_(danmachi!)"]]
+                      ["hestia", "hestia_(danmachi!)"],
+                      ["zelda", "princess_zelda"]]
+
         for [known, work] in self.known:
             if self.name == known:
                 self.original_name = work
@@ -87,7 +98,7 @@ class WaifuRegisterClass(object):
         self.safebooru_count_re = 0
 
         # Note down that the name was reversed
-        # TODO: Do I actually need this if _re is higher?
+        # TODO: Do I actually need this if count_re is higher?
         self.sankaku_re = False
         self.safebooru_re = False
 
@@ -100,7 +111,7 @@ class WaifuRegisterClass(object):
     def clean_name(self, name):
         name = name.strip()
         name = re.sub(
-            '[][<>!"@#*:~\'$^%£]', '', name
+            '[][<>"@#*:~\'$^%£]', '', name
             ).strip().replace(" ", "_").lower()
         return name
 
@@ -253,12 +264,9 @@ Spanish: {2}
         user_waifus_file.close()
 
     def accept_tag(self):
+        # Make sure they're not registering a show
         html_tags = self.soup.find_all(
-            'li', class_="tag-type-general")
-        html_tags += self.soup.find_all(
             'li', class_="tag-type-copyright")
-        html_tags += self.soup.find_all(
-            'li', class_="tag-type-artist")
         tags = []
         for tag in html_tags:
             tags.append(str(tag.text).split(" (?)")[0].replace(" ", "_"))
@@ -285,11 +293,21 @@ Spanish: {2}
             if not self.accept_tag():
                 return False
             self.get_site_count(0)
-            # This should be fine off for now as only 5
-            # out of 1000+ use site 2
-            # but it's still a good back up for another time.
-            # self.get_site_count(2)
         return True
+
+    def four_images(self):
+        path_name = slugify(self.name,
+                            word_boundary=True, separator="_")
+        path = os.path.join(settings['image_loc'],
+                            self.gender.lower(), path_name)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        file_count = len(os.listdir(path))
+        tags = self.name + self.end_tags_main
+        if file_count < 3:
+            needed_imgs = 3 - file_count
+            for x in range(0, needed_imgs):
+                get_image_online(tags, site=0, high_page=1, path=path)
 
     def finish(self):
         config = configparser.ConfigParser()
@@ -300,13 +318,17 @@ Spanish: {2}
             results.append(self.sankaku_count)
             results.append(self.safebooru_count)
             if max(results) == 0:
-                return "No images were found for {0}! Help: {1}".format(
-                    self.original_name, help_urls['no_imgs_found'])
-            elif max(results) <= 10:
-                return "Not enough images were found! Help: {0}".format(
-                    help_urls['not_enough_imgs'])
+                return "No images found for \"{0}\"! Help: {1}".format(
+                    capwords(self.original_name), help_urls['no_imgs_found'])
+            elif max(results) <= 15:
+                return "Not enough images found for \"{0}\"! Help: {1}".format(
+                    capwords(self.original_name), help_urls['not_enough_imgs'])
             self.site_index = results.index(max(results))
             if self.sankaku_re or self.safebooru_re:
                 self.waifu_name = self.reverse_waifu(self.name)
+        # Everything passed
+        # Make sure 4 images are stored in the waifu/husbando
+        # folder for that person
+        self.four_images()
         self.save_to_file()
         return True

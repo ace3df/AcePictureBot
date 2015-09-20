@@ -11,14 +11,32 @@ import configparser
 import subprocess
 import requests
 import hashlib
+import pathlib
 import pickle
 import random
+import ntpath
 import json
 import time
+import sys
 import re
 import os
-
 s = None
+
+
+def printf(*objects, sep=' ', end='\n', file=sys.stdout):
+    enc = file.encoding
+    if enc == 'UTF-8':
+        print(*objects, sep=sep, end=end, file=file)
+    else:
+        print(*map(
+            lambda obj: str(obj).encode(
+                enc, errors='backslashreplace').decode(
+                enc), objects), sep=sep, end=end, file=file)
+
+
+def path_leaf(path):
+    head, tail = ntpath.split(str(path))
+    return tail
 
 
 def make_paste(text, title="", expire="10M"):
@@ -45,7 +63,7 @@ def file_to_list(file):
         if ":" in lines[0]:
             split_by = ":"
             keep_s = 0
-            keep_e = 0
+            keep_e = 1
         elif "||" in lines[0]:
             split_by = "||"
             keep_s = 0
@@ -62,8 +80,8 @@ def file_to_list(file):
             continue
         if split_by:
             line = line.split(split_by)
-            if keep_s >= 0:
-                line = line[keep_s:keep_e]
+            if keep_e < 2:
+                line = line[keep_s:keep_e][0]
         to_list.append(line)
     return to_list
 
@@ -103,7 +121,7 @@ def scrape_site(url, cookie_file=""):
         browser.open(url)
         return browser
     except:
-        print("[WARNING] TIMEOUT WITH WEBSITE: {0}".format(url))
+        printf("[WARNING] TIMEOUT WITH WEBSITE: {0}".format(url))
         return False
 
 
@@ -128,7 +146,7 @@ def video_to_gif(video):
             os.remove(video)
     except Exception as v:
         # Shouldn't happen but it's here to print in case
-        print(v)
+        printf(v)
         return False
 
     return filename
@@ -237,6 +255,7 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
     found_page = False
     good_image = False
     no_images = False
+    browser = False
     if site == 0:
         cookie_file = "sankakucomplex.txt"
         url_start = "https://chan.sankakucomplex.com"
@@ -273,14 +292,17 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
         url_search = "http://konachan.com/post?tags="
         pid = False
         login = False
-
     if isinstance(tags, list):
+        tag_count = len(tags)
         tags = '+'.join(tags)
-
+    else:
+        tag_count = len(tags.split("+"))
     if site == 0:
         if "rating:safe" not in tags:
             tags += "+rating:safe"
-
+        if "order:popular" not in tags:
+            if tag_count < 7:
+                tags += "order:popular"
     if login:
         if not os.path.exists(cookie_file):
             global s
@@ -290,13 +312,11 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
             form[form_password].value = password
             browser.submit_form(form)
             s.cookies.save()
-
     if pid:
         rand = 40
         tried_pages = [high_page * rand]
     else:
         rand = 1
-
     while not good_image:
         while not found_image:
             while not found_page:
@@ -317,10 +337,14 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                 x = min(tried_pages)
                 if not pid:
                     page_url = "&page=" + str(page)
-                elif not pid:
+                elif pid:
                     page_url = "&pid=" + str(page)
                 url = "%s%s%s" % (url_search, tags, page_url)
-                browser = scrape_site(url, cookie_file)
+                if not browser:
+                    browser = scrape_site(url, cookie_file)
+                if not browser:
+                    # Time'd out
+                    return False
                 if site == 0:
                     if browser.find('div', text="No matching posts"):
                         no_images = True
@@ -434,11 +458,8 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
             if any([item.lower()in settings['ignore_tags']
                     for item in image_tags]):
                 continue
-
-            if "waifu" in ignore_list or "husbando" in ignore_list:
-                if any(" (cosplay)" in s for s in image_tags):
-                    continue
-
+            if any(" (cosplay)" in s for s in image_tags):
+                continue
             break
 
         pickle.dump(ignore_urls, open(
@@ -459,20 +480,38 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                 return False
         elif site == 2:
             url = image_url['src']
-
         tweet_image = download_image(url, path)
-
         return tweet_image
 
 
-def get_image(path):
+def get_image(path, ignore_list=False):
     if ":" not in path:
         path = os.path.join(settings['image_loc'], path)
-    try:
-        img = random.choice(next(os.walk(path))[2])
-    except:
-        return False
-    return os.path.join(path, img)
+    if not ignore_list:
+        try:
+            files = [p for p in pathlib.Path(path).iterdir() if p.is_file()]
+            img = path_leaf(random.choice(files))
+        except:
+            return False
+        return os.path.join(path, img)
+    else:
+        try:
+            ignore_urls = pickle.load(open(
+                    os.path.join(settings['ignore_loc'], ignore_list), 'rb'))
+        except:
+            ignore_urls = []
+        safe_break = 0
+        files = [p for p in pathlib.Path(path).iterdir() if p.is_file()]
+        img = path_leaf(random.choice(files))
+        while img in ignore_urls:
+            safe_break += 1
+            if safe_break == 10:
+                break
+            img = path_leaf(random.choice(files))
+        ignore_urls.append(img)
+        pickle.dump(ignore_urls, open(
+            os.path.join(settings['ignore_loc'], ignore_list), 'wb'))
+        return os.path.join(path, img)
 
 
 def get_command(string):

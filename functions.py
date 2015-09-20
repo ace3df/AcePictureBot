@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from waifu_register import WaifuRegisterClass
 from config import credentials, status_credentials
+from spam_checker import remove_one_limit
 from config import settings
 from slugify import slugify
+from math import exp, log
 from PIL import Image
 import configparser
 import datetime
@@ -38,7 +40,7 @@ def login(REST=True, status=False):
 
 
 def block_user(user_id, reason=""):
-    path = os.path.join(settings['list_loc'], 'blocked_users.txt')
+    path = os.path.join(settings['list_loc'], 'Blocked Users.txt')
     filename = open(path, 'r')
     blocked_users = filename.read().splitlines()
     filename.close()
@@ -50,66 +52,94 @@ def block_user(user_id, reason=""):
     filename.close()
 
 
+def warn_user(user_id, reason=""):
+    path = os.path.join(settings['list_loc'], 'Warned Users.txt')
+    filename = open(path, 'r')
+    warned_users = filename.read().splitlines()
+    filename.close()
+    count = 1
+    blocked = False
+    for warning in warned_users[1:]:
+        line = warning.split(":")
+        if str(line[0]) == str(user_id):
+            warned_users.pop(count)
+            block_user(user_id, reason=reason)
+            blocked = True
+            break
+        count += 1
+    if not blocked:
+        line = "{0}:{1}".format(user_id, reason)
+        warned_users.append(line)
+    filename = open(path, 'w')
+    for item in warned_users:
+        filename.write("%s\n" % item)
+    filename.close()
+
+
 def config_get(section, key, file=0):
-    config = configparser.ConfigParser()
     if file == 0:
         file = settings['settings']
     elif file == 1:
         file = settings['count_file']
-    config.read(file)
-    try:
-        return config[section][key]
-    except:
-        print("[WARNING] Nothing found! Section: {0}, Key: {1}, File: {2}"
-              .format(section, key, file))
-        return False
+    with open(file) as fp:
+        config = configparser.ConfigParser(allow_no_value=True)
+        config.readfp(fp)
+        try:
+            return config[section][key]
+        except:
+            return False
 
 
 def config_save(section, key, result, file=0):
-    config = configparser.ConfigParser()
     if file == 0:
         file = settings['settings']
     elif file == 1:
         file = settings['count_file']
-    config.read(file)
-    config.set(section, key, str(result))
-
-    with open(file, 'w') as configfile:
-        config.write(configfile)
+    with open(file) as fp:
+        config = configparser.ConfigParser(allow_no_value=True)
+        config.readfp(fp)
+        config.set(section, key, str(result))
+    with open(file, 'w') as fp:
+        config.write(fp)
 
 
 def config_get_section_items(section, file=0):
-    config = configparser.ConfigParser()
     if file == 0:
         file = settings['settings']
     elif file == 1:
         file = settings['count_file']
-    config.read(file)
-    try:
-        return dict(config.items(section))
-    except:
-        return False
+    with open(file) as fp:
+        config = configparser.ConfigParser(allow_no_value=True)
+        config.readfp(fp)
+        try:
+            return dict(config.items(section))
+        except:
+            return False
 
 
 def config_add_section(section, file=0):
-    config = configparser.ConfigParser()
     if file == 0:
         file = settings['settings']
     elif file == 1:
         file = settings['count_file']
-    config.read(file)
-    config.add_section(section)
-
-    with open(file, 'w') as configfile:
-        config.write(configfile)
+    with open(file) as fp:
+        config = configparser.ConfigParser(allow_no_value=True)
+        config.readfp(fp)
+        config.add_section(section)
+    with open(file, 'w') as fp:
+        config.write(fp)
 
 
 def count_trigger(command, user_id="Failed"):
+    if not command.strip():
+        return
+    if "dellimits" in command.lower():
+        return
     user_id = str(user_id).title()
     if user_id == "Failed":
-        loc = "Failed"
+        loc = "failed"
     else:
-        loc = "Global"
+        loc = "global"
     try:
         glob_cur_cont = int(config_get(loc, command, 1)) + 1
     except:
@@ -127,7 +157,7 @@ def count_trigger(command, user_id="Failed"):
         config_save(user_id, command, user_cur_count, 1)
 
 
-def get_lvl(user_id):
+def get_level(user_id):
     cmd_exp = {'default': 1,
                'my{GENDER}': 2,
                '{GENDER}': 4,
@@ -137,11 +167,10 @@ def get_lvl(user_id):
                'imouto': 3,
                '{GENDER}register': 6,
                'monstergirl': 10}
-
     sec = config_get_section_items(str(user_id), 1)
     if not sec:
-        return "\nYou are Level 1 \nCurrent Exp: 0 \nNext Level At: 25"
-    exp = 0
+        return "\nYou are Level: 1 \nCurrent Exp: 0 \nNext Level: 25"
+    user_exp = 0
     total = 0
     for cmd, count in sec.items():
         cmd = cmd.replace("waifu", "{GENDER}")
@@ -149,28 +178,49 @@ def get_lvl(user_id):
         for i in range(0, int(count)):
             total += 1
             try:
-                exp += cmd_exp[cmd]
+                user_exp += cmd_exp[cmd]
             except:
-                exp += cmd_exp['default']
-    level = 1
-    level_next = 25
-    while exp >= level_next:
-        level += 1
-        exp = exp - level_next
-        level_next = round(level_next * 1.025)
-    return "\nYou are Level {0}\nCurrent Exp: {1}\nNext Level At: {2}".format(
-        level, exp, level_next)
+                user_exp += cmd_exp['default']
+    levels = 100
+    xp_for_first_level = 25
+    xp_for_last_level = 1000000
+    B = log(1.0 * xp_for_last_level / xp_for_first_level) / (levels - 1)
+    A = 1.0 * xp_for_first_level / (exp(B) - 1.0)
+
+    def xp_for_level(i):
+        x = int(A * exp(B * i))
+        y = 10**int(log(x) / log(10) - 2.2)
+        return int(x / y) * y
+
+    if user_exp < xp_for_first_level:
+        level = 1
+        for_next = 25
+    elif user_exp >= xp_for_last_level:
+        level = levels
+        for_next = "MAXED"
+    else:
+        for i in range(1, levels+1):
+            level_range = xp_for_level(i) - xp_for_level(i-1)
+            if user_exp < level_range:
+                level = i
+                for_next = level_range - user_exp
+                break
+    return """\nYou are Level: {0}
+Current Exp: {1}
+Next Level: {2}""".format(level, user_exp, for_next)
 
 
 def waifu(gender, args="", otp=False):
     if gender == 0:
-        list_name = "waifu"
+        list_name = "Waifu"
+        end_tag = "1girl"
     else:
-        list_name = "husbando"
+        list_name = "Husbando"
+        end_tag = "1boy"
     result = ""
     lines = utils.file_to_list(
                     os.path.join(settings['list_loc'],
-                                 list_name + "_list.txt"))
+                                 list_name + " List.txt"))
     args = ' '.join(args.split()).lower()
     matched = []
     # Slugify
@@ -185,10 +235,10 @@ def waifu(gender, args="", otp=False):
             # Waifu High School DxD for weeks!
             # So simply blacklist that show
             # and other ones that a group of people
-            # use nothing but that said show.
+            # use nothing but that said show,
+            # as well as shows that are used in triggers.
             if slugify(entry[1], word_boundary=True) in ignore:
                 continue
-
             if slugify(args,
                        word_boundary=True) == slugify(entry[1],
                                                       word_boundary=True):
@@ -196,7 +246,7 @@ def waifu(gender, args="", otp=False):
         # It's not really that random if
         # thre isn't that many people matched
         if otp:
-            t = 4
+            t = 2
         else:
             t = 7
         if len(matched) > t:
@@ -212,8 +262,8 @@ def waifu(gender, args="", otp=False):
     path = os.path.join(list_name, path_name)
     tweet_image = utils.get_image(path)
     if not tweet_image:
-        tags = [name.replace(" ", "_"), "solo"]
-        tweet_image = utils.get_image_online(tags, 0, 2,
+        tags = [name.replace(" ", "_"), "solo", "-genderswap", end_tag]
+        tweet_image = utils.get_image_online(tags, 0, 1,
                                              "", path)
     name = re.sub(r' \([^)]*\)', '', name)
     m = "Your {0} is {1} ({2})".format(list_name.title(),
@@ -242,17 +292,27 @@ def mywaifu(user_id, gender):
 Use {1}Register!
 Help: {2}""".format(gender, gender,
                     config_get('Help URLs', 'include_name'))
+        # Note to self: DO NOT include remove_all_limit
+        # or remove_one_limit here!
+        # It can easily be abused as they could unregister their
+        # waifu and register back, etc, etc.
         return m, False
 
     tags = user['name'] + user['tags']
     path_name = slugify(user['name'],
                         word_boundary=True, separator="_")
-    path = "{0}/{1}".format(gender.lower(), path_name)
+    path = os.path.join(settings['image_loc'],
+                        gender.lower(), path_name)
     ignore_list = "user_ignore/{0}".format(user['twitter_id'])
     tweet_image = utils.get_image_online(tags, user['web_index'],
                                          30, ignore_list, path)
     if not tweet_image:
-        tweet_image = utils.get_image(path)
+        tweet_image = utils.get_image(path, ignore_list)
+    if not tweet_image:
+        m = """Failed to get an image (website could be offline).
+Help: {0}""".format(config_get('Help URLs', 'no_mywaifu_image'))
+        remove_one_limit(user_id, "my" + gender.lower())
+        return m, False
     if datetime.datetime.now().isoweekday() == 3:
         m = "#{0}Wednesday".format(gender)
     else:
@@ -263,24 +323,36 @@ Help: {2}""".format(gender, gender,
 def waifuregister(user_id, username, name, gender):
     if config_get('Websites', 'sankakucomplex') == "False":
         m = "Some websites are offline. Try again later!"
-        # Function here to remove 1 from user limit
+        if gender == 0:
+            gender = "Waifu"
+        elif gender == 1:
+            gender = "Husbando"
+        remove_one_limit(user_id, gender.lower() + "register", username)
         return m, False
-
-    if name.strip() == "":
-        m = "Please include a name! Help: {0}".format(
+    name = name.strip()
+    if name == "":
+        m = "You forgot to include a name! Help: {0}".format(
             config_get('Help URLs', 'include_name'))
         return m, False
+    elif len(name) >= 41:
+        return False, False
+    elif len(name) <= 3:
+        return False, False
+
+    # Remove spaces in "name ( show )"
+    # Weebs man
+    name = name.replace("( ", "(").replace(" )", ")")
 
     register_object = WaifuRegisterClass(
         user_id, username, name, gender)
     # User used a banned name
     if register_object.blocked():
-        block_user(user_id, "Banned Register: {0}".format(name))
+        warn_user(user_id, "Banned Register: {0}".format(name))
         return False, False
 
     # Name is single and collides with a lot of other names
     # Return a paste with a list to try and make sure they
-    # get the right image.
+    # get the right person.
     if not register_object.is_override():
         single_name, m = register_object.check_possible_names()
         if single_name:
@@ -288,7 +360,7 @@ def waifuregister(user_id, username, name, gender):
 
         start = register_object.start()
         if not start:
-            block_user(user_id, "Banned Register: {0}".format(name))
+            warn_user(user_id, "Banned Register: {0}".format(name))
             return False, False
         m = register_object.finish()
 
@@ -342,8 +414,12 @@ def otp_image(img_1, img_2):
     overlays_loc = os.path.join(settings['image_loc'], "otp_overlays")
     save_loc = os.path.join(
         settings['image_loc'], "otps", str(random.randint(5, 999999)) + ".jpg")
-    urllib.request.urlretrieve(img_1, "1.jpg")
-    urllib.request.urlretrieve(img_2, "2.jpg")
+    try:
+        urllib.request.urlretrieve(img_1, "1.jpg")
+        urllib.request.urlretrieve(img_2, "2.jpg")
+    except:
+        # Timeout
+        return False
     otp_one = Image.open("1.jpg")
     otp_two = Image.open("2.jpg")
     overlay = random.randint(0, len(os.listdir(overlays_loc)) - 1)
@@ -417,7 +493,6 @@ def otp(args):
 
 def random_list(index, args=""):
     args = args.lower()
-    high_page = 10
     gender = "waifu"
     name = ""
     path = ""
@@ -439,7 +514,6 @@ def random_list(index, args=""):
     elif index == 1:
         list_name = "Touhou"
         hashtag = "#Touhou"
-        high_page = 3
         if "otp" in args:
             list_name += " OTP"
             lines = utils.file_to_list('Touhou OTP.txt')
@@ -448,7 +522,6 @@ def random_list(index, args=""):
     elif index == 2:
         list_name = "Vocaloid"
         hashtag = "#Vocaloids"
-        high_page = 1
         if "otp" in args:
             list_name += " OTP"
             lines = utils.file_to_list('Vocaloid OTP.txt')
@@ -456,12 +529,10 @@ def random_list(index, args=""):
             lines = utils.file_to_list('Vocaloid.txt')
     elif index == 3:
         list_name = "Imouto"
-        high_page = 1
         show_series = True
         lines = utils.file_to_list('Imouto.txt')
     elif index == 4:
         list_name = "Idol"
-        high_page = 3
         show_series = True
         if "love live" in args or "lovelive" in args:
             search_for = "Love Live!"
@@ -549,7 +620,7 @@ def random_list(index, args=""):
                         word_boundary=True, separator="_")
     path = "{0}/{1}".format(gender.lower(), path_name)
     if scrape_images:
-        tweet_image = utils.get_image_online(tags, 0, high_page, "", path)
+        tweet_image = utils.get_image_online(tags, 0, 1, "", path)
 
     if not tweet_image:
         tweet_image = utils.get_image(path)
@@ -667,13 +738,13 @@ def source(_API, status):
 
         if site == "":
             # No scrapable link found!
-            return False, False, False
+            return False, False, False, False
 
         try:
             soup = utils.scrape_site(url)
         except:
             # Site could be down
-            return False, False, False
+            return False, False, False, False
 
         try:
             if site == 0:
@@ -735,7 +806,7 @@ def source(_API, status):
                 soup = utils.scrape_site(url)
             except:
                 # Site could be down
-                return False, False
+                return False, False, False, False
             if site == 0:
                 tl_text = soup.find(
                     'table', class_="row-highlight").find_next('tbody')

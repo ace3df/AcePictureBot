@@ -7,11 +7,15 @@ images/
 
 config.py
 
-blocked_waifus.txt
-blocked_users.txt
+Blocked Waifus.txt
+Blocked Users.txt
+Blocked Words.txt
+Warned Users.txt
 sankakucomplex.txt
 users_waifus.json
 users_husbandos.json
 count.ini
 
+notes
+Tasks.TODO
 palette.png

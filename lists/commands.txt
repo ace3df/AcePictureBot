@@ -1,4 +1,5 @@
 # List of commands. Type=None
+DelLimits
 My{GENDER}
 {GENDER}Register
 {GENDER}Remove
@@ -19,3 +20,4 @@ Airing
 Source
 !Level
 Monstergirl
+Reroll

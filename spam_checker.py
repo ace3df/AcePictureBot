@@ -1,35 +1,48 @@
-from functions import config_get
+from datetime import timedelta
+from datetime import datetime
 from config import settings
-from datetime import datetime, timedelta
-import pickle
+import configparser
 import os
 
-FMT = '%Y-%m-%d %H:%M:%S'
+FMT = '%Y-%m-%d %H:%M:%S.%f'
+
+
+def config_get(section, key, file=0):
+    with open(settings['settings']) as fp:
+        config = configparser.ConfigParser(allow_no_value=True)
+        config.readfp(fp)
+        try:
+            return config[section][key]
+        except:
+            return False
 
 
 class SpamCheck(object):
     def __init__(self, twitter_id, twitter_handle, command):
-        self._id = int(twitter_id)
+        self._id = str(twitter_id)
         self._handle = twitter_handle
         self._command = command.lower()
-
-        self._limit = int(config_get('Limit', self._command))
-        self._limit_hours = int(config_get('Limit Hours', self._command))
+        self._limit = str(config_get('Limit', self._command))
+        self._limit_hours = str(config_get('Limit Hours', self._command))
         if not self._limit:
-            self._limit = int(config_get('Limit', "default"))
-            self._limit_hours = int(config_get('Limit Hours', "default"))
-
+            self._limit = str(config_get('Limit', "default"))
+            self._limit_hours = str(config_get('Limit Hours', "default"))
         self._now = datetime.now()
-
         try:
-            self._userlist = pickle.load(open(
-                os.path.join(settings['ignore_loc'], 'userlimit.pkl'), 'rb'))
+            self._userlist = open(
+                os.path.join(
+                    settings['ignore_loc'], 'User Limits.txt'), 'r').read(
+            ).splitlines()
         except:
-            self._userlist = [[0, "username", "command", 1, self._now, False]]
+            self._userlist = "0||username||waifu||1||{0}||False".format(
+                self._now).splitlines()
 
     def dump(self):
-        pickle.dump(self._userlist, open(
-            os.path.join(settings['ignore_loc'], 'userlimit.pkl'), 'wb'))
+        with open(
+                os.path.join(
+                    settings['ignore_loc'], 'user limits.txt'), 'w') as file:
+            file.write('\n'.join(self._userlist))
+        return True
 
     def get_time(self, lst_time, is_max):
         elapsed = self._now - (lst_time)
@@ -62,44 +75,108 @@ class SpamCheck(object):
                 self._command, msg)
         return msg
 
-    def command_limit(self):
-        print(self._limit)
-        for i, [lst_id, lst_handle, lst_command, lst_count,
-                lst_time, lst_warning] in enumerate(self._userlist):
-            if lst_id == self._id and lst_command == self._command:
-                # User is in list
-                if lst_count >= self._limit:
-                    # User has hit the limit
-                    if ((self._now - lst_time) >= timedelta(
-                         hours=int(self._limit_hours))):
-                        # Limit over, rest
-                        self._userlist[i] = [self._id, self._handle,
-                                             self._command, 1,
-                                             self._now, False]
-                        self.dump()
+    def remove_one(self):
+        edit_count = 0
+        for a in self._userlist:
+                line = a.split("||")
+                id, handle, command, count, time, warning = line
+                if not self._handle:
+                    self._handle = handle
+                if id == self._id and command == self._command:
+                    # User is found with command
+                    if int(count) <= 1:
+                        # Just call remove_all
+                        self.remove_all()
                         return True
-                    if not lst_warning:
-                        # Have not tweeted warning, so tweet it
-                        self._userlist[i] = [self._id, self._handle,
-                                             self._command, lst_count,
-                                             lst_time, True]
-                        self.dump()
-                        return self.get_time(lst_time, False)
-                    else:
-                        # Still limited
-                        return False
-                else:
-                    # User is not limited; add
-                    self._userlist[i] = [self._id, self._handle,
-                                         self._command, lst_count + 1,
-                                         lst_time, False]
+                    self._userlist.pop(int(edit_count))
+                    list_add = "{0}||{1}||{2}||{3}||{4}||False".format(
+                                self._id, self._handle,
+                                self._command, str(int(count) - 1),
+                                time)
+                    self._userlist += [list_add]
                     self.dump()
                     return True
-        # Add to list
-        list_add = [self._id, self._handle, self._command, 1, self._now, False]
+                edit_count += 1
+        self.dump()
+        return True
+
+    def remove_all(self):
+        edit_count = 0
+        for a in self._userlist:
+                line = a.split("||")
+                id, handle, command, count, time, warning = line
+                if id == self._id and command == self._command:
+                    self._userlist.pop(int(edit_count))
+                    self.dump()
+                    return True
+                edit_count += 1
+        self.dump()
+        return True
+
+    def command_limit(self):
+        edit_count = 0
+        for a in self._userlist:
+                line = a.split("||")
+                id, handle, command, count, time, warning = line
+                if id == self._id and command == self._command:
+                    # User is in list
+                    if count >= self._limit:
+                        # User has hit the limit
+                        if (self._now - datetime.strptime(
+                            time, FMT)) >= timedelta(
+                             hours=int(self._limit_hours)):
+                            # Limit is over, reset
+                            self._userlist.pop(int(edit_count))
+                            list_add = "{0}||{1}||{2}||{3}||{4}||True".format(
+                                        self._id, self._handle,
+                                        self._command, str(1),
+                                        self._now)
+                            self._userlist += [list_add]
+                            self.dump()
+                            return True
+                        if warning == "False":
+                            # Have no tweeted limit warning
+                            self._userlist.pop(int(edit_count))
+                            list_add = "{0}||{1}||{2}||{3}||{4}||True".format(
+                                        self._id, self._handle,
+                                        self._command, str(count),
+                                        time)
+                            self._userlist += [list_add]
+                            self.dump()
+                            return self.get_time(
+                                datetime.strptime(time, FMT), False)
+                        else:
+                            # Still limited
+                            return False
+                    else:
+                        # User is not limited; add
+                        self._userlist.pop(int(edit_count))
+                        list_add = "{0}||{1}||{2}||{3}||{4}||False".format(
+                                    self._id, self._handle,
+                                    self._command, str(int(count) + 1),
+                                    time)
+                        self._userlist += [list_add]
+                        self.dump()
+                        return True
+                edit_count += 1
+
+        # User not in list; add
+        list_add = "{0}||{1}||{2}||1||{3}||False".format(
+                    self._id, self._handle,
+                    self._command, self._now)
         self._userlist.append(list_add)
         self.dump()
         return True
+
+
+def remove_one_limit(twitter_id, command, twitter_handle=""):
+    spam_object = SpamCheck(twitter_id, twitter_handle, command)
+    spam_object.remove_one()
+
+
+def remove_all_limit(twitter_id, command, twitter_handle=""):
+    spam_object = SpamCheck(twitter_id, twitter_handle, command)
+    spam_object.remove_all()
 
 
 def user_spam_check(twitter_id, twitter_handle, command):

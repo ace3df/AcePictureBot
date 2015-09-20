@@ -1,6 +1,10 @@
+from spam_checker import remove_all_limit
 from spam_checker import user_spam_check
 import xml.etree.ElementTree as etree
+from collections import OrderedDict
+from utils import printf as print
 from threading import Thread
+from itertools import islice
 from config import settings
 import functions as func
 import urllib.request
@@ -13,71 +17,89 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 
 BLOCKED_IDS = utils.file_to_list(
                 os.path.join(settings['list_loc'],
-                             "blocked_users.txt"))
+                             "Blocked Users.txt"))
 IGNORE_WORDS = utils.file_to_list(
                 os.path.join(settings['list_loc'],
-                             "blocked_words.txt"))
+                             "Blocked Words.txt"))
 LIMITED = False
 HAD_ERROR = False
 TWEETS_READ = []
+MOD_IDS = [2780494890, 121144139]
 RATE_LIMIT_DICT = {}
+USER_LAST_COMMAND = OrderedDict()
 START_TIME = time.time()
 HANG_TIME = time.time()
-
 API = None
 STATUS_API = None
 SAPI = None
-DEBUG = True
+DEBUG = False
 
 
 def post_tweet(_API, tweet, media=False, command=False, rts=False):
-    if media:
-        media = media.replace("\\", "\\\\")
-    if rts and command:
-        print("[{0}] Tweeting: {1} ({2}): [{3}] {4}".format(
-            time.strftime("%Y-%m-%d %H:%M"),
-            rts.user.screen_name, rts.user.id,
-            command, tweet))
-    else:
-        print("[{0}] Tweeting: {1}".format(
-            time.strftime("%Y-%m-%d %H:%M"),
-            tweet))
-    if rts:
+    try:
         if media:
-            print("(Image: {0})".format(media))
-            _API.update_with_media(media, status=tweet,
+            media = media.replace("\\", "\\\\")
+        if rts and command:
+            print("[{0}] Tweeting: {1} ({2}): [{3}] {4}".format(
+                time.strftime("%Y-%m-%d %H:%M"),
+                rts.user.screen_name, rts.user.id,
+                command, tweet))
+        else:
+            print("[{0}] Tweeting: {1}".format(
+                time.strftime("%Y-%m-%d %H:%M"),
+                tweet))
+        if rts:
+            if media:
+                print("(Image: {0})".format(media))
+                _API.update_with_media(media, status=tweet,
+                                       in_reply_to_status_id=rts.id)
+            else:
+                _API.update_status(status=tweet,
                                    in_reply_to_status_id=rts.id)
         else:
-            _API.update_status(status=tweet,
-                               in_reply_to_status_id=rts.id)
-    else:
-        if media:
-            print("(Image: {0})".format(media))
-            _API.update_with_media(media, status=tweet)
-        else:
-            _API.update_status(status=tweet)
+            if media:
+                print("(Image: {0})".format(media))
+                _API.update_with_media(media, status=tweet)
+            else:
+                _API.update_status(status=tweet)
+    except:
+        # 99% of the time it's because they delete their tweets
+        # Twitter gets confused and BAM!
+        # The 1% is probs just twitter being twitter
+        pass
 
 
 def tweet_command(_API, status, tweet, command):
     tweet_image = False
     user = status.user
+
+    # Mod command
+    is_mod = [True if user.id in MOD_IDS else False][0]
+    if command == "DelLimits":
+        if is_mod:
+            their_id, cmd = tweet.split(' ', 2)
+            remove_all_limit(their_id, cmd)
+            print("[INFO] Removed limits for {0} - {1}".format(
+                their_id, cmd))
+        return False, False
+
+    if not is_mod:
+        user_is_limited = user_spam_check(user.id, user.screen_name, command)
+        if isinstance(user_is_limited, str):
+            # User hit limit, tweet warning
+            command = ""
+            tweet = user_is_limited
+        elif not user_is_limited:
+            # User is limited, return
+            print("[{0}] User is limited! Ignoring...".format(
+                time.strftime("%Y-%m-%d %H:%M")))
+            return False
     if settings['count_on']:
         func.count_trigger(command, user.id)
-    user_is_limited = user_spam_check(user.id, user.screen_name, command)
-
-    if isinstance(user_is_limited, str):
-        # User hit limit, tweet warning
-        command = ""
-        tweet = user_is_limited
-    elif not user_is_limited:
-        # User is limited, return
-        print("[{0}] User is limited! Ignoring...".format(
-            time.strftime("%Y-%m-%d %H:%M")))
-        return False
 
     # Joke Commands
     if command == "Spoiler":
@@ -85,7 +107,7 @@ def tweet_command(_API, status, tweet, command):
                     os.path.join(settings['list_loc'],
                                  "spoilers.txt")))
     elif command == "!Level":
-        tweet = func.get_lvl(user.id)
+        tweet = func.get_level(user.id)
 
     # Main Commands
     if command == "Waifu":
@@ -104,7 +126,6 @@ Help: {0}""".format(func.config_get('Help URLs', 'must_follow'))
                                                     tweet, gender)
 
     if "My" in command:
-        print(gender)
         tweet, tweet_image = func.mywaifu(user.id, gender)
 
     if "Remove" in command:
@@ -143,13 +164,15 @@ Help: {0}""".format(func.config_get('Help URLs', 'must_follow'))
     if command == "Source":
         tweet = func.source(_API, status)
 
-    tweet = "@{0} {1}".format(user.screen_name, tweet)
-    post_tweet(_API, tweet, tweet_image, command, status)
+    if tweet:
+        tweet = "@{0} {1}".format(user.screen_name, tweet)
+        post_tweet(_API, tweet, tweet_image, command, status)
 
 
 def acceptable_tweet(status):
-    global BLOCKED_IDS
+    global USER_LAST_COMMAND
     global IGNORE_WORDS
+    global BLOCKED_IDS
 
     tweet = status.text
     user = status.user
@@ -159,17 +182,16 @@ def acceptable_tweet(status):
         return False, False
 
     if DEBUG:
-        DEBUG_IDs = [2780494890, 121144139]
-        if user.id not in DEBUG_IDs:
+        if user.id not in MOD_IDS:
             return False, False
 
     # Reload incase of manual updates.
     BLOCKED_IDS = utils.file_to_list(
                     os.path.join(settings['list_loc'],
-                                 "blocked_users.txt"))
+                                 "Blocked Users.txt"))
     IGNORE_WORDS = utils.file_to_list(
                     os.path.join(settings['list_loc'],
-                                 "blocked_words.txt"))
+                                 "Blocked Words.txt"))
 
     # Ignore bots and bad boys.
     if str(user.id) in BLOCKED_IDS:
@@ -214,6 +236,20 @@ def acceptable_tweet(status):
         else:
             return False, False
 
+    if command == "Reroll":
+        try:
+            command = USER_LAST_COMMAND[user.id]
+            if "register" in command:
+                return False, False
+        except:
+            return False, False
+    else:
+        USER_LAST_COMMAND[user.id] = command
+        if len(USER_LAST_COMMAND) > 30:
+            USER_LAST_COMMAND = (OrderedDict(
+                islice(USER_LAST_COMMAND.items(),
+                       20, None)))
+
     # Make sure the user isn't going ham on comamnds.
     # This is to make sure the bot doesn't get closer to being
     # limited from only one user.
@@ -236,11 +272,14 @@ def acceptable_tweet(status):
         # User not found, add them to RATE_LIMIT_DICT.
         # Before that quickly go through RATE_LIMIT_DICT
         # and remove all the finished unused users.
-        for person in RATE_LIMIT_DICT:
-            if ((rate_time - RATE_LIMIT_DICT[person][0])
+        # As you can't edit a dict while in it
+        # create a fake copy and then pass that through
+        TEMP_DICT = RATE_LIMIT_DICT
+        for person in TEMP_DICT:
+            if ((rate_time - TEMP_DICT[person][0])
                .total_seconds() > 18000):
                 del RATE_LIMIT_DICT[person]
-
+        del TEMP_DICT
         RATE_LIMIT_DICT[user.id] = [rate_time, 1]
 
     # Fail check
@@ -271,8 +310,13 @@ def status_account(STATUS_API):
     def read_rss(url, name, pre_msg, find_xml):
         recent_id = open(os.path.join(settings['ignore_loc'],
                          name), 'r').read()
-        rss = urllib.request.urlopen(url).read().decode("utf-8")
-        xml = etree.fromstring(rss)
+        try:
+            rss = urllib.request.urlopen(url).read().decode("utf-8")
+            xml = etree.fromstring(rss)
+        except:
+            # Don't need anymore than this for something like this
+            print("Failed to read/parse {0} ({1}) RSS".format(name, url))
+            return False
 
         if bool(find_xml['sub_listing']):
             entry = xml[0][find_xml['entries_in']]
@@ -301,17 +345,6 @@ def status_account(STATUS_API):
         post_tweet(STATUS_API, msg)
 
     while True:
-        url = "http://ace3df.github.io/AcePictureBot/feed.xml"
-        name = "BlogHistory.txt"
-        pre_msg = "[Blog Entry]]\n"
-        find_xml = {"sub_listing": True,
-                    "entries_in": 7,
-                    "entry_id": "guid",
-                    "link_id": "guid",
-                    "get_href": False,
-                    "msg_id": "title"}
-        read_rss(url, name, pre_msg, find_xml)
-        time.sleep(5)
         url = "https://github.com/ace3df/AcePictureBot/commits/master.atom"
         name = "GitCommit.txt"
         pre_msg = "[Git Commit]\n"
@@ -322,7 +355,7 @@ def status_account(STATUS_API):
                     "get_href": True,
                     "msg_id": "{http://www.w3.org/2005/Atom}content"}
         read_rss(url, name, pre_msg, find_xml)
-        time.sleep(60)
+        time.sleep(300)
 
 
 class CustomStreamListener(tweepy.StreamListener):
@@ -358,33 +391,32 @@ def start_stream(SAPI=None):
     print("[INFO] Reading Twitter Stream!")
     sapi.filter(track=[x.lower() for x in settings['twitter_track']],
                 async=True)
-    return True
+    return sapi
 
 
-def handle_stream(SAPI):
-    start_stream(SAPI)
+def handle_stream(SAPI, STATUS_API=False):
+    sapi = start_stream(SAPI)
     global HANG_TIME
     # Create a loop which makes sure that the stream
     # hasn't been haning at all.
     # If it has, it will try to reconnect.
+
+    # FOR NOW KEEP THIS AS FALSE
     while True:
         time.sleep(5)
         elapsed = (time.time() - HANG_TIME)
         if elapsed > 600:
             print("[WARNING] STREAM HANING. RESTARTING...")
             try:
-                # Tweet to the status bot that the stream was hanging.
-                msg = settings['twitter_track'][0] + \
-                 ":\nStream haning. Restarting..."
-                print(msg)
+                if STATUS_API:
+                    # Tweet to the status bot that the stream was hanging.
+                    msg = "[WARNING] " + settings['twitter_track'][0] + \
+                     ":\nStream haning. Restarting..."
+                    post_tweet(STATUS_API, msg)
             except:
                 pass
-            try:
-                # Try and disconnect the stream if it's not done already.
-                SAPI.disconnect()
-            except:
-                pass
-            time.sleep(1)
+            sapi.disconnect()
+            time.sleep(3)
             # Restart the stream and catch up on late tweets.
             Thread(target=start_stream).start()
             Thread(target=read_notifications,
@@ -413,6 +445,7 @@ def read_notifications(_API, reply, tweets_read):
                                "tweets_read.txt"),
                   'w') as file:
             file.write("\n".join(TWEETS_READ))
+    print("[INFO] Finished reading late tweets!")
 
 if __name__ == '__main__':
     # Load read IDs of already read tweets.
@@ -424,10 +457,10 @@ if __name__ == '__main__':
     SAPI = func.login(REST=False)
     # Get the status account API.
     STATUS_API = func.login(status=True)
-    # Start 3 threads:
-    # read_notifcations (for late start ups).
+    # Start 2 threads:
+    # First read_notifcations (for late start ups).
     # status_account (to check if there is a problem).
     # handle_stream (check if the stream has disconnected/haning).
-    Thread(target=read_notifications, args=(API, True, TWEETS_READ)).start()
+    read_notifications(API, True, TWEETS_READ)
     Thread(target=status_account, args=(STATUS_API, )).start()
-    Thread(target=handle_stream, args=(SAPI, )).start()
+    Thread(target=handle_stream, args=(SAPI, STATUS_API)).start()
