@@ -17,7 +17,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 
 BLOCKED_IDS = utils.file_to_list(
                 os.path.join(settings['list_loc'],

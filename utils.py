@@ -167,7 +167,11 @@ def download_image(url, path="", filename=""):
            'Connection': 'keep-alive'}
     req = urllib.request.Request(url, headers=hdr)
     response = urllib.request.urlopen(req)
-    data = response.read()
+    try:
+        data = response.read()
+    except:
+        # Loss data / IncompleteRead
+        return False
     if path == "":
         path = os.path.join(settings['image_loc'], "downloads")
     else:
@@ -409,6 +413,8 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                     break
             ignore_urls.append(url)
             browser.open(url)
+            if not browser:
+                return False
             image_tags = []
             if site == 0:
                 site_tag = browser.find('ul', id="tag-sidebar")

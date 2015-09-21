@@ -23,8 +23,8 @@ class WaifuRegisterClass(object):
         self.STOP = False
 
         if gender == 0:
-            self.end_tags_main = "+solo+1girl"
-            self.end_tags = "+1girl+-male+-1boy"
+            self.end_tags_main = "+solo"
+            self.end_tags = "+-male+-1boy"
             self.gender = "waifu"
             self.filename = "users_waifus.json"
             self.pic_limit = 15
@@ -33,7 +33,7 @@ class WaifuRegisterClass(object):
             self.end_tags = "+solo+-1girl+-female"
             self.gender = "husbando"
             self.filename = "users_husbandos.json"
-            self.pic_limit = 15
+            self.pic_limit = 10
 
         self.subscribe = False
         self.override = False
@@ -122,7 +122,6 @@ class WaifuRegisterClass(object):
             return False
 
     def reverse_waifu(self, name):
-        # self.reversed = True
         name = name.split("_")
         name = '_'.join(reversed(name))
         return name
@@ -232,10 +231,11 @@ Spanish: {2}
 
     def get_site_count(self, site):
         site_result = self.has_enough_images(self.soup, site)
-        if not site_result:
+        if not site_result or site_result < self.pic_limit:
             # Not enough/no images
             # Try reversing the name
             self.name = self.reverse_waifu(self.name)
+            self.soup = self.get_soup(site)
             site_result = self.has_enough_images(self.soup, site, True)
         if site == 0:
             if self.sankaku_count_re > self.sankaku_count:
