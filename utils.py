@@ -448,7 +448,8 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
             try_count = 0
             if ignore_list:
                 while url in ignore_urls:
-                    url = "%s/%s" % (url_start, random.choice(good_image_links))
+                    url = "%s/%s" % (url_start,
+                                     random.choice(good_image_links))
                     try_count = try_count + 1
                     if try_count == 20:
                         break
@@ -549,28 +550,32 @@ def get_image(path, ignore_list=False):
         return os.path.join(path, img)
     else:
         try:
-            ignore_urls = open(
+            ignore_imgs = open(
                 os.path.join(
                     settings['ignore_loc'],
                     ignore_list), 'r').read().splitlines()
         except:
-            ignore_urls = []
-        safe_break = 0
+            ignore_imgs = []
         try:
             files = [p for p in pathlib.Path(path).iterdir() if p.is_file()]
             img = path_leaf(random.choice(files))
         except:
             # Emptry path
             return False
-        while img in ignore_urls:
+        hex_data = image_hash(os.path.join(path, img))
+        safe_break = 0
+        while hex_data in ignore_imgs:
             safe_break += 1
             if safe_break == 10:
-                break
+                return False
             img = path_leaf(random.choice(files))
-        ignore_urls.append(img)
+            hex_data = image_hash(os.path.join(path, img))
+            if hex_data in ignore_imgs:
+                continue
+        ignore_imgs.append(hex_data)
         with open(os.path.join(
                     settings['ignore_loc'], ignore_list), 'w') as file:
-            file.write('\n'.join(ignore_urls))
+            file.write('\n'.join(ignore_imgs))
         return os.path.join(path, img)
 
 
