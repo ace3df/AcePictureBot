@@ -3,6 +3,7 @@ Kuroi Nanako||Lucky Star
 Shizuka Nekonome||Rosario + Vampire
 Mizuho Kazami||Onegai Teacher
 Nagase Jun||Kami nomi zo Shiru Sekai
+Nikaido Yuri||Kami nomi zo Shiru Sekai
 Yamanaka Sawako||K-On!
 Kakinozaka Ayana||Asa Made Jugyou Chu!
 Marie Mjolnir||Soul Eater
@@ -53,7 +54,6 @@ Saotome Kazuko||Mahou Shoujo Madoka Magica
 Kyoko-sensei||Nisekoi
 Takahashi Maya||Amagami
 Yamada Maya||Infinite Stratos
-Kitagawa Misa||Photo Kano
 Ootani Momoko||Photo Kano
 Amagi Mizuha||Vividred Operation
 Kazami Mizuho||Onegai Teacher
@@ -69,3 +69,5 @@ Yagami Tsurugi||Sasami-san@ganbaranai
 Douraku Utage||Noucome
 Yumi Azusa||Soul Eater
 Nikaidou Yuri||Kami Nomi zo Shiru Sekai
+Chris (Kore wa Zombie Desu ka?)||Kore wa Zombie Desu ka?
+Ariel (Kore wa Zombie Desu ka?)||Kore wa Zombie Desu ka?

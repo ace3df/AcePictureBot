@@ -230,13 +230,14 @@ def waifu(gender, args="", otp=False):
               "idolmaster-cinderella-girls"]
     if len(args) > 4:
         for entry in lines:
-            # Personally not a huge fan of people that
-            # keep doing nothing but
-            # Waifu High School DxD for weeks!
-            # So simply blacklist that show
-            # and other ones that a group of people
-            # use nothing but that said show,
-            # as well as shows that are used in triggers.
+            """ Personally not a huge fan of people that
+                keep doing nothing but
+                Waifu High School DxD for weeks!
+                So simply blacklist that show
+                and other ones that a group of people
+                use nothing but that said show,
+                as well as shows that are used in triggers.
+            """
             if slugify(entry[1], word_boundary=True) in ignore:
                 continue
             if slugify(args,
@@ -248,7 +249,7 @@ def waifu(gender, args="", otp=False):
         if otp:
             t = 2
         else:
-            t = 7
+            t = 5
         if len(matched) > t:
             result = random.choice(matched)
     if not result:
@@ -299,13 +300,17 @@ Help: {2}""".format(gender, gender,
         return m, False
 
     tags = user['name'] + user['tags']
+    if user.get('max_page'):
+        max_page = user['max_page']
+    else:
+        max_page = 0
     path_name = slugify(user['name'],
                         word_boundary=True, separator="_")
     path = os.path.join(settings['image_loc'],
                         gender.lower(), path_name)
     ignore_list = "user_ignore/{0}".format(user['twitter_id'])
     tweet_image = utils.get_image_online(tags, user['web_index'],
-                                         30, ignore_list, path)
+                                         max_page, ignore_list, path)
     if not tweet_image:
         tweet_image = utils.get_image(path, ignore_list)
     if not tweet_image:
@@ -338,6 +343,7 @@ def waifuregister(user_id, username, name, gender):
         return False, False
     elif len(name) <= 3:
         return False, False
+    name = name.replace("+", "")
 
     # Remove spaces in "name ( show )"
     # Weebs man
@@ -838,15 +844,13 @@ def source(_API, status):
             tweet = _API.get_status(status.in_reply_to_status_id)
             tweet = tweet.entities['media'][0]['media_url_https']
             if ".mp4" in tweet:
-                m = "Sorry, source is a video and not an image!"
-                return m
+                return "Sorry, source is a video and not an image!"
             return tweet
         except:
-            m = "Are you sure you're asking for source on an image?"
-            return m
+            return "Are you sure you're asking for source on an image?"
 
     tweeted_image = tweeted_image(_API, status)
-    if "Are you sure" in tweeted_image:
+    if ("Are you sure" in tweeted_image) or ("source is a" in tweeted_image):
         count_trigger("source")
         return tweeted_image
 
@@ -856,27 +860,23 @@ def source(_API, status):
     if not artist and not names and not series:
         # No source at all
         return saucenao
-
     if artist:
         artist = "\nBy: {0}".format(utils.short_string(artist, 15))
-
     if names:
         names = "\nBased on: {0} ".format(utils.short_string(names, 15))
-
     if series:
         series = "\nFrom: {0} ".format(utils.short_string(series, 15))
-
     if translation:
         translation = "\nTL: {0} ".format(translation)
-
+    seen = set()
     handles = status.text.lower()
     handles = [word for word in handles.split() if word.startswith('@')]
+    handles = [x for x in handles if x not in seen and not seen.add(x)]
     handles = ' '.join(handles).replace(
         "@" + settings["twitter_track"][0].lower(), "")
     m = "{0}{1}{2}{3}".format(artist, names, series,
                               translation)
     if (len(m) + 24) > 110:
         m = utils.make_paste(m)
-    m = "{0}\nSource Info: {1}\n{2}".format(handles, m, saucenao)
-    m = m.replace("&Amp;", "&")
-    return m
+    m = "{0}\n{1}\n{2}".format(handles, m, saucenao)
+    return m.replace("&Amp;", "&")

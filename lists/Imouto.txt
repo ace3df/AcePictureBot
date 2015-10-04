@@ -51,6 +51,7 @@ Takanashi Miu||Papa no Iukoto wo Kikinasai!
 Gokou Hinata||Oreimo
 Uryuu Sakuno||Mashiroiro Symphony
 Yaegashi Rina||Kokoro Connect
+Tachibana Miya||Amagami SS
 Amatsuka Tsurara||Baby Princess
 Koshigaya Komari||Non Non Biyori
 Koshigaya Natsumi||Non Non Biyori
@@ -89,3 +90,5 @@ Kurosaki Yuzu||Bleach
 Patricia Thompson||Soul Eater
 Nishijou Nanami||Chäos;Head
 Isara Gunther||Valkyria Chronicles
+Gokou Hinata||OreImo
+Gokou Tamaki||OreImo

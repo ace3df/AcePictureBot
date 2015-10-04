@@ -40,7 +40,7 @@ class SpamCheck(object):
     def dump(self):
         with open(
                 os.path.join(
-                    settings['ignore_loc'], 'user limits.txt'), 'w') as file:
+                    settings['ignore_loc'], 'User Limits.txt'), 'w') as file:
             file.write('\n'.join(self._userlist))
         return True
 

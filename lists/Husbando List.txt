@@ -45,9 +45,9 @@ Sasagawa Ryouhei||Katekyo Hitman Reborn!||http://cdn.myanimelist.net/images/char
 Allen Walker||D.Gray-man||http://cdn.myanimelist.net/images/characters/2/51942.jpg
 Kanda Yuu||D.Gray-man||http://cdn.myanimelist.net/images/characters/9/68714.jpg
 
-Ash||Pokemon||http://cdn.myanimelist.net/images/characters/6/276229.jpg
-Takeshi (pokemon)||Pokemon||http://cdn.myanimelist.net/images/characters/13/99557.jpg
-Kojirou (pokemon)||Pokemon||http://cdn.myanimelist.net/images/characters/4/278095.jpg
+Satoshi (Pokemon)||Pokemon||http://cdn.myanimelist.net/images/characters/6/276229.jpg
+Takeshi (Pokemon)||Pokemon||http://cdn.myanimelist.net/images/characters/13/99557.jpg
+Kojirou (Pokemon)||Pokemon||http://cdn.myanimelist.net/images/characters/4/278095.jpg
 
 Sakata Gintoki||Gintama||http://cdn.myanimelist.net/images/characters/9/120516.jpg
 Shimura Shinpachi||Gintama||http://cdn.myanimelist.net/images/characters/14/114081.jpg
@@ -177,5 +177,65 @@ Souma Hiroomi||Working!!||http://cdn.myanimelist.net/images/characters/4/87906.j
 Satou Jun||Working!!||http://cdn.myanimelist.net/images/characters/5/87907.jpg
 
 Suminoe Keita||Kiss x Sis||http://cdn.myanimelist.net/images/characters/16/83710.jpg
+
+Sai Akuto||Ichiban Ushiro no Daimaou||http://cdn.myanimelist.net/images/characters/4/87609.jpg
+
+Ichinomiya Kou||Arakawa Under the Bridge||http://cdn.myanimelist.net/images/characters/5/151031.jpg
+Hoshi (Arakawa)||Arakawa Under the Bridge||http://cdn.myanimelist.net/images/characters/10/85129.jpg
+
+Komuro Takashi||Highschool of the Dead||http://cdn.myanimelist.net/images/characters/7/85770.jpg
+
+Ozaki Toshio||Shiki||http://cdn.myanimelist.net/images/characters/6/94100.jpg
+Yuuki Natsuno||Shiki||http://cdn.myanimelist.net/images/characters/12/94549.jpg
+
+Tachibana Junichi||Amagami SS||http://cdn.myanimelist.net/images/characters/15/94527.jpg
+
+Morino Ryoushi||Ookami-san||http://cdn.myanimelist.net/images/characters/13/94476.jpg
+
+Sion Astal||Densetsu no Yuusha no Densetsu||http://cdn.myanimelist.net/images/characters/4/105242.jpg
+Ryner Lute||Densetsu no Yuusha no Densetsu||http://cdn.myanimelist.net/images/characters/4/235589.jpg
+
+Nura Rikuo||Nurarihyon no Mago||http://cdn.myanimelist.net/images/characters/4/90134.jpg
+
+Kakazu Kio||Asobi ni Iku yo!||http://cdn.myanimelist.net/images/characters/11/94546.jpg
+
+Kousaka Kyousuke||OreImo||http://cdn.myanimelist.net/images/characters/15/101411.jpg
+
+Katsuragi Keima||Kami nomi zo Shiru Sekai||http://cdn.myanimelist.net/images/characters/8/122018.jpg
+
+Mashiro Moritaka||Bakuman||http://cdn.myanimelist.net/images/characters/14/133311.jpg
+Takagi Akito||Bakuman||http://cdn.myanimelist.net/images/characters/8/142279.jpg
+Fukuda Shinta||Bakuman||http://cdn.myanimelist.net/images/characters/6/112128.jpg
+Hiramaru Kazuya||Bakuman||http://cdn.myanimelist.net/images/characters/8/113540.jpg
+Niizuma Eiji||Bakuman||http://cdn.myanimelist.net/images/characters/14/175495.jpg
+
+Kasugano Haruka||Yosuga no Sora||http://cdn.myanimelist.net/images/characters/11/105672.jpg
+
+Sado Taro||MM!||http://cdn.myanimelist.net/images/characters/2/101188.jpg
+
+Yagyuu Muneakira||Hyakka Ryouran: Samurai Girls||http://cdn.myanimelist.net/images/characters/10/99358.jpg
+
+Shindou Sugata||Star Driver||http://cdn.myanimelist.net/images/characters/5/109503.jpg
+Tsunashi Takuto||Star Driver||http://cdn.myanimelist.net/images/characters/9/104281.jpg
+
+Aikawa Ayumu||Kore wa Zombie Desu ka?||http://cdn.myanimelist.net/images/characters/5/109594.jpg
+
+Orimura Ichika||Infinite Stratos||http://cdn.myanimelist.net/images/characters/6/216545.jpg
+
+Kujou Kazuya||Gosick||http://cdn.myanimelist.net/images/characters/3/85505.jpg
+
+Furuichi Takayuki||Beelzebub||http://cdn.myanimelist.net/images/characters/2/108786.jpg
+Oga Tatsumi||Beelzebub||http://cdn.myanimelist.net/images/characters/14/154439.jpg
+
+Fujiwara Yumeji||Yumekui Merry||http://cdn.myanimelist.net/images/characters/6/107745.jpg
+
+Hashida Itaru||Steins;Gate||http://cdn.myanimelist.net/images/characters/6/113767.jpg
+Okabe Rintarou||Steins;Gate||http://cdn.myanimelist.net/images/characters/6/122643.jpg
+
+Okumura Yukio||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/13/114364.jpg
+Okumura Rin||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/10/114367.jpg
+Amaimon||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/2/159261.jpg
+Mephisto Pheles||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/13/117925.jpg
+Shima Renzou||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/11/133259.jpg
 
 # Video Games

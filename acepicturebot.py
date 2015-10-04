@@ -17,7 +17,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.1.1"
+__version__ = "2.2.0"
 
 BLOCKED_IDS = utils.file_to_list(
                 os.path.join(settings['list_loc'],
@@ -216,7 +216,7 @@ def acceptable_tweet(status):
     tweet = re.sub(' +', ' ', tweet)
 
     # Remove @UserNames (usernames could trigger commands alone)
-    tweet = ' '.join(re.sub("(@[A-Za-z0-9]+)", " ", tweet).split())
+    tweet = ' '.join(re.sub("(@[A-Za-z0-9_]+)", " ", tweet).split())
 
     # Find the command they used.
     command = utils.get_command(tweet)
@@ -240,6 +240,8 @@ def acceptable_tweet(status):
         try:
             command = USER_LAST_COMMAND[user.id]
             if "register" in command:
+                return False, False
+            elif "my" in command:
                 return False, False
         except:
             return False, False
@@ -398,7 +400,7 @@ def handle_stream(SAPI, STATUS_API=False):
     sapi = start_stream(SAPI)
     global HANG_TIME
     # Create a loop which makes sure that the stream
-    # hasn't been haning at all.
+    # hasn't been hanging at all.
     # If it has, it will try to reconnect.
 
     # FOR NOW KEEP THIS AS FALSE
@@ -406,12 +408,12 @@ def handle_stream(SAPI, STATUS_API=False):
         time.sleep(5)
         elapsed = (time.time() - HANG_TIME)
         if elapsed > 600:
-            print("[WARNING] STREAM HANING. RESTARTING...")
+            print("[WARNING] STREAM HANGING. RESTARTING...")
             try:
                 if STATUS_API:
                     # Tweet to the status bot that the stream was hanging.
                     msg = "[WARNING] " + settings['twitter_track'][0] + \
-                     ":\nStream haning. Restarting..."
+                     ":\nStream hanging. Restarting..."
                     post_tweet(STATUS_API, msg)
             except:
                 pass
@@ -460,7 +462,7 @@ if __name__ == '__main__':
     # Start 2 threads:
     # First read_notifcations (for late start ups).
     # status_account (to check if there is a problem).
-    # handle_stream (check if the stream has disconnected/haning).
+    # handle_stream (check if the stream has disconnected/hanging).
     read_notifications(API, True, TWEETS_READ)
     Thread(target=status_account, args=(STATUS_API, )).start()
     Thread(target=handle_stream, args=(SAPI, STATUS_API)).start()

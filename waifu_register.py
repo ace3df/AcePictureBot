@@ -24,13 +24,13 @@ class WaifuRegisterClass(object):
 
         if gender == 0:
             self.end_tags_main = "+solo"
-            self.end_tags = "+-male+-1boy"
+            self.end_tags = "+-male+-1boy+-genderswap"
             self.gender = "waifu"
             self.filename = "users_waifus.json"
             self.pic_limit = 15
         elif gender == 1:
             self.end_tags_main = "+solo+-1girl+-female"
-            self.end_tags = "+solo+-1girl+-female"
+            self.end_tags = "+solo+-1girl+-female+-genderswap"
             self.gender = "husbando"
             self.filename = "users_husbandos.json"
             self.pic_limit = 10
@@ -209,7 +209,7 @@ Spanish: {2}
             else:
                 self.safebooru_count = post_count
         if post_count >= self.pic_limit:
-            return True
+            return post_count
         else:
             # There isn't enough images
             # 10 isn't enough for how much people actually use MyWaifu
@@ -234,6 +234,8 @@ Spanish: {2}
         if not site_result or site_result < self.pic_limit:
             # Not enough/no images
             # Try reversing the name
+            if "(" in self.name:
+                return
             self.name = self.reverse_waifu(self.name)
             self.soup = self.get_soup(site)
             site_result = self.has_enough_images(self.soup, site, True)
@@ -331,4 +333,5 @@ Spanish: {2}
         # folder for that person
         self.four_images()
         self.save_to_file()
+        self.user_waifus = ""
         return True

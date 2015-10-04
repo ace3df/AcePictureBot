@@ -12,7 +12,6 @@ import subprocess
 import requests
 import hashlib
 import pathlib
-import pickle
 import random
 import ntpath
 import json
@@ -125,6 +124,32 @@ def scrape_site(url, cookie_file=""):
         return False
 
 
+def image_hash(image, hash_size=8):
+    if isinstance(image, str):
+        image = Image.open(image)
+    image = image.convert('L').resize(
+        (hash_size + 1, hash_size),
+        Image.ANTIALIAS,
+    )
+
+    difference = []
+    for row in range(hash_size):
+        for col in range(hash_size):
+            pixel_left = image.getpixel((col, row))
+            pixel_right = image.getpixel((col + 1, row))
+            difference.append(pixel_left > pixel_right)
+    decimal_value = 0
+    hex_string = []
+    for index, value in enumerate(difference):
+        if value:
+            decimal_value += 2**(index % 8)
+        if (index % 8) == 7:
+            hex_string.append(hex(decimal_value)[2:].rjust(2, '0'))
+            decimal_value = 0
+
+    return ''.join(hex_string)
+
+
 def video_to_gif(video):
     """
     Return encoded gif path
@@ -152,7 +177,16 @@ def video_to_gif(video):
     return filename
 
 
-def download_image(url, path="", filename=""):
+def download_image(url, path="", filename="", ignore_list=""):
+    if ignore_list:
+        try:
+            ignore_imgs = open(
+                os.path.join(
+                    settings['ignore_loc'],
+                    ignore_list), 'r').read().splitlines()
+        except:
+            ignore_imgs = []
+
     imgTypes = {"jpg": "image/jpeg",
                 "jpeg": "image/jpeg",
                 "png": "image/png",
@@ -160,7 +194,7 @@ def download_image(url, path="", filename=""):
                 "webm": "video/webm"}
     filepath = urlparse(url).path
     ext = os.path.splitext(filepath)[1].lower()
-    if not ext[ext.rfind(".")+1:] in imgTypes:
+    if not ext[ext.rfind(".") + 1:] in imgTypes:
         return False
 
     hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)',
@@ -191,7 +225,7 @@ def download_image(url, path="", filename=""):
     else:
         tweet_image = os.path.join(path, str(filename))
 
-    if "webm" in ext[ext.rfind(".")+1:]:
+    if "webm" in ext[ext.rfind(".") + 1:]:
         tweet_image = video_to_gif(tweet_image)
         if not tweet_image:
             return False
@@ -210,6 +244,14 @@ def download_image(url, path="", filename=""):
             return False
 
     pil_image = Image.open(tweet_image)
+    if ignore_list:
+        hex_data = image_hash(pil_image)
+        if hex_data in ignore_imgs:
+            return False
+        ignore_imgs.append(hex_data)
+        with open(os.path.join(
+                    settings['ignore_loc'], ignore_list), 'w') as file:
+            file.write('\n'.join(ignore_imgs))
     pil_image.load()
     width, height = pil_image.size
     del pil_image
@@ -239,18 +281,16 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
         site = 1
     if websites['danbooru'] == "False" and site == 1:
         site = 0
-
     if ignore_list:
         try:
-            ignore_urls = pickle.load(open(
-                    os.path.join(settings['ignore_loc'], ignore_list), 'rb'))
+            ignore_urls = open(
+                os.path.join(
+                    settings['ignore_loc'],
+                    ignore_list), 'r').read().splitlines()
         except:
             ignore_urls = []
-    else:
-        ignore_list = "img_urls.pkl"
-        ignore_urls = []
-
-    tried_pages = [high_page]
+    tried_pages = [high_page + 1]
+    last_tries = 0
     try_count = 0
     low_page = 0
     page = 0
@@ -306,7 +346,7 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
             tags += "+rating:safe"
         if "order:popular" not in tags:
             if tag_count < 7:
-                tags += "order:popular"
+                tags += "+order:popular"
     if login:
         if not os.path.exists(cookie_file):
             global s
@@ -321,6 +361,7 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
         tried_pages = [high_page * rand]
     else:
         rand = 1
+    x = min(tried_pages)
     while not good_image:
         while not found_image:
             while not found_page:
@@ -329,23 +370,22 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                 if try_count == 15:
                     return False
                 page = str(int(random.randint(low_page, high_page) * rand))
-                while int(page) in tried_pages:
+                while int(page) in tried_pages or int(page) > int(x):
                     if int(page) == 0:
                         break
-                    if not x:
-                        x = high_page
                     page = str(int(random.randint(low_page, high_page) * rand))
-                    if int(page) > int(x):
-                        continue
-                tried_pages.append(int(page))
-                x = min(tried_pages)
+                    if int(page) < int(x):
+                        break
                 if not pid:
                     page_url = "&page=" + str(page)
                 elif pid:
                     page_url = "&pid=" + str(page)
                 url = "%s%s%s" % (url_search, tags, page_url)
-                if not browser:
-                    browser = scrape_site(url, cookie_file)
+                tried_pages.append(int(page))
+                tried_pages = [int(i) for i in tried_pages]
+                x = min(tried_pages)
+                browser = scrape_site(url, cookie_file)
+                printf("Searching:\n" + str(browser))
                 if not browser:
                     # Time'd out
                     return False
@@ -406,15 +446,20 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
             else:
                 url = "%s/%s" % (url_start, random.choice(good_image_links))
             try_count = 0
-            while url in ignore_urls:
-                url = "%s/%s" % (url_start, random.choice(good_image_links))
-                try_count = try_count + 1
-                if try_count == 20:
-                    break
-            ignore_urls.append(url)
+            if ignore_list:
+                while url in ignore_urls:
+                    url = "%s/%s" % (url_start, random.choice(good_image_links))
+                    try_count = try_count + 1
+                    if try_count == 20:
+                        break
+                ignore_urls.append(url)
             browser.open(url)
             if not browser:
                 return False
+            if ignore_list:
+                with open(os.path.join(
+                            settings['ignore_loc'], ignore_list), 'w') as file:
+                    file.write('\n'.join(ignore_urls))
             image_tags = []
             if site == 0:
                 site_tag = browser.find('ul', id="tag-sidebar")
@@ -464,14 +509,11 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
             if any([item.lower()in settings['ignore_tags']
                     for item in image_tags]):
                 continue
-            if any(" (cosplay)" in s for s in image_tags):
+            if any("(cosplay)" in s for s in image_tags):
                 continue
             break
 
-        pickle.dump(ignore_urls, open(
-            os.path.join(settings['ignore_loc'], ignore_list), 'wb'))
         image_url = browser.find('img', attrs={'id': 'image'})
-
         if not image_url:
             image_url = browser.find('video', attrs={'id': 'image'})
         if site == 0:
@@ -486,8 +528,13 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                 return False
         elif site == 2:
             url = image_url['src']
-        tweet_image = download_image(url, path)
-        return tweet_image
+        tweet_image = download_image(url=url, path=path,
+                                     ignore_list=ignore_list)
+        if last_tries == 5:
+            # Just return last found
+            return tweet_image
+        if tweet_image:
+            return tweet_image
 
 
 def get_image(path, ignore_list=False):
@@ -502,21 +549,28 @@ def get_image(path, ignore_list=False):
         return os.path.join(path, img)
     else:
         try:
-            ignore_urls = pickle.load(open(
-                    os.path.join(settings['ignore_loc'], ignore_list), 'rb'))
+            ignore_urls = open(
+                os.path.join(
+                    settings['ignore_loc'],
+                    ignore_list), 'r').read().splitlines()
         except:
             ignore_urls = []
         safe_break = 0
-        files = [p for p in pathlib.Path(path).iterdir() if p.is_file()]
-        img = path_leaf(random.choice(files))
+        try:
+            files = [p for p in pathlib.Path(path).iterdir() if p.is_file()]
+            img = path_leaf(random.choice(files))
+        except:
+            # Emptry path
+            return False
         while img in ignore_urls:
             safe_break += 1
             if safe_break == 10:
                 break
             img = path_leaf(random.choice(files))
         ignore_urls.append(img)
-        pickle.dump(ignore_urls, open(
-            os.path.join(settings['ignore_loc'], ignore_list), 'wb'))
+        with open(os.path.join(
+                    settings['ignore_loc'], ignore_list), 'w') as file:
+            file.write('\n'.join(ignore_urls))
         return os.path.join(path, img)
 
 
