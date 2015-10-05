@@ -257,7 +257,6 @@ def acceptable_tweet(status):
     # This is to make sure the bot doesn't get closer to being
     # limited from only one user.
     rate_time = datetime.datetime.now()
-
     if user.id in RATE_LIMIT_DICT:
         # User is limited (5 hours in seconds (18000))
         if ((rate_time - RATE_LIMIT_DICT[user.id][0])
@@ -275,14 +274,10 @@ def acceptable_tweet(status):
         # User not found, add them to RATE_LIMIT_DICT.
         # Before that quickly go through RATE_LIMIT_DICT
         # and remove all the finished unused users.
-        # As you can't edit a dict while in it
-        # create a fake copy and then pass that through
-        TEMP_DICT = RATE_LIMIT_DICT
-        for person in TEMP_DICT:
-            if ((rate_time - TEMP_DICT[person][0])
+        for person in list(RATE_LIMIT_DICT):
+            if ((rate_time - RATE_LIMIT_DICT[person][0])
                .total_seconds() > 18000):
                 del RATE_LIMIT_DICT[person]
-        del TEMP_DICT
         RATE_LIMIT_DICT[user.id] = [rate_time, 1]
 
     # Fail check

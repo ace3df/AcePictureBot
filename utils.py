@@ -200,8 +200,8 @@ def download_image(url, path="", filename="", ignore_list=""):
     hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)',
            'Connection': 'keep-alive'}
     req = urllib.request.Request(url, headers=hdr)
-    response = urllib.request.urlopen(req)
     try:
+        response = urllib.request.urlopen(req)
         data = response.read()
     except:
         # Loss data / IncompleteRead

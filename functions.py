@@ -303,7 +303,7 @@ Help: {2}""".format(gender, gender,
     if user.get('max_page'):
         max_page = user['max_page']
     else:
-        max_page = 0
+        max_page = 30
     path_name = slugify(user['name'],
                         word_boundary=True, separator="_")
     path = os.path.join(settings['image_loc'],
