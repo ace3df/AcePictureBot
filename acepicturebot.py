@@ -17,7 +17,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.2.2"
+__version__ = "2.2.4"
 
 BLOCKED_IDS = utils.file_to_list(
                 os.path.join(settings['list_loc'],
@@ -217,7 +217,7 @@ def acceptable_tweet(status):
     tweet = re.sub(' +', ' ', tweet)
 
     # Remove @UserNames (usernames could trigger commands alone)
-    tweet = ' '.join(re.sub("(^|\n)(@[A-Za-z0-9_]+)", " ", tweet).split())
+    tweet = ' '.join(re.sub("(^|\n| )(@[A-Za-z0-9_]+)", " ", tweet).split())
 
     # Find the command they used.
     command = utils.get_command(tweet)
