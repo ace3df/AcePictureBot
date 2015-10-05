@@ -17,7 +17,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.2.0"
+__version__ = "2.2.2"
 
 BLOCKED_IDS = utils.file_to_list(
                 os.path.join(settings['list_loc'],
@@ -36,7 +36,7 @@ HANG_TIME = time.time()
 API = None
 STATUS_API = None
 SAPI = None
-DEBUG = False
+DEBUG = True
 
 
 def post_tweet(_API, tweet, media=False, command=False, rts=False):
@@ -76,6 +76,7 @@ def post_tweet(_API, tweet, media=False, command=False, rts=False):
 def tweet_command(_API, status, tweet, command):
     tweet_image = False
     user = status.user
+    print(tweet)
 
     # Mod command
     is_mod = [True if user.id in MOD_IDS else False][0]
@@ -216,7 +217,7 @@ def acceptable_tweet(status):
     tweet = re.sub(' +', ' ', tweet)
 
     # Remove @UserNames (usernames could trigger commands alone)
-    tweet = ' '.join(re.sub("(@[A-Za-z0-9_]+)", " ", tweet).split())
+    tweet = ' '.join(re.sub("(^|\n)(@[A-Za-z0-9_]+)", " ", tweet).split())
 
     # Find the command they used.
     command = utils.get_command(tweet)
@@ -232,7 +233,7 @@ def acceptable_tweet(status):
 
         # Last case, check if they're not replying to a tweet
         if status.in_reply_to_status_id is None:
-            command = "waifu"
+            command = "Waifu"
         else:
             return False, False
 
@@ -287,7 +288,7 @@ def acceptable_tweet(status):
     # Fail check
     if not isinstance(command, str):
         return False, False
-    tweet = tweet.lower().replace(command.lower(), " ").strip()
+    tweet = tweet.lower().replace(command.lower(), " ", 1).strip()
     return tweet, command
 
 
