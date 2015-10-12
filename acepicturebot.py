@@ -17,7 +17,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.2.4"
+__version__ = "2.3.0"
 
 BLOCKED_IDS = utils.file_to_list(
                 os.path.join(settings['list_loc'],
@@ -76,7 +76,6 @@ def post_tweet(_API, tweet, media=False, command=False, rts=False):
 def tweet_command(_API, status, tweet, command):
     tweet_image = False
     user = status.user
-    print(tweet)
 
     # Mod command
     is_mod = [True if user.id in MOD_IDS else False][0]
@@ -135,26 +134,12 @@ Help: {0}""".format(func.config_get('Help URLs', 'must_follow'))
     if command == "OTP":
         tweet, tweet_image = func.otp(tweet)
 
-    if command == "Shipgirl":
-        tweet, tweet_image = func.random_list(0, tweet)
-    elif command == "Touhou":
-        tweet, tweet_image = func.random_list(1, tweet)
-    elif command == "Vocaloid":
-        tweet, tweet_image = func.random_list(2)
-    elif command == "Imouto":
-        tweet, tweet_image = func.random_list(3)
-    elif command == "Idol":
-        tweet, tweet_image = func.random_list(4, tweet)
-    elif command == "Shota":
-        tweet, tweet_image = func.random_list(5)
-    elif command == "Onii":
-        tweet, tweet_image = func.random_list(6)
-    elif command == "Onee":
-        tweet, tweet_image = func.random_list(7)
-    elif command == "Sensei":
-        tweet, tweet_image = func.random_list(8, tweet)
-    elif command == "Monstergirl":
-        tweet, tweet_image = func.random_list(9, tweet)
+    list_cmds = ["Shipgirl", "Touhou", "Vocaloid",
+                 "Imouto", "Idol", "Shota",
+                 "Onii", "Onee", "Sensei",
+                 "Monstergirl", "Witchgirl", "Tankgirl"]
+    if command in list_cmds:
+        tweet, tweet_image = func.random_list(command, tweet)
 
     if command == "Airing":
         tweet = func.airing(tweet)
@@ -214,13 +199,19 @@ def acceptable_tweet(status):
         tweet += " source"
 
     # Remove extra spaces
-    tweet = re.sub(' +', ' ', tweet)
+    tweet = re.sub(' +', ' ', tweet).lstrip()
 
     # Remove @UserNames (usernames could trigger commands alone)
     tweet = ' '.join(re.sub("(^|\n| )(@[A-Za-z0-9_]+)", " ", tweet).split())
+    tweet = tweet.replace("#", "")
 
     # Find the command they used.
     command = utils.get_command(tweet)
+    if command == "WaifuRegister" or command == "HusbandoRegister":
+        if len(tweet) > (len(command) +
+                         len(settings['twitter_track'][0]) + 2):
+            tweet = tweet.split(command, 1)[1].lstrip()
+
     # No command is found see if acceptable for a random waifu
     if not command:
         # Ignore Quote RTs only in this case
@@ -398,28 +389,24 @@ def handle_stream(SAPI, STATUS_API=False):
     # Create a loop which makes sure that the stream
     # hasn't been hanging at all.
     # If it has, it will try to reconnect.
-
-    # FOR NOW KEEP THIS AS FALSE
     while True:
         time.sleep(5)
         elapsed = (time.time() - HANG_TIME)
         if elapsed > 600:
-            print("[WARNING] STREAM HANGING. RESTARTING...")
+            msg = """[{0}] Crashed/Hanging!
+The bot will catch up on missed messages now!""".format(
+                    time.strftime("%Y-%m-%d %H:%M"))
+            print(msg)
             try:
                 if STATUS_API:
-                    # Tweet to the status bot that the stream was hanging.
-                    msg = "[WARNING] " + settings['twitter_track'][0] + \
-                     ":\nStream hanging. Restarting..."
                     post_tweet(STATUS_API, msg)
             except:
                 pass
             sapi.disconnect()
             time.sleep(3)
-            # Restart the stream and catch up on late tweets.
             Thread(target=start_stream).start()
             Thread(target=read_notifications,
                    args=(API, True, TWEETS_READ)).start()
-            # Restart HANG_TIME.
             HANG_TIME = time.time()
 
 
@@ -448,8 +435,8 @@ def read_notifications(_API, reply, tweets_read):
 if __name__ == '__main__':
     # Load read IDs of already read tweets.
     TWEETS_READ = utils.file_to_list(
-                os.path.join(settings['ignore_loc'],
-                             "tweets_read.txt"))
+                    os.path.join(settings['ignore_loc'],
+                                 "tweets_read.txt"))
     # Get the main bot's API and STREAM request.
     API = func.login(REST=True)
     SAPI = func.login(REST=False)

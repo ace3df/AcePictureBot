@@ -238,4 +238,29 @@ Amaimon||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/2/159261.j
 Mephisto Pheles||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/13/117925.jpg
 Shima Renzou||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/11/133259.jpg
 
+Yadomi Jinta||AnoHana||http://cdn.myanimelist.net/images/characters/10/116629.jpg
+Matsuyuki Atsumu||AnoHana||http://cdn.myanimelist.net/images/characters/4/118052.jpg
+Hisakawa Tetsudou||AnoHana||http://cdn.myanimelist.net/images/characters/2/118996.jpg
+
+Igarashi Ganta||Deadman Wonderland||http://cdn.myanimelist.net/images/characters/4/78019.jpg
+
+Tooyama Kinji||Hidan no Aria||http://cdn.myanimelist.net/images/characters/9/132997.jpg
+
+Mikuni Souichirou||[C] - CONTROL||http://cdn.myanimelist.net/images/characters/11/120117.jpg
+Yoga Kimimaro||[C] - CONTROL||http://cdn.myanimelist.net/images/characters/7/115293.jpg
+Masakaki||[C] - CONTROL||http://cdn.myanimelist.net/images/characters/14/118413.jpg
+
+Niwa Makoto||Denpa Onna to Seishun Otoko||http://cdn.myanimelist.net/images/characters/16/117809.jpg
+
+Barnaby Brooks Jr.||Tiger & Bunny||http://cdn.myanimelist.net/images/characters/2/133051.jpg
+Kaburagi T. Kotetsu||Tiger & Bunny||http://cdn.myanimelist.net/images/characters/10/113442.jpg
+Keith Goodman||Tiger & Bunny||http://cdn.myanimelist.net/images/characters/2/113956.jpg
+Ivan Karelin||Tiger & Bunny||http://cdn.myanimelist.net/images/characters/3/133047.jpg
+Antonio Lopez||Tiger & Bunny||http://cdn.myanimelist.net/images/characters/15/123105.jpg
+
+Cinque Izumi||Dog Days||http://cdn.myanimelist.net/images/characters/3/118618.jpg
+Gaul Galette des Rois||Dog Days||http://cdn.myanimelist.net/images/characters/8/140093.jpg
+
+
+
 # Video Games

@@ -152,10 +152,10 @@ def image_hash(image, hash_size=8):
 
 def video_to_gif(video):
     """
-    Return encoded gif path
+    Return encoded gif path / compress gif size
     """
     try:
-        save_to = os.path.join(settings['image_loc'], "downloads")
+        save_to = os.path.dirname(video)
         SCRIPT_LOC = settings['webm_script']
         filename = os.path.join(
             save_to,
@@ -464,6 +464,9 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
             image_tags = []
             if site == 0:
                 site_tag = browser.find('ul', id="tag-sidebar")
+                if not site_tag:
+                    # No tags? Normal post got passed?
+                    return False
                 site_tag = site_tag.find_all('li')
                 for tag in site_tag:
                     text = tag.text
@@ -586,7 +589,6 @@ def get_command(string):
         gender = "Waifu"
     elif "husbando" in string:
         gender = "Husbando"
-
     rep = {"waifu": "{GENDER}", "husbando": "{GENDER}",
            "anime?": "source", "anime ?": "source",
            "is this from": "source", "sauce": "source"}
@@ -610,9 +612,11 @@ def get_command(string):
 def short_string(string, limit=40):
     if string == "":
         return string
+    elif len(string) < 40:
+        return string
     try:
         count = 0
-        if string[limit + 5]:
+        if string[limit]:
             for a in string:
                 count += 1
                 if count >= limit and a == " ":

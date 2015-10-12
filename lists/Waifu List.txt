@@ -1,41 +1,41 @@
 # Full list of waifus. Type=||
 #
 # Anime/Manga
-Nagato (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/16/262025.jpg
-Mutsu (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/259455.jpg
-Akagi (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/15/240533.jpg
-Kaga (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/3/240535.jpg
-Souryuu (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/260387.jpg
-Hiryuu (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/3/260385.jpg
-Shimakaze (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/255087.jpg
-Fubuki (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/12/276470.jpg
-Junyou (kantai collection)||Kantai Collection||http://img2.wikia.nocookie.net/__cb20130901123536/kancolle/images/d/df/066.jpg
-Murakumo (kantai collection)||Kantai Collection||http://img3.wikia.nocookie.net/__cb20150519015231/kancolle/images/c/cc/DD_Murakumo_033_Card.jpg
-Mamiya (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/14/274796.jpg
-Kisaragi (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/8/274797.jpg
-Mochizuki (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/7/274828.jpg
-Sendai (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/13/257473.jpg
-Mogami (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/8/277716.jpg
-Takao (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/12/274825.jpg
-Atago (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/3/260401.jpg
-Akatsuki (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/6/260403.jpg
-Hibiki (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/11/259363.jpg
-Naka (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/5/257475.jpg
-Ikazuchi (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/9/262013.jpg
-Inazuma (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/11/262015.jpg
-Shoukaku (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/274798.jpg
-Zuikaku (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/275480.jpg
-Yamato (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/12/277528.jpg
-Yuudachi (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/5/255487.jpg
-Kongou (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/4/255091.jpg
-Hiei (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/10/264493.jpg
-Haruna (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/6/276027.jpg
-Kirishima (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/273815.jpg
-I-401 (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/12/278758.jpg
-Jintsuu (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/5/257479.jpg
-Yayoi (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/14/274829.jpg
-Ooyodo (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/13/277527.jpg
-Haguro (kantai collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/11/277714.jpg
+Nagato (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/16/262025.jpg
+Mutsu (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/259455.jpg
+Akagi (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/15/240533.jpg
+Kaga (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/3/240535.jpg
+Souryuu (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/260387.jpg
+Hiryuu (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/3/260385.jpg
+Shimakaze (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/255087.jpg
+Fubuki (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/12/276470.jpg
+Junyou (Kantai Collection)||Kantai Collection||http://img2.wikia.nocookie.net/__cb20130901123536/kancolle/images/d/df/066.jpg
+Murakumo (Kantai Collection)||Kantai Collection||http://img3.wikia.nocookie.net/__cb20150519015231/kancolle/images/c/cc/DD_Murakumo_033_Card.jpg
+Mamiya (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/14/274796.jpg
+Kisaragi (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/8/274797.jpg
+Mochizuki (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/7/274828.jpg
+Sendai (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/13/257473.jpg
+Mogami (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/8/277716.jpg
+Takao (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/12/274825.jpg
+Atago (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/3/260401.jpg
+Akatsuki (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/6/260403.jpg
+Hibiki (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/11/259363.jpg
+Naka (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/5/257475.jpg
+Ikazuchi (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/9/262013.jpg
+Inazuma (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/11/262015.jpg
+Shoukaku (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/274798.jpg
+Zuikaku (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/275480.jpg
+Yamato (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/12/277528.jpg
+Yuudachi (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/5/255487.jpg
+Kongou (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/4/255091.jpg
+Hiei (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/10/264493.jpg
+Haruna (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/6/276027.jpg
+Kirishima (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/273815.jpg
+I-401 (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/12/278758.jpg
+Jintsuu (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/5/257479.jpg
+Yayoi (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/14/274829.jpg
+Ooyodo (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/13/277527.jpg
+Haguro (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/11/277714.jpg
 
 Shirayuki Mizore||Rosario to Vampire||http://cdn.myanimelist.net/images/characters/2/134611.jpg
 Akashiya Moka||Rosario to Vampire||http://cdn.myanimelist.net/images/characters/13/78832.jpg
@@ -568,6 +568,60 @@ Kiryuu Moeka||Steins;Gate||http://cdn.myanimelist.net/images/characters/12/27531
 Kamiki izumo||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/16/159265.jpg
 Kirigakure Shura||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/6/159263.jpg
 Moriyama Shiemi||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/13/134333.jpg
+
+Anjou Naruko||AnoHana||http://cdn.myanimelist.net/images/characters/10/121622.jpg
+Honma Meiko||AnoHana||http://cdn.myanimelist.net/images/characters/16/115711.jpg
+Tsurumi Chiriko||AnoHana||http://cdn.myanimelist.net/images/characters/9/118055.jpg
+
+Shiro (Deadman Wonderland)||Deadman Wonderland||http://cdn.myanimelist.net/images/characters/3/78022.jpg
+
+Aioi Yuuko||Nichijou||http://cdn.myanimelist.net/images/characters/15/114020.jpg
+Minakami Mai||Nichijou||http://cdn.myanimelist.net/images/characters/3/122625.jpg
+Naganohara Mio||Nichijou||http://cdn.myanimelist.net/images/characters/3/116963.jpg
+Shinonome Nano||Nichijou||http://cdn.myanimelist.net/images/characters/10/119459.jpg
+Professor Shinonome||Nichijou||http://cdn.myanimelist.net/images/characters/5/113407.jpg
+
+Kanzaki H Aria||Hidan no Aria||http://cdn.myanimelist.net/images/characters/7/113250.jpg
+Mamiya Akari||Hidan no Aria||http://cdn.myanimelist.net/images/characters/4/287254.jpg
+Hotogi Shirayuki||Hidan no Aria||http://cdn.myanimelist.net/images/characters/11/239649.jpg
+Mine Riko||Hidan no Aria||http://cdn.myanimelist.net/images/characters/7/149097.jpg
+Reki (Hidan no Aria)||Hidan no Aria||http://cdn.myanimelist.net/images/characters/6/148931.jpg
+Jeanne d'Arc (Hidan no Aria)||Hidan no Aria||http://cdn.myanimelist.net/images/characters/2/148927.jpg
+
+Mashu (Control)||[C] - CONTROL||http://cdn.myanimelist.net/images/characters/11/115294.jpg
+Jennifer Satou||[C] - CONTROL||http://cdn.myanimelist.net/images/characters/12/114633.jpg
+Q (Control)||[C] - CONTROL||http://cdn.myanimelist.net/images/characters/8/142501.jpg
+
+Mifune Ryuuko||Denpa Onna to Seishun Otoko||http://cdn.myanimelist.net/images/characters/3/114673.jpg
+Maekawa||Denpa Onna to Seishun Otoko||http://cdn.myanimelist.net/images/characters/13/114671.jpg
+Touwa Erio||Denpa Onna to Seishun Otoko||http://cdn.myanimelist.net/images/characters/10/118161.jpg
+Hoshimiya Yashiro||Denpa Onna to Seishun Otoko||http://cdn.myanimelist.net/images/characters/7/119184.jpg
+Touwa Meme||Denpa Onna to Seishun Otoko||http://cdn.myanimelist.net/images/characters/3/114674.jpg
+
+Matsumae Ohana||Hanasaku Iroha||http://cdn.myanimelist.net/images/characters/6/132503.jpg
+Oshimizu Nako||Hanasaku Iroha||http://cdn.myanimelist.net/images/characters/12/113489.jpg
+Tsurugi Minko||Hanasaku Iroha||http://cdn.myanimelist.net/images/characters/4/132507.jpg
+Wakura Yuina||Hanasaku Iroha||http://cdn.myanimelist.net/images/characters/8/132515.jpg
+
+Huang Baoling||Tiger & Bunny||http://cdn.myanimelist.net/images/characters/3/113958.jpg
+Karina Lyle||Tiger & Bunny||http://cdn.myanimelist.net/images/characters/15/113438.jpg
+Kaburagi Kaede||Tiger & Bunny||http://cdn.myanimelist.net/images/characters/7/120139.jpg
+
+Rebecca Anderson||Dog Days||http://cdn.myanimelist.net/images/characters/8/176549.jpg
+Couvert Eschenbach Pastillage||Dog Days||http://cdn.myanimelist.net/images/characters/6/176551.jpg
+Leonmitchelli Galette des Rois||Dog Days||http://cdn.myanimelist.net/images/characters/2/245989.jpg
+Millhiore F. Biscotti||Dog Days||http://cdn.myanimelist.net/images/characters/8/110096.jpg
+Ricotta Elmar||Dog Days||http://cdn.myanimelist.net/images/characters/2/113962.jpg
+Eclair Martinozzi||Dog Days||http://cdn.myanimelist.net/images/characters/9/113959.jpg
+Brioche d'Arquien||Dog Days||http://cdn.myanimelist.net/images/characters/15/164963.jpg
+Yukikaze Panettone||Dog Days||http://cdn.myanimelist.net/images/characters/10/164965.jpg
+Noir Vinocacao||Dog Days||http://cdn.myanimelist.net/images/characters/14/260039.jpg
+Vert Farbreton||Dog Days||http://cdn.myanimelist.net/images/characters/11/119426.jpg
+Takatsuki Nanami||Dog Days||http://cdn.myanimelist.net/images/characters/7/176547.jpg
+
+
+
+# http://myanimelist.net/anime/season/2011/spring SKET Dance
 
 # Video Games
 Samus Aran||Metroid||http://i.imgur.com/x09sloo.jpg

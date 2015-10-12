@@ -20,4 +20,6 @@ Airing
 Source
 !Level
 Monstergirl
+Witchgirl
+Tankgirl
 Reroll

@@ -205,6 +205,8 @@ def get_level(user_id):
                 level = i
                 for_next = level_range - user_exp
                 break
+    if level == 1:
+        for_next = for_next - user_exp
     return """\nYou are Level: {0}
 Current Exp: {1}
 Next Level: {2}""".format(level, user_exp, for_next)
@@ -339,6 +341,7 @@ def waifuregister(user_id, username, name, gender):
         m = "You forgot to include a name! Help: {0}".format(
             config_get('Help URLs', 'include_name'))
         return m, False
+        
     elif len(name) >= 41:
         return False, False
     elif len(name) <= 3:
@@ -497,7 +500,7 @@ def otp(args):
     return m, tweet_image
 
 
-def random_list(index, args=""):
+def random_list(list_name, args=""):
     args = args.lower()
     gender = "waifu"
     name = ""
@@ -508,8 +511,7 @@ def random_list(index, args=""):
     tweet_image = False
     show_series = False
     scrape_images = True
-    if index == 0:
-        list_name = "Shipgirl"
+    if list_name == "Shipgirl":
         hashtag = "#Kancolle"
         if "otp" in args:
             list_name += " OTP"
@@ -517,28 +519,25 @@ def random_list(index, args=""):
             lines = utils.file_to_list('Shipgirl OTP.txt')
         else:
             lines = utils.file_to_list('Shipgirl.txt')
-    elif index == 1:
-        list_name = "Touhou"
+    elif list_name == "Touhou":
         hashtag = "#Touhou"
         if "otp" in args:
             list_name += " OTP"
             lines = utils.file_to_list('Touhou OTP.txt')
         else:
             lines = utils.file_to_list('Touhou.txt')
-    elif index == 2:
-        list_name = "Vocaloid"
+    elif list_name == "Vocaloid":
         hashtag = "#Vocaloids"
         if "otp" in args:
             list_name += " OTP"
             lines = utils.file_to_list('Vocaloid OTP.txt')
         else:
             lines = utils.file_to_list('Vocaloid.txt')
-    elif index == 3:
+    elif list_name == "Imouto":
         list_name = "Imouto"
         show_series = True
         lines = utils.file_to_list('Imouto.txt')
-    elif index == 4:
-        list_name = "Idol"
+    elif list_name == "Idol":
         show_series = True
         if "love live" in args or "lovelive" in args:
             search_for = "Love Live!"
@@ -571,22 +570,20 @@ def random_list(index, args=""):
                         temp_lines.append(line)
                 lines = temp_lines
                 del temp_lines
-    elif index == 5:
-        list_name = "Shota"
+    elif list_name == "Shota":
         show_series = True
         gender = "husbando"
         lines = utils.file_to_list('Shota.txt')
-    elif index == 6:
+    elif list_name == "Onii":
         list_name = "Onii-chan"
         show_series = True
         gender = "husbando"
         lines = utils.file_to_list('Onii-chan.txt')
-    elif index == 7:
+    elif list_name == "Onee":
         list_name = "Onee-chan"
         show_series = True
         lines = utils.file_to_list('Onee-chan.txt')
-    elif index == 8:
-        list_name = "Sensei"
+    elif list_name == "Sensei":
         show_series = True
         if "female" in args:
             lines = utils.file_to_list('Sensei Female.txt')
@@ -596,17 +593,26 @@ def random_list(index, args=""):
         else:
             lines = utils.file_to_list('Sensei Male.txt')
             lines += utils.file_to_list('Sensei Female.txt')
-    elif index == 9:
-        list_name = "Monstergirl"
+    elif list_name == "Monstergirl":
         hashtag = "#MonsterMusume"
         show_series = True
         scrape_images = False
         lines = utils.file_to_list('Monstergirl.txt')
+    elif list_name == "Witchgirl":
+        hashtag = "#s_witch"
+        show_series = False
+        scrape_images = True
+        lines = utils.file_to_list('Witchgirl.txt')
+    elif list_name == "Tankgirl":
+        hashtag = "#garupan"
+        show_series = False
+        scrape_images = True
+        lines = utils.file_to_list('Tankgirl.txt')
 
     entry = random.choice(lines)
     if list_name.endswith("OTP"):
         names = entry.split("(x)")
-        if index == 1:
+        if list_name == "Touhou":
             tags = "{0}+{1}+2girls+yuri+touhou+-asai_genji+-comic".format(
                     names[0].replace(" ", "_"),
                     names[1].replace(" ", "_"))
@@ -639,10 +645,8 @@ def random_list(index, args=""):
         name_one = re.sub(r' \([^)]*\)', '', names[0])
         name_two = re.sub(r' \([^)]*\)', '', names[1])
         name = "{0} x {1}".format(name_one, name_two)
-
     if not m:
         m = "Your {0} is {1} {2}".format(list_name, name, hashtag)
-
     return m, tweet_image
 
 
@@ -725,6 +729,8 @@ def source(_API, status):
     def info(image):
         url = "http://iqdb.org/?url=%s" % (str(image))
         soup = utils.scrape_site(url)
+        if soup.find('th', text="No relevant matches"):
+            return False, False, False, False
         site = ""
         links = soup.find_all('a')
         for link in links:
@@ -732,26 +738,25 @@ def source(_API, status):
                 link['href']
             except:
                 continue
+            if link.string == "(hide)":
+                # Haven't broke yet, onto low results
+                return False, False, False, False
             if "chan.sankakucomplex.com/post/show/" in link['href']:
                 url = link['href']
                 site = 0
                 break
             elif "http://danbooru.donmai.us/posts/" in link['href']:
-                # Don't break with danbooru as we mostly use Sankaku
-                # so danbooru is last resort only.
                 url = link['href']
                 site = 1
-
+                break
         if site == "":
             # No scrapable link found!
             return False, False, False, False
-
         try:
             soup = utils.scrape_site(url)
         except:
             # Site could be down
             return False, False, False, False
-
         try:
             if site == 0:
                 # Sankaku
@@ -765,7 +770,6 @@ def source(_API, status):
                     'a', class_="search-tag").text.title()
         except:
             artist = ""
-
         try:
             if site == 0:
                 # Sankaku
@@ -779,7 +783,6 @@ def source(_API, status):
                     'a', class_="search-tag").text.title()
         except:
             series = ""
-
         try:
             if site == 0:
                 # Sankaku
@@ -803,7 +806,6 @@ def source(_API, status):
                 names = ''.join(name)
         except:
             names = ""
-
         # Translation
         if site == 0:
             url = "https://chan.sankakucomplex.com/note/history?post_id=" + \
@@ -840,16 +842,19 @@ def source(_API, status):
 
     def tweeted_image(_API, status):
         """Return the image url from the tweet."""
+        IS_GIF = False
         try:
             tweet = _API.get_status(status.in_reply_to_status_id)
             tweet = tweet.entities['media'][0]['media_url_https']
+            if "tweet_video_thumb" in str(tweet):
+                IS_GIF = True
             if ".mp4" in tweet:
-                return "Sorry, source is a video and not an image!"
-            return tweet
+                return "Sorry, source is a video and not an image!", IS_GIF
+            return tweet, IS_GIF
         except:
-            return "Are you sure you're asking for source on an image?"
+            return "Are you sure you're asking for source on an image?", IS_GIF
 
-    tweeted_image = tweeted_image(_API, status)
+    tweeted_image, IS_GIF = tweeted_image(_API, status)
     if ("Are you sure" in tweeted_image) or ("source is a" in tweeted_image):
         count_trigger("source")
         return tweeted_image
@@ -857,17 +862,17 @@ def source(_API, status):
     artist, series, names, translation = info(tweeted_image)
     saucenao = u"http://saucenao.com/search.php?urlify=1&url={0}".format(
         str(tweeted_image))
-    if not artist and not names and not series:
-        # No source at all
-        return saucenao
-    if artist:
-        artist = "\nBy: {0}".format(utils.short_string(artist, 15))
-    if names:
-        names = "\nBased on: {0} ".format(utils.short_string(names, 15))
-    if series:
-        series = "\nFrom: {0} ".format(utils.short_string(series, 15))
-    if translation:
-        translation = "\nTL: {0} ".format(translation)
+    if not artist and not series and not names:
+        return "No relevant source infomation found!\n" + saucenao
+    else:
+        if artist:
+            artist = "By: {0}\n".format(artist)
+        if names:
+            names = "Based on: {0}\n".format(names)
+        if series:
+            series = "From: {0}\n".format(utils.short_string(series, 25))
+        if translation:
+            translation = "TL: {0}\n".format(translation)
     seen = set()
     handles = status.text.lower()
     handles = [word for word in handles.split() if word.startswith('@')]
@@ -876,7 +881,10 @@ def source(_API, status):
         "@" + settings["twitter_track"][0].lower(), "")
     m = "{0}{1}{2}{3}".format(artist, names, series,
                               translation)
-    if (len(m) + 24) > 110:
+    if IS_GIF:
+        m = m + "*Source is a gif so this could be inaccurate.\n"
+    if (len(m) + 24) >= 120:
         m = utils.make_paste(m)
-    m = "{0}\n{1}\n{2}".format(handles, m, saucenao)
+        m = "Source information is too long to Tweet:\n" + m + "\n"
+    m = "{0}\n{1}{2}".format(handles, m, saucenao)
     return m.replace("&Amp;", "&")
