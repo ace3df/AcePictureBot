@@ -594,9 +594,8 @@ def random_list(list_name, args=""):
             lines = utils.file_to_list('Sensei Male.txt')
             lines += utils.file_to_list('Sensei Female.txt')
     elif list_name == "Monstergirl":
-        hashtag = "#MonsterMusume"
         show_series = True
-        scrape_images = False
+        scrape_images = True
         lines = utils.file_to_list('Monstergirl.txt')
     elif list_name == "Witchgirl":
         hashtag = "#s_witch"
