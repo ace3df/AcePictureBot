@@ -1,4 +1,4 @@
-# List of idol love live OTPs. Type=None
+# List of Idol Love Live OTPs. Type=None
 Ayase Eli(x)Hoshizora Rin
 Ayase Eli(x)Koizumi Hanayo
 Ayase Eli(x)Kousaka Honoka
@@ -10,7 +10,6 @@ Ayase Eli(x)Yazawa Nico
 Hoshizora Rin(x)Ayase Eli
 Hoshizora Rin(x)Koizumi Hanayo
 Hoshizora Rin(x)Kousaka Honoka
-Hoshizora Rin(x)Minami Kotori
 Hoshizora Rin(x)Nishikino Maki
 Hoshizora Rin(x)Sonoda Umi
 Hoshizora Rin(x)Toujou Nozomi
@@ -22,7 +21,6 @@ Koizumi Hanayo(x)Minami Kotori
 Koizumi Hanayo(x)Nishikino Maki
 Koizumi Hanayo(x)Sonoda Umi
 Koizumi Hanayo(x)Toujou Nozomi
-Koizumi Hanayo(x)Yazawa Nico
 Kousaka Honoka(x)Ayase Eli
 Kousaka Honoka(x)Hoshizora Rin
 Kousaka Honoka(x)Koizumi Hanayo
@@ -32,7 +30,6 @@ Kousaka Honoka(x)Sonoda Umi
 Kousaka Honoka(x)Toujou Nozomi
 Kousaka Honoka(x)Yazawa Nico
 Minami Kotori(x)Ayase Eli
-Minami Kotori(x)Hoshizora Rin
 Minami Kotori(x)Koizumi Hanayo
 Minami Kotori(x)Kousaka Honoka
 Minami Kotori(x)Nishikino Maki

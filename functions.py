@@ -28,10 +28,8 @@ def login(REST=True, status=False):
         consumer_secret = credentials['consumer_secret']
         access_token = credentials['access_token']
         access_token_secret = credentials['access_token_secret']
-
     auth = tweepy.OAuthHandler(consumer_token, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
-
     if REST:
         api = tweepy.API(auth)
         return api
@@ -508,17 +506,27 @@ def random_list(list_name, args=""):
     hashtag = ""
     search_for = ""
     m = False
+    lines = False
     tweet_image = False
     show_series = False
     scrape_images = True
     if list_name == "Shipgirl":
-        hashtag = "#Kancolle"
-        if "otp" in args:
-            list_name += " OTP"
-            gender = "shipgirl_otp"
-            lines = utils.file_to_list('Shipgirl OTP.txt')
+        if "aoki" in args:
+            lines = utils.file_to_list('Shipgirl Aoki.txt')
+        elif "all" in args:
+            if "otp" in args:
+                list_name += " OTP"
+                lines = utils.file_to_list('Shipgirl All OTP.txt')
+            else:
+                lines = utils.file_to_list('Shipgirl Aoki.txt')
+                lines += utils.file_to_list('Shipgirl.txt')
         else:
-            lines = utils.file_to_list('Shipgirl.txt')
+            hashtag = "#Kancolle"
+            if "otp" in args:
+                list_name += " OTP"
+                lines = utils.file_to_list('Shipgirl OTP.txt')
+            else:
+                lines = utils.file_to_list('Shipgirl.txt')
     elif list_name == "Touhou":
         hashtag = "#Touhou"
         if "otp" in args:
@@ -542,6 +550,10 @@ def random_list(list_name, args=""):
         if "love live" in args or "lovelive" in args:
             search_for = "Love Live!"
             hashtag = "#LoveLive"
+            if "otp" in args:
+                list_name = "Love Live! OTP"
+                show_series = False
+                lines = utils.file_to_list('Idol Love Live OTP.txt')
         elif "cinderella" in args or "cinderella" in args:
             search_for = "Idolmaster Cinderella Girls"
             hashtag = "#Idolmaster"
@@ -557,19 +569,19 @@ def random_list(list_name, args=""):
         elif "aikatsu" in args:
             search_for = "Aikatsu!"
             hashtag = "#Aikatsu"
-
         if "male" in args:
             list_name = "Male Idol"
             lines = utils.file_to_list('Idol Males.txt')
         else:
-            lines = utils.file_to_list('Idol.txt')
-            if search_for:
-                temp_lines = []
-                for line in lines:
-                    if line[1] == search_for:
-                        temp_lines.append(line)
-                lines = temp_lines
-                del temp_lines
+            if not lines:
+                lines = utils.file_to_list('Idol.txt')
+                if search_for:
+                    temp_lines = []
+                    for line in lines:
+                        if line[1] == search_for:
+                            temp_lines.append(line)
+                    lines = temp_lines
+                    del temp_lines
     elif list_name == "Shota":
         show_series = True
         gender = "husbando"
@@ -615,10 +627,15 @@ def random_list(list_name, args=""):
             tags = "{0}+{1}+2girls+yuri+touhou+-asai_genji+-comic".format(
                     names[0].replace(" ", "_"),
                     names[1].replace(" ", "_"))
+        if "love live" in list_name.lower():
+            tags = "{0}+{1}+2girls+yuri+-comic".format(
+                    names[0].replace(" ", "_"),
+                    names[1].replace(" ", "_"))
         else:
             tags = "{0}+{1}+2girls+-asai_genji+-comic".format(
                     names[0].replace(" ", "_"),
                     names[1].replace(" ", "_"))
+        name = "{0}(x){1}".format(names[0], names[1])
     else:
         if isinstance(entry, list):
             name = entry[0]

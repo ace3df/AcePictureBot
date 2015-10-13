@@ -1,5 +1,7 @@
 __pycache__/
+_site/
 *.py[cod]
+Gemfile.lock
 
 ignore_lists/
 FFmpeg/

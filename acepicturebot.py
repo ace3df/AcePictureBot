@@ -17,7 +17,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.3.1"
+__version__ = "2.3.2"
 
 BLOCKED_IDS = utils.file_to_list(
                 os.path.join(settings['list_loc'],
@@ -208,9 +208,10 @@ def acceptable_tweet(status):
     # Find the command they used.
     command = utils.get_command(tweet)
     if command == "WaifuRegister" or command == "HusbandoRegister":
+        reg = "({0})(?i)".format(command)
         if len(tweet) > (len(command) +
                          len(settings['twitter_track'][0]) + 2):
-            tweet = tweet.split(command, 1)[1].lstrip()
+            tweet = re.split(reg, tweet)[2].lstrip()
 
     # No command is found see if acceptable for a random waifu
     if not command:

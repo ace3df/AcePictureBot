@@ -115,7 +115,8 @@ def scrape_site(url, cookie_file=""):
     s.headers['Accept'] = 'text/html'
     s.headers['Connection'] = 'keep-alive'
     browser = RoboBrowser(session=s,
-                          parser='html5lib')
+                          parser='html5lib',
+                          timeout=15)
     try:
         browser.open(url)
         return browser
@@ -534,6 +535,7 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
             url = image_url['src']
         tweet_image = download_image(url=url, path=path,
                                      ignore_list=ignore_list)
+        last_tries += 1
         if last_tries == 5:
             # Just return last found
             return tweet_image

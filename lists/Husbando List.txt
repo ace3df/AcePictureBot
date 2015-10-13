@@ -261,6 +261,19 @@ Antonio Lopez||Tiger & Bunny||http://cdn.myanimelist.net/images/characters/15/12
 Cinque Izumi||Dog Days||http://cdn.myanimelist.net/images/characters/3/118618.jpg
 Gaul Galette des Rois||Dog Days||http://cdn.myanimelist.net/images/characters/8/140093.jpg
 
+Fujisaki Yuusuke||SKET Dance||http://cdn.myanimelist.net/images/characters/16/271097.jpg
+Usui Kazuyoshi||SKET Dance||http://cdn.myanimelist.net/images/characters/13/113840.jpg
+Agata Soujirou||SKET Dance||http://cdn.myanimelist.net/images/characters/8/114135.jpg
+Katou Kiri||SKET Dance||http://cdn.myanimelist.net/images/characters/2/181555.jpg
+Tsubaki Sasuke||SKET Dance||http://cdn.myanimelist.net/images/characters/2/119399.jpg
 
+Hatori Yoshiyuki||Sekaiichi Hatsukoi||http://cdn.myanimelist.net/images/characters/13/134459.jpg
+Kisa Shouta||Sekaiichi Hatsukoi||http://cdn.myanimelist.net/images/characters/16/125821.jpg
+Onodera Ritsu||Sekaiichi Hatsukoi||http://cdn.myanimelist.net/images/characters/16/113270.jpg
+Takano Masamune||Sekaiichi Hatsukoi||http://cdn.myanimelist.net/images/characters/3/133973.jpg
+Yukina Kou||Sekaiichi Hatsukoi||http://cdn.myanimelist.net/images/characters/10/145299.jpg
+
+Touhara Naoya||Astarotte no Omocha!||http://cdn.myanimelist.net/images/characters/9/135429.jpg
+||Astarotte no Omocha!||
 
 # Video Games
