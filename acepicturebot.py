@@ -17,7 +17,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.3.2"
+__version__ = "2.3.3"
 
 BLOCKED_IDS = utils.file_to_list(
                 os.path.join(settings['list_loc'],
@@ -27,6 +27,7 @@ IGNORE_WORDS = utils.file_to_list(
                              "Blocked Words.txt"))
 LIMITED = False
 HAD_ERROR = False
+LAST_STATUS_CODE = 0
 TWEETS_READ = []
 MOD_IDS = [2780494890, 121144139]
 RATE_LIMIT_DICT = {}
@@ -279,9 +280,7 @@ def acceptable_tweet(status):
     return tweet, command
 
 
-def is_following(_API=None, user_id=None):
-    if _API is None:
-        _API = login()
+def is_following(_API, user_id=None):
     try:
         ship = _API.lookup_friendships(user_ids=(2910211797, user_id))
     except:
@@ -370,7 +369,16 @@ class CustomStreamListener(tweepy.StreamListener):
             file.write("\n".join(TWEETS_READ))
 
     def on_error(self, status_code):
-        print(status_code)
+        global LAST_STATUS_CODE
+        global HANG_TIME
+        HANG_TIME = time.time()
+        if int(status_code) != int(LAST_STATUS_CODE):
+            LAST_STATUS_CODE = status_code
+            msg = """[{0}] Twitter Returning Status Code: {1}.
+More Info: https://dev.twitter.com/overview/api/response-codes""".format(
+                    time.strftime("%Y-%m-%d %H:%M"), status_code)
+            print(msg)
+            post_tweet(func.login(status=True), msg)
         return True
 
 

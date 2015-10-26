@@ -4,7 +4,7 @@ from config import settings
 import configparser
 import os
 
-FMT = '%Y-%m-%d %H:%M:%S.%f'
+FMT = '%Y-%m-%d %H:%M:%S'
 
 
 def config_get(section, key, file=0):
@@ -28,6 +28,7 @@ class SpamCheck(object):
             self._limit = str(config_get('Limit', "default"))
             self._limit_hours = str(config_get('Limit Hours', "default"))
         self._now = datetime.now()
+        self._now = self._now.replace(microsecond=0)
         try:
             self._userlist = open(
                 os.path.join(

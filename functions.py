@@ -2,8 +2,9 @@
 from waifu_register import WaifuRegisterClass
 from config import credentials, status_credentials
 from spam_checker import remove_one_limit
-from config import settings
 from slugify import slugify
+from config import settings
+from string import capwords
 from math import exp, log
 from PIL import Image
 import configparser
@@ -80,11 +81,11 @@ def config_get(section, key, file=0):
     elif file == 1:
         file = settings['count_file']
     with open(file) as fp:
-        config = configparser.ConfigParser(allow_no_value=True)
+        config = configparser.RawConfigParser(allow_no_value=True)
         config.readfp(fp)
         try:
-            return config[section][key]
-        except:
+            return config.get(section, key)
+        except configparser.NoOptionError:
             return False
 
 
@@ -293,17 +294,13 @@ def mywaifu(user_id, gender):
 Use {1}Register!
 Help: {2}""".format(gender, gender,
                     config_get('Help URLs', 'include_name'))
-        # Note to self: DO NOT include remove_all_limit
-        # or remove_one_limit here!
-        # It can easily be abused as they could unregister their
-        # waifu and register back, etc, etc.
         return m, False
 
     tags = user['name'] + user['tags']
     if user.get('max_page'):
         max_page = user['max_page']
     else:
-        max_page = 30
+        max_page = 20
     path_name = slugify(user['name'],
                         word_boundary=True, separator="_")
     path = os.path.join(settings['image_loc'],
@@ -326,6 +323,9 @@ Help: {0}""".format(config_get('Help URLs', 'no_mywaifu_image'))
 
 
 def waifuregister(user_id, username, name, gender):
+    config = configparser.ConfigParser()
+    config.read(settings['settings'])
+    help_urls = (dict(config.items('Help URLs')))
     if config_get('Websites', 'sankakucomplex') == "False":
         m = "Some websites are offline. Try again later!"
         if gender == 0:
@@ -334,53 +334,39 @@ def waifuregister(user_id, username, name, gender):
             gender = "Husbando"
         remove_one_limit(user_id, gender.lower() + "register", username)
         return m, False
-    name = name.strip()
     if name == "":
         m = "You forgot to include a name! Help: {0}".format(
             config_get('Help URLs', 'include_name'))
         return m, False
-        
     elif len(name) >= 41:
         return False, False
-    elif len(name) <= 3:
+    elif len(name) == 1:
         return False, False
     name = name.replace("+", "")
-
-    # Remove spaces in "name ( show )"
-    # Weebs man
     name = name.replace("( ", "(").replace(" )", ")")
 
     register_object = WaifuRegisterClass(
-        user_id, username, name, gender)
-    # User used a banned name
-    if register_object.blocked():
-        warn_user(user_id, "Banned Register: {0}".format(name))
+            user_id, username, name, gender)
+    if register_object.offline:
+        remove_one_limit(user_id, gender.lower() + "register")
+        return "Some websites are offline. Try again later!"
+    if register_object.disable:
+        warn_user(user_id, "Banned Register - {0}".format(name))
         return False, False
-
-    # Name is single and collides with a lot of other names
-    # Return a paste with a list to try and make sure they
-    # get the right person.
-    if not register_object.is_override():
-        single_name, m = register_object.check_possible_names()
-        if single_name:
-            return m, False
-
-        start = register_object.start()
-        if not start:
-            warn_user(user_id, "Banned Register: {0}".format(name))
-            return False, False
-        m = register_object.finish()
-
-        if isinstance(m, str):
-            return m, False
     else:
+        # Everything is fine so far
         register_object.start()
-        m = register_object.finish()
-
-    if m:
-        m, tweet_image = mywaifu(user_id, gender)
-    else:
-        tweet_image = False
+        if register_object.multinames:
+            return register_object.multinames, False
+        elif register_object.noimages:
+            return "No images found for \"{0}\"! Help: {1}".format(
+                capwords(register_object.org_name),
+                help_urls['no_imgs_found']), False
+        elif register_object.notenough:
+            return "Not enough images found for \"{0}\"! Help: {1}".format(
+                capwords(register_object.org_name),
+                help_urls['not_enough_imgs']), False
+    m, tweet_image = mywaifu(user_id, gender)
     return m, tweet_image
 
 
@@ -404,7 +390,6 @@ def waifuremove(user_id, gender):
             removed = True
             break
         count += 1
-
     if removed:
         user_waifus_file = open(
             os.path.join(settings['list_loc'], filename), 'w',
@@ -904,3 +889,16 @@ def source(_API, status):
         m = "Source information is too long to Tweet:\n" + m + "\n"
     m = "{0}\n{1}{2}".format(handles, m, saucenao)
     return m.replace("&Amp;", "&")
+
+
+def spookjoke():
+    name = random.choice(utils.file_to_list('Sp00k.txt'))
+    path_name = slugify(name,
+                        word_boundary=True, separator="_")
+    path = "{0}/{1}".format("spook", path_name)
+    tweet_image = utils.get_image(path)
+    name = re.sub(r' \([^)]*\)', '', name)
+    m = "You were #Sp00k'ed by {0}!!".format(name)
+    return m, tweet_image
+
+#print(spookjoke())
