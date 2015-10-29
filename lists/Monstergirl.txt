@@ -4,6 +4,13 @@ Papi (monster musume)||Monster Musume no Iru Nichijou
 Suu (monster musume)||Monster Musume no Iru Nichijou
 Rachnera Arachnera||Monster Musume no Iru Nichijou
 Meroune Lorelei||Monster Musume no Iru Nichijou
+Doppel (monster musume)||Monster Musume no Iru Nichijou
+Kii (monster musume)||Monster Musume no Iru Nichijou
+Lala (monster musume)||Monster Musume no Iru Nichijou
+Lilith (monster musume)||Monster Musume no Iru Nichijou
+Manako||Monster Musume no Iru Nichijou
+Zombina||Monster Musume no Iru Nichijou
+Tionishia||Monster Musume no Iru Nichijou
 Fuji-san||Namiuchigiwa no Muromi-san
 Muromi-san||Namiuchigiwa no Muromi-san
 Levia-san||Namiuchigiwa no Muromi-san
@@ -30,3 +37,5 @@ Kurono Kurumu||Rosario to Vampire
 Eucliwood Hellscythe||Kore wa Zombie Desu ka?
 Seraphim (Kore wa Zombie Desu ka?)||Kore wa Zombie Desu ka?
 Krul Tepes||Owari no Seraph
+Tuka Luna Marceau||GATE
+Rory Mercury||GATE

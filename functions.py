@@ -85,6 +85,8 @@ def config_get(section, key, file=0):
         config.readfp(fp)
         try:
             return config.get(section, key)
+        except configparser.NoSectionError:
+            return False
         except configparser.NoOptionError:
             return False
 

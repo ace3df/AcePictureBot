@@ -24,6 +24,7 @@ Kazuki Ferrari||Galilei Donna
 Geraldine Bernstein||Gj-Bu
 Shinomiya Kasumi||Gj-Bu
 Victorique De Blois||Gosick
+Takakura Himari||Mawaru Penguindrum
 Ayase Arisa||Love Live!
 Kousaka Yukiho||Love Live!
 Ange Ushiromiya||Umineko no Naku Koro Ni
@@ -45,7 +46,6 @@ Elsea De Lute Irma||Kami Nomi Zo Shiru Sekai
 Tsutsukakushi Tsukiko||Hentai Ouji To Warawanai Neko.
 Shimada Hazuki||Baka To Test
 Yasuri Nanami||Katanagatari
-Takakura Himari||Mawaru Penguindrum
 Toudou Koyori||Hoshizora e Kakaru Hashi
 Toudou Kasane||Hoshizora e Kakaru Hashi
 Takanashi Hina||Papa no Iukoto wo Kikinasai!
@@ -95,3 +95,10 @@ Isara Gunther||Valkyria Chronicles
 Gokou Hinata||OreImo
 Gokou Tamaki||OreImo
 Agata Saaya||SKET Dance
+Shimada Hazuki||Baka to Test to Shoukanjuu
+Sakamachi Kureha||Mayo Chiki!
+Otosaka Ayumi||Charlotte
+Kurobane Yusa||Charlotte
+Doma Umaru||Himouto! Umaru-chan
+Sakurada Akane||Joukamachi no Dandelion
+Sera Mizuki||Classroom Crisis

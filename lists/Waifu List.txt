@@ -646,7 +646,117 @@ Momoki Run||A-Channel||http://cdn.myanimelist.net/images/characters/12/114813.jp
 Nishi Yuuko||A-Channel||http://cdn.myanimelist.net/images/characters/13/113049.jpg
 Tennouji Nagisa||A-Channel||http://cdn.myanimelist.net/images/characters/6/114849.jpg
 
-# http://myanimelist.net/anime/season/2011/summer
+Kaga Rin||Usagi Drop||http://cdn.myanimelist.net/images/characters/13/127325.jpg
+
+Himeji Mizuki||Baka to Test to Shoukanjuu||http://cdn.myanimelist.net/images/characters/3/110667.jpg
+Kirishima Shouko||Baka to Test to Shoukanjuu||http://cdn.myanimelist.net/images/characters/13/96539.jpg
+Shimada Minami||Baka to Test to Shoukanjuu||http://cdn.myanimelist.net/images/characters/9/82468.jpg
+Kinoshita Yuuko||Baka to Test to Shoukanjuu||http://cdn.myanimelist.net/images/characters/6/76945.jpg
+Shimada Hazuki||Baka to Test to Shoukanjuu||http://cdn.myanimelist.net/images/characters/14/84299.jpg
+Yoshii Akira||Baka to Test to Shoukanjuu||http://cdn.myanimelist.net/images/characters/10/85307.jpg
+Kudou Aiko||Baka to Test to Shoukanjuu||http://cdn.myanimelist.net/images/characters/15/76949.jpg
+
+Konoe Subaru||Mayo Chiki!||http://cdn.myanimelist.net/images/characters/3/259063.jpg
+Suzutsuki Kanade||Mayo Chiki!||http://cdn.myanimelist.net/images/characters/10/121324.jpg
+Narumi Nakuru||Mayo Chiki!||http://cdn.myanimelist.net/images/characters/6/135229.jpg
+Usami Masamune||Mayo Chiki!||http://cdn.myanimelist.net/images/characters/16/120040.jpg
+Sakamachi Kureha||Mayo Chiki!||http://cdn.myanimelist.net/images/characters/8/121354.jpg
+
+Oginome Ringo||Mawaru Penguindrum||http://cdn.myanimelist.net/images/characters/13/121788.jpg
+Takakura Himari||Mawaru Penguindrum||http://cdn.myanimelist.net/images/characters/4/129767.jpg
+
+Akaza Akari||Yuru Yuri||http://cdn.myanimelist.net/images/characters/13/121373.jpg
+Funami Yui||Yuru Yuri||http://cdn.myanimelist.net/images/characters/7/129119.jpg
+Toshinou Kyouko||Yuru Yuri||http://cdn.myanimelist.net/images/characters/3/116749.jpg
+Yoshikawa Chinatsu||Yuru Yuri||http://cdn.myanimelist.net/images/characters/14/116763.jpg
+Akaza Akane||Yuru Yuri||http://cdn.myanimelist.net/images/characters/13/125665.jpg
+Furutani Himawari||Yuru Yuri||http://cdn.myanimelist.net/images/characters/8/134007.jpg
+Ikeda Chitose||Yuru Yuri||http://cdn.myanimelist.net/images/characters/4/136395.jpg
+Oomuro Sakurako||Yuru Yuri||http://cdn.myanimelist.net/images/characters/6/134011.jpg
+Sugiura Ayano||Yuru Yuri||http://cdn.myanimelist.net/images/characters/16/136397.jpg
+
+# http://myanimelist.net/anime/season/2011/summer Kamisama 
+
+Otosaka Ayumi||Charlotte||http://cdn.myanimelist.net/images/characters/4/288021.jpg
+Kurobane Yusa||Charlotte||http://cdn.myanimelist.net/images/characters/7/288018.jpg
+Kurobane Misa||Charlotte||http://cdn.myanimelist.net/images/characters/5/287688.jpg
+Tomori Nao||Charlotte||http://cdn.myanimelist.net/images/characters/10/288020.jpg
+
+Chester Mora||Rokka no Yuusha||http://cdn.myanimelist.net/images/characters/7/291654.jpg
+Nashetania Loei Piena Augustra||Rokka no Yuusha||http://cdn.myanimelist.net/images/characters/14/291600.jpg
+Chamo Rosso||Rokka no Yuusha||http://cdn.myanimelist.net/images/characters/11/291656.jpg
+Fremy Speeddraw||Rokka no Yuusha||http://cdn.myanimelist.net/images/characters/8/291611.jpg
+
+Albedo||Overlord||http://cdn.myanimelist.net/images/characters/5/288167.jpg
+Shalltear Bloodfallen||Overlord||http://cdn.myanimelist.net/images/characters/15/290334.jpg
+
+Pina co Lada (Gate)||GATE||http://cdn.myanimelist.net/images/characters/3/287884.jpg
+Lelei la Lalena||GATE||http://cdn.myanimelist.net/images/characters/11/278274.jpg
+Tuka Luna Marceau||GATE||http://cdn.myanimelist.net/images/characters/15/287899.jpg
+Rory Mercury||GATE||http://cdn.myanimelist.net/images/characters/10/287900.jpg
+
+Tachibana Sakuya||God Eater||http://cdn.myanimelist.net/images/characters/14/286891.jpg
+Alisa Ilinichina Amiella||God Eater||http://cdn.myanimelist.net/images/characters/6/186845.jpg
+
+Kurihara Chiyo||Prison School||http://cdn.myanimelist.net/images/characters/2/292158.jpg
+Kurihara Mari||Prison School||http://cdn.myanimelist.net/images/characters/6/256035.jpg
+Midorikawa Hana||Prison School||http://cdn.myanimelist.net/images/characters/13/287340.jpg
+Shiraki Meiko||Prison School||http://cdn.myanimelist.net/images/characters/8/252153.jpg
+Takenomiya Kate||Prison School||http://cdn.myanimelist.net/images/characters/2/246199.jpg
+
+Kajou Ayame||Shimoseka||http://cdn.myanimelist.net/images/characters/5/290512.jpg
+Onigashira Kosuri||Shimoseka||http://cdn.myanimelist.net/images/characters/4/286057.jpg
+Saotome Otome||Shimoseka||http://cdn.myanimelist.net/images/characters/2/292526.jpg
+Fuwa Hyouka||Shimoseka||http://cdn.myanimelist.net/images/characters/13/286144.jpg
+Anna Nishikinomiya||Shimoseka||http://cdn.myanimelist.net/images/characters/3/290523.jpg
+
+Meer (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/3/287359.jpg
+Centaurea Shianus||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/9/287358.jpg
+Papi (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/9/287357.jpg
+Suu (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/11/288087.jpg
+Rachnera Arachnera||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/12/278394.jpg
+Meroune Lorelei||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/15/220541.jpg
+Doppel (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/16/292252.jpg
+Kii (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/10/292261.jpg
+Lala (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/5/292260.jpg
+Lilith (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/12/292259.jpg
+Manako||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/5/292253.jpg
+Zombina||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/2/292255.jpg
+Tionishia||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/13/292254.jpg
+Ms. Smith||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/12/292256.jpg
+
+Ebisuzawa Kurumi||Gakkougurashi!||http://cdn.myanimelist.net/images/characters/13/286725.jpg
+Naoki Miki||Gakkougurashi!||http://cdn.myanimelist.net/images/characters/10/286723.jpg
+Takeya Yuki||Gakkougurashi!||http://cdn.myanimelist.net/images/characters/6/285442.jpg
+Wakasa Yuuri||Gakkougurashi!||http://cdn.myanimelist.net/images/characters/15/285446.jpg
+Sakura Megumi||Gakkougurashi!||http://cdn.myanimelist.net/images/characters/14/291464.jpg
+
+Doma Umaru||Himouto! Umaru-chan||http://cdn.myanimelist.net/images/characters/14/288278.jpg
+Ebina Nana||Himouto! Umaru-chan||http://cdn.myanimelist.net/images/characters/11/288276.jpg
+Motoba Kirie||Himouto! Umaru-chan||http://cdn.myanimelist.net/images/characters/14/289620.jpg
+Yachibana Sylphynford||Himouto! Umaru-chan||http://cdn.myanimelist.net/images/characters/7/288275.jpg
+
+Aizawa Nagisa||Jitsu wa Watashi wa||http://cdn.myanimelist.net/images/characters/9/279984.jpg
+Akemi Mikan||Jitsu wa Watashi wa||http://cdn.myanimelist.net/images/characters/9/289694.jpg
+Koumoto Akane||Jitsu wa Watashi wa||http://cdn.myanimelist.net/images/characters/12/275394.jpg
+Shiragami Youko||Jitsu wa Watashi wa||http://cdn.myanimelist.net/images/characters/5/275392.jpg
+Koumoto Akari||Jitsu wa Watashi wa||http://cdn.myanimelist.net/images/characters/4/280002.jpg
+Shishido Shiho||Jitsu wa Watashi wa||http://cdn.myanimelist.net/images/characters/7/280227.jpg
+
+Lecty Eisenach||Sky Wizards Academy||http://cdn.myanimelist.net/images/characters/14/270179.jpg
+Rico Flamel||Sky Wizards Academy||http://cdn.myanimelist.net/images/characters/16/270181.jpg
+Misora Whitale||Sky Wizards Academy||http://cdn.myanimelist.net/images/characters/4/292774.jpg
+Yuri Flostre||Sky Wizards Academy||http://cdn.myanimelist.net/images/characters/8/270185.jpg
+Freon Flamel||Sky Wizards Academy||http://cdn.myanimelist.net/images/characters/11/270187.jpg
+Chloe Sevegny||Sky Wizards Academy||http://cdn.myanimelist.net/images/characters/7/270189.jpg
+
+Sakurada Hikari||Joukamachi no Dandelion||http://cdn.myanimelist.net/images/characters/5/287045.jpg
+Sakurada Akane||Joukamachi no Dandelion||http://cdn.myanimelist.net/images/characters/16/291770.jpg
+Ayugase Karen||Joukamachi no Dandelion||http://cdn.myanimelist.net/images/characters/7/288073.jpg
+
+Sera Mizuki||Classroom Crisis||http://cdn.myanimelist.net/images/characters/2/287524.jpg
+Shirasaki Iris||Classroom Crisis||http://cdn.myanimelist.net/images/characters/13/287523.jpg
+
 
 # Video Games
 Samus Aran||Metroid||http://i.imgur.com/x09sloo.jpg
@@ -656,4 +766,4 @@ Rosalina (Mario)||Super Mario Bros.||http://i.imgur.com/nmM7grR.jpg
 Princess Zelda||The Legend of Zelda||http://i.imgur.com/nmQUFrk.jpg
 Lucina||Fire Emblem||http://i.imgur.com/o3CPNQ1.jpg
 Palutena||Kid Icarus||http://i.imgur.com/6z2UCA5.jpg
-Bayonetta (character)||Bayonetta||http://cdn.myanimelist.net/images/characters/16/264599.jpg
+Bayonetta (Character)||Bayonetta||http://cdn.myanimelist.net/images/characters/16/264599.jpg
