@@ -607,6 +607,9 @@ def random_list(list_name, args=""):
         scrape_images = True
         lines = utils.file_to_list('Tankgirl.txt')
 
+    # Under heavy stuff random.choice can be very weak
+    # so just a quick way to make sure it's 'random random'
+    random.shuffle(lines)
     entry = random.choice(lines)
     if list_name.endswith("OTP"):
         names = entry.split("(x)")
@@ -634,11 +637,9 @@ def random_list(list_name, args=""):
     path_name = slugify(name,
                         word_boundary=True, separator="_")
     path = "{0}/{1}".format(gender.lower(), path_name)
-    if scrape_images:
+    tweet_image = utils.get_image(path)
+    if scrape_images and not tweet_image:
         tweet_image = utils.get_image_online(tags, 0, 1, "", path)
-
-    if not tweet_image:
-        tweet_image = utils.get_image(path)
 
     name = re.sub(r' \([^)]*\)', '', name)
     if show_series:
@@ -900,7 +901,5 @@ def spookjoke():
     path = "{0}/{1}".format("spook", path_name)
     tweet_image = utils.get_image(path)
     name = re.sub(r' \([^)]*\)', '', name)
-    m = "You were #Sp00k'ed by {0}!!".format(name)
+    m = "Oh oh! Looks like your comamnd was stolen by {0}!! #Sp00ky".format(name)
     return m, tweet_image
-
-#print(spookjoke())

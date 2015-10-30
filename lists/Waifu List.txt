@@ -633,7 +633,6 @@ Toudou Kasane||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/chara
 Yorozu Senka||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/characters/5/114403.jpg
 Hinata Ibuki||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/characters/8/112933.jpg
 
-Touhara Asuha||Astarotte no Omocha!||http://cdn.myanimelist.net/images/characters/8/113051.jpg
 Astarotte Ygvar||Astarotte no Omocha!||http://cdn.myanimelist.net/images/characters/6/113053.jpg
 Isadora Finnsdottir||Astarotte no Omocha!||http://cdn.myanimelist.net/images/characters/11/150371.jpg
 Elfleda Mirjasdottir||Astarotte no Omocha!||http://cdn.myanimelist.net/images/characters/13/113043.jpg

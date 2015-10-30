@@ -207,11 +207,8 @@ def download_image(url, path="", filename="", ignore_list=""):
     except:
         # Loss data / IncompleteRead
         return False
-    if path == "":
-        path = os.path.join(settings['image_loc'], "downloads")
-    else:
-        path = os.path.join(settings['image_loc'], path)
 
+    path = os.path.join(settings['image_loc'], "downloads")
     if filename == "":
         hash = hashlib.md5(data).hexdigest()
         filename = "%s%s" % (hash, ext)

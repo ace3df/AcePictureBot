@@ -103,6 +103,8 @@ def tweet_command(_API, status, tweet, command):
         func.count_trigger(command, user.id)
 
     # Joke Commands
+    if command == "spook":
+        tweet, tweet_image = func.spookjoke()
     if command == "Spoiler":
         tweet = random.choice(utils.file_to_list(
                     os.path.join(settings['list_loc'],
