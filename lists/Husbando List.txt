@@ -290,7 +290,15 @@ Shion (No.6)||No.6||http://cdn.myanimelist.net/images/characters/10/118571.jpg
 Takakura Shouma||Mawaru Penguindrum||http://cdn.myanimelist.net/images/characters/13/121792.jpg
 Takakura Kanba||Mawaru Penguindrum||http://cdn.myanimelist.net/images/characters/3/121976.jpg
 
-##
+Hijirikawa Masato||Uta No Prince-Sama||http://cdn.myanimelist.net/images/characters/14/128373.jpg
+Ichinose Tokiya||Uta No Prince-Sama||http://cdn.myanimelist.net/images/characters/8/128893.jpg
+Ittoki Otoya||Uta No Prince-Sama||http://cdn.myanimelist.net/images/characters/8/128889.jpg
+Jinguuji Ren||Uta No Prince-Sama||http://cdn.myanimelist.net/images/characters/10/128895.jpg
+Kurusu Shou||Uta No Prince-Sama||http://cdn.myanimelist.net/images/characters/11/153331.jpg
+Shinomiya Natsuki||Uta No Prince-Sama||http://cdn.myanimelist.net/images/characters/14/128887.jpg
+
+Producer (Idolmaster)||Idolmaster||http://cdn.myanimelist.net/images/characters/11/122171.jpg
+
 
 Otosaka Yuu||Charlotte||http://cdn.myanimelist.net/images/characters/15/288011.jpg
 Takajou Joujirou||Charlotte||http://cdn.myanimelist.net/images/characters/9/288012.jpg
@@ -320,6 +328,11 @@ Doma Taihei||Himouto! Umaru-chan||http://cdn.myanimelist.net/images/characters/1
 Kanata Age||Sky Wizards Academy||http://cdn.myanimelist.net/images/characters/3/270177.jpg
 
 Kiryuu Nagisa||Classroom Crisis||http://cdn.myanimelist.net/images/characters/5/286087.jpg
+
+Worick Arcangelo||Gangsta.||http://cdn.myanimelist.net/images/characters/15/222987.jpg
+
+Obi (Akagami no Shirayukihime)||Akagami no Shirayukihime||http://cdn.myanimelist.net/images/characters/14/292272.jpg
+Zen Wistalia||Akagami no Shirayuki-hime||http://cdn.myanimelist.net/images/characters/5/229453.jpg
 
 
 # Video Games

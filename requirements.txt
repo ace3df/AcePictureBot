@@ -1,3 +1,5 @@
+PIL
+slugify
 c:\python34\lib\site == packages\requests
 c:\python34\lib\site == packages\robobrowser
 c:\python34\lib\site == packages\tweepy

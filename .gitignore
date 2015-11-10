@@ -2,6 +2,8 @@ __pycache__/
 _site/
 *.py[cod]
 Gemfile.lock
+.idea/
+Ace.xml
 
 ignore_lists/
 FFmpeg/
@@ -18,6 +20,4 @@ users_waifus.json
 users_husbandos.json
 count.ini
 
-notes
-Tasks.TODO
 palette.png

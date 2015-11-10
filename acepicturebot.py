@@ -17,7 +17,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.3.3"
+__version__ = "2.3.4"
 
 BLOCKED_IDS = utils.file_to_list(
                 os.path.join(settings['list_loc'],
@@ -40,7 +40,7 @@ SAPI = None
 DEBUG = True
 
 
-def post_tweet(_API, tweet, media=False, command=False, rts=False):
+def post_tweet(_API, tweet, media="", command=False, rts=False):
     try:
         if media:
             media = media.replace("\\", "\\\\")
@@ -68,9 +68,6 @@ def post_tweet(_API, tweet, media=False, command=False, rts=False):
             else:
                 _API.update_status(status=tweet)
     except:
-        # 99% of the time it's because they delete their tweets
-        # Twitter gets confused and BAM!
-        # The 1% is probs just twitter being twitter
         pass
 
 
@@ -120,9 +117,21 @@ def tweet_command(_API, status, tweet, command):
 
     gender = utils.gender(status.text)
     if "Register" in command:
-        if not is_following(API, user.id):
-            tweet = """You must follow @AcePictureBot to register!
-Help: {0}""".format(func.config_get('Help URLs', 'must_follow'))
+        follow_result = is_following(user.id)
+        if follow_result == "Limited":
+            tweet = ("The bot is currently limited on checking stuff.\n"
+                     "Try again in 15 minutes!")
+            if gender == 0:
+                gender = "waifu"
+            else:
+                gender = "husbando"
+            func.remove_one_limit(user.id, gender.lower() + "register")
+        elif follow_result == "Not Genuine":
+            tweet = ("Your account wasn't found to be genuine.\n"
+                     "Help: {url}").format(url=func.config_get('Help URLs', 'not_genuine'))
+        elif not follow_result:
+            tweet = ("You must follow @AcePictureBot to register!\n"
+                     "Help: {url}").format(url=func.config_get('Help URLs', 'must_follow'))
         else:
             tweet, tweet_image = func.waifuregister(user.id,
                                                     user.screen_name,
@@ -140,7 +149,8 @@ Help: {0}""".format(func.config_get('Help URLs', 'must_follow'))
     list_cmds = ["Shipgirl", "Touhou", "Vocaloid",
                  "Imouto", "Idol", "Shota",
                  "Onii", "Onee", "Sensei",
-                 "Monstergirl", "Witchgirl", "Tankgirl"]
+                 "Monstergirl", "Witchgirl", "Tankgirl",
+                 "Senpai", "Kohai"]
     if command in list_cmds:
         tweet, tweet_image = func.random_list(command, tweet)
 
@@ -166,7 +176,7 @@ def acceptable_tweet(status):
     tweet = status.text
     user = status.user
 
-    # Ignore retweets.
+    # Ignore ReTweets.
     if tweet.startswith('RT'):
         return False, False
 
@@ -174,7 +184,7 @@ def acceptable_tweet(status):
         if user.id not in MOD_IDS:
             return False, False
 
-    # Reload incase of manual updates.
+    # Reload in case of manual updates.
     BLOCKED_IDS = utils.file_to_list(
                     os.path.join(settings['list_loc'],
                                  "Blocked Users.txt"))
@@ -196,37 +206,35 @@ def acceptable_tweet(status):
                for a in settings['twitter_track']):
         return False, False
 
-    # If the user @sauce_plz add "source" to the text
-    # as every @ is later removed
+    # If the user @sauce_plz add "source" to the text as every @ is later removed.
     if "sauce" in tweet.lower():
         tweet += " source"
 
-    # Remove extra spaces
+    # Remove extra spaces.
     tweet = re.sub(' +', ' ', tweet).lstrip()
 
     # Remove @UserNames (usernames could trigger commands alone)
-    tweet = ' '.join(re.sub("(^|\n| )(@[A-Za-z0-9_]+)", " ", tweet).split())
+    tweet = ' '.join(re.sub('(^|\n| )(@[A-Za-z0-9_]+)', ' ', tweet).split())
     tweet = tweet.replace("#", "")
 
     # Find the command they used.
     command = utils.get_command(tweet)
     if command == "WaifuRegister" or command == "HusbandoRegister":
+        # Cut the text off after the command word.
         reg = "({0})(?i)".format(command)
         if len(tweet) > (len(command) +
                          len(settings['twitter_track'][0]) + 2):
             tweet = re.split(reg, tweet)[2].lstrip()
 
-    # No command is found see if acceptable for a random waifu
+    # No command is found see if acceptable for a random waifu.
     if not command:
-        # Ignore Quote RTs only in this case
+        # Ignore quote ReTweets.
         if tweet.startswith('"@'):
             return False, False
-
-        # Ignore if it doesn't mention the main bot ONLY
-        if not settings['twitter_track'][0].lower() in tweet.lower():
+        # Ignore if it doesn't mention the main bot only.
+        if settings['twitter_track'][0] not in status.text:
             return False, False
-
-        # Last case, check if they're not replying to a tweet
+        # Last case, check if they're not replying to a tweet.
         if status.in_reply_to_status_id is None:
             command = "Waifu"
         else:
@@ -239,7 +247,7 @@ def acceptable_tweet(status):
                 return False, False
             elif "my" in command:
                 return False, False
-        except:
+        except ValueError:
             return False, False
     else:
         USER_LAST_COMMAND[user.id] = command
@@ -248,19 +256,18 @@ def acceptable_tweet(status):
                 islice(USER_LAST_COMMAND.items(),
                        20, None)))
 
-    # Make sure the user isn't going ham on comamnds.
-    # This is to make sure the bot doesn't get closer to being
-    # limited from only one user.
+    # Stop someone limiting the bot on their own.
     rate_time = datetime.datetime.now()
+    rate_limit_secs = 10800
     if user.id in RATE_LIMIT_DICT:
-        # User is limited (5 hours in seconds (18000))
+        # User is now limited (3 hours).
         if ((rate_time - RATE_LIMIT_DICT[user.id][0])
-                .total_seconds() < 18000)\
+                .total_seconds() < rate_limit_secs)\
            and (RATE_LIMIT_DICT[user.id][1] >= 15):
             return False, False
-        # User limit is over
+        # User limit is over.
         elif ((rate_time - RATE_LIMIT_DICT[user.id][0])
-                .total_seconds() > 18000):
+                .total_seconds() > rate_limit_secs):
             del RATE_LIMIT_DICT[user.id]
         else:
             # User found, not limited, add one to the trigger count.
@@ -271,33 +278,42 @@ def acceptable_tweet(status):
         # and remove all the finished unused users.
         for person in list(RATE_LIMIT_DICT):
             if ((rate_time - RATE_LIMIT_DICT[person][0])
-               .total_seconds() > 18000):
+               .total_seconds() > rate_limit_secs):
                 del RATE_LIMIT_DICT[person]
         RATE_LIMIT_DICT[user.id] = [rate_time, 1]
 
-    # Fail check
+    # This shouldn't happen but just in case.
     if not isinstance(command, str):
         return False, False
+
     tweet = tweet.lower().replace(command.lower(), " ", 1).strip()
     return tweet, command
 
 
-def is_following(_API, user_id=None):
+def is_following(user_id):
     try:
-        ship = _API.lookup_friendships(user_ids=(2910211797, user_id))
-    except:
-        print("[WARNING] Hit lookup_friendships API limit!")
-        # Hit API limit, reject them for now
-        return False
+        user_info = API.get_user(user_id)
+    except tweepy.TweepError:
+        return "Limited"
+    if user_info.statuses_count < 10:
+        return "Not Genuine"
+    elif user_info.followers_count < 6:
+        return "Not Genuine"
+    try:
+        ship = API.lookup_friendships(user_ids=(2910211797, user_id))
+    except tweepy.TweepError:
+        return "Limited"
     try:
         return ship[1].is_followed_by
-    except:
-        # Account doesn't exsist anymore
+    except TypeError:
+        # Account doesn't exist anymore.
         return False
 
 
-def status_account(STATUS_API):
-    """ Read RSS feeds and post them on the status Twitter account."""
+def status_account(status_api):
+    """ Read RSS feeds and post them on the status Twitter account.
+    :param status_api: The Tweepy API object for the status account.
+    """
     def read_rss(url, name, pre_msg, find_xml):
         recent_id = open(os.path.join(settings['ignore_loc'],
                          name), 'r').read()
@@ -329,11 +345,11 @@ def status_account(STATUS_API):
 
         msg_msg = re.sub('<[^<]+?>', '', entry.findtext(find_xml['msg_id']))
         msg_msg = re.sub(' +', ' ', os.linesep.join(
-                    [s for s in msg_msg.splitlines() if s])).lstrip()
+                         [s for s in msg_msg.splitlines() if s])).lstrip()
         msg = "{0}{1}\n{2}".format(pre_msg,
                                    utils.short_str(msg_msg, 90),
                                    msg_url)
-        post_tweet(STATUS_API, msg)
+        post_tweet(status_api, msg)
 
     while True:
         url = "https://github.com/ace3df/AcePictureBot/commits/master.atom"
@@ -376,8 +392,8 @@ class CustomStreamListener(tweepy.StreamListener):
         HANG_TIME = time.time()
         if int(status_code) != int(LAST_STATUS_CODE):
             LAST_STATUS_CODE = status_code
-            msg = """[{0}] Twitter Returning Status Code: {1}.
-More Info: https://dev.twitter.com/overview/api/response-codes""".format(
+            msg = ("[{0}] Twitter Returning Status Code: {1}.\n"
+                   "More Info: https://dev.twitter.com/overview/api/response-codes").format(
                     time.strftime("%Y-%m-%d %H:%M"), status_code)
             print(msg)
             post_tweet(func.login(status=True), msg)
@@ -394,8 +410,8 @@ def start_stream(SAPI=None):
     return sapi
 
 
-def handle_stream(SAPI, STATUS_API=False):
-    sapi = start_stream(SAPI)
+def handle_stream(sapi, status_api=False):
+    sapi = start_stream(sapi)
     global HANG_TIME
     # Create a loop which makes sure that the stream
     # hasn't been hanging at all.
@@ -409,8 +425,8 @@ The bot will catch up on missed messages now!""".format(
                     time.strftime("%Y-%m-%d %H:%M"))
             print(msg)
             try:
-                if STATUS_API:
-                    post_tweet(STATUS_API, msg)
+                if status_api:
+                    post_tweet(status_api, msg)
             except:
                 pass
             sapi.disconnect()
@@ -449,8 +465,8 @@ if __name__ == '__main__':
                     os.path.join(settings['ignore_loc'],
                                  "tweets_read.txt"))
     # Get the main bot's API and STREAM request.
-    API = func.login(REST=True)
-    SAPI = func.login(REST=False)
+    API = func.login(rest=True)
+    SAPI = func.login(rest=False)
     # Get the status account API.
     STATUS_API = func.login(status=True)
     # Start 2 threads:

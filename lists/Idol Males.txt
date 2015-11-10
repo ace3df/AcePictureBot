@@ -1,11 +1,17 @@
 # List of male idols. Type=||
 Hyoudou Aoi||Kaichou Wa Maid-Sama
 Camus (Utapri)||Uta No Prince-Sama
+Hijirikawa Masato||Uta No Prince-Sama
+Ichinose Tokiya||Uta No Prince-Sama
+Ittoki Otoya||Uta No Prince-Sama
+Jinguuji Ren||Uta No Prince-Sama
+Kurusu Shou||Uta No Prince-Sama
+Shinomiya Natsuki||Uta No Prince-Sama
+Ringo Tsukimiya||Uta No Prince-Sama
 Tomii Daiki||Shounen Hollywood
 Amaki Ikuma||Shounen Hollywood
 Kazami Kakeru||Shounen Hollywood
 Sakeki Kira||Shounen Hollywood
-Ringo Tsukimiya||Uta No Prince-Sama
 Maiyama Shun||Shounen Hollywood
 Katsura Kogorou (Bakumatsu Rock)||Bakumatsu Rock
 Hijikata Toshizou (Bakumatsu Rock)||Bakumatsu Rock
@@ -17,3 +23,4 @@ Aion (Show By Rock!!)||Show By Rock!!
 Rom (Show By Rock!!)||Show By Rock!!
 Shu Zo (Show By Rock!!)||Show By Rock!!
 Riku (Show By Rock!!)||Show By Rock!!
+Okamura Nao||Idolmaster: SideM

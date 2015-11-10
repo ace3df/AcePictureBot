@@ -80,6 +80,7 @@ Kasuga Mirai||Idolmaster
 Katagiri Sanae||Idolmaster Cinderella Girls
 Katayama Minami||Wake Up Girls!
 Kawashima Mizuki||Idolmaster Cinderella Girls
+Maria Cadenzavuna Eve||Senki Zesshou Symphogear
 Kazanari Tsubasa||Senki Zesshou Symphogear
 Kenzaki Makoto||Dokidoki! Pretty Cure
 Kikuchi Makoto||Idolmaster
@@ -108,7 +109,6 @@ Maeda Atsuko||AKB0048
 Maekawa Miku||Idolmaster
 Maekawa Miku||Idolmaster Cinderella Girls
 Maizono Sayaka||Danganronpa
-Maria Cadenzavuna Eve||Senki Zesshou Symphogear G
 Maya Mari||Samurai Flamenco
 Mimura Kanako||Idolmaster
 Mimura Kanako||Idolmaster Cinderella Girls
@@ -202,3 +202,5 @@ Yazawa Nico||Love Live!
 Yokomizo Makoto||AKB0048
 Yuuka Ichijou||AKB0048
 Zange||Kannagi
+Hotaru (Splatoon)||Splatoon
+Aori (Splatoon)||Splatoon

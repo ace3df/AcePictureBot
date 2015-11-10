@@ -22,18 +22,19 @@ class WaifuRegisterClass:
         self.noimages = False
         self.notenough = False
         self.offline = False
+        self.soup = False
         if gender == 0:
             self.end_tags_main = "+solo"
             self.end_tags = "+-male+solo+-1boy+-genderswap"
             self.gender = "waifu"
             self.filename = "users_waifus.json"
-            self.pic_limit = 25
+            self.pic_limit = 30
         elif gender == 1:
             self.end_tags_main = "+solo+-1girl+-female"
             self.end_tags = "+solo+-1girl+-female+-genderswap"
             self.gender = "husbando"
             self.filename = "users_husbandos.json"
-            self.pic_limit = 15
+            self.pic_limit = 25
 
         blocked_waifus = file_to_list(
                             os.path.join(settings['list_loc'],
@@ -66,7 +67,8 @@ class WaifuRegisterClass:
                 break
         self.known = [["anarchy_stocking", "stocking_(psg)"],
                       ["hestia", "hestia_(danmachi!)"],
-                      ["zelda", "princess_zelda"]]
+                      ["zelda", "princess_zelda"],
+                      ["asuka", "asuka_langley"]]
         for [known, work] in self.known:
             if self.name == known:
                 self.name = work
@@ -75,13 +77,16 @@ class WaifuRegisterClass:
         if self.override:
             return None
 
-    def clean_name(self, name):
+    @staticmethod
+    def clean_name(name):
         name = re.sub(
             '[<>"@#*:~\'$^%£]', '', name).strip()
         name = re.sub(' +', ' ', name).replace(" ", "_").lower()
+        name = name.replace("kancolle", "kantai_collection")
         return name
 
-    def reverse_name(self, name):
+    @staticmethod
+    def reverse_name(name):
         name = name.split("_")
         name = '_'.join(reversed(name))
         return name
@@ -95,7 +100,7 @@ class WaifuRegisterClass:
             a = "http://safebooru.org/"
             url_search = a + "index.php?page=post&s=list&tags="
         tags = self.name + self.end_tags
-        if (site == 0 or site >= 2):
+        if site == 0 or site >= 2:
             tags += "+rating:safe"
         url = url_search + tags
         return scrape_site(url, cookie_file)
@@ -107,10 +112,12 @@ class WaifuRegisterClass:
             name = a.next.text
             name = name.title()
             if " " not in name:
-                name = name + " $"
+                name += " $"
             possible_names.append(name)
         if not possible_names:
             return False
+        if self.name.lower() + " $" in list(map(str.lower, possible_names)):
+            return True
         help_eng = "%sRegister one of these names:" % self.gender.title()
         help_frn = "%sRegister un de ces noms:" % self.gender.title()
         help_spn = ""
@@ -190,6 +197,7 @@ Spanish: {2}
             self.multinames = self.check_possible_names()
             if isinstance(self.multinames, str):
                 return self.multinames
+            self.multinames = False
         if not self.is_name():
             if "(" in self.name:
                 self.noimages = True

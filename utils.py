@@ -55,24 +55,21 @@ def file_to_list(file):
         file = os.path.join(settings['list_loc'], file)
     lines = list(filter(None,
                  open(file, 'r', encoding='utf-8').read().splitlines()))
+    if not lines:
+        return []
     to_list = []
     split_by = False
     keep_s = -1
-    try:
-        if ":" in lines[0]:
-            split_by = ":"
-            keep_s = 0
-            keep_e = 1
-        elif "||" in lines[0]:
-            split_by = "||"
-            keep_s = 0
-            keep_e = 2
-            if (lines[3].count("||")) == 2:
-                keep_e = 3
-    except:
-        # File is empty
-        return []
-
+    if ":" in lines[0]:
+        split_by = ":"
+        keep_s = 0
+        keep_e = 1
+    elif "||" in lines[0]:
+        split_by = "||"
+        keep_s = 0
+        keep_e = 2
+        if (lines[3].count("||")) == 2:
+            keep_e = 3
     for line in lines:
         # Comment line
         if line[0] == "#":
@@ -85,22 +82,6 @@ def file_to_list(file):
     return to_list
 
 
-def short_str(string, cap=30):
-    if not string:
-        return string
-    try:
-        count = 0
-        if string[cap + 5]:
-            for char in string:
-                count += 1
-                if count >= cap or not char:
-                    break
-            string = string[:count].strip()
-            return string + "[...]"
-    except:
-        return string.strip()
-
-
 def scrape_site(url, cookie_file=""):
     global s
     s = Session()
@@ -109,7 +90,7 @@ def scrape_site(url, cookie_file=""):
         try:
             s.cookies.load(ignore_discard=True)
         except:
-            # Cookies don't exsit yet
+            # Cookies don't exist yet
             pass
     s.headers['User-Agent'] = 'Mozilla/5.0 (X11; Ubuntu; rv:39.0)'
     s.headers['Accept'] = 'text/html'
@@ -188,14 +169,14 @@ def download_image(url, path="", filename="", ignore_list=""):
         except:
             ignore_imgs = []
 
-    imgTypes = {"jpg": "image/jpeg",
-                "jpeg": "image/jpeg",
-                "png": "image/png",
-                "gif": "image/gif",
-                "webm": "video/webm"}
-    filepath = urlparse(url).path
-    ext = os.path.splitext(filepath)[1].lower()
-    if not ext[ext.rfind(".") + 1:] in imgTypes:
+    img_types = {"jpg": "image/jpeg",
+                 "jpeg": "image/jpeg",
+                 "png": "image/png",
+                 "gif": "image/gif",
+                 "webm": "video/webm"}
+    file_path = urlparse(url).path
+    ext = os.path.splitext(file_path)[1].lower()
+    if not ext[ext.rfind(".") + 1:] in img_types:
         return False
 
     hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)',
@@ -204,14 +185,14 @@ def download_image(url, path="", filename="", ignore_list=""):
     try:
         response = urllib.request.urlopen(req)
         data = response.read()
-    except:
+    except urllib.request.URLError:
         # Loss data / IncompleteRead
         return False
-
-    path = os.path.join(settings['image_loc'], "downloads")
+    if path:
+        path = os.path.join(settings['image_loc'], "downloads")
     if filename == "":
-        hash = hashlib.md5(data).hexdigest()
-        filename = "%s%s" % (hash, ext)
+        img_hash = hashlib.md5(data).hexdigest()
+        filename = "%s%s" % (img_hash, ext)
 
     if not os.path.exists(path):
         os.makedirs(path)
@@ -228,13 +209,13 @@ def download_image(url, path="", filename="", ignore_list=""):
         if not tweet_image:
             return False
 
-    if ((os.stat(tweet_image).st_size / 1000000) > 2.8):
-        # Filesize too big, return False if normal image
+    if (os.stat(tweet_image).st_size / 1000000) > 2.8:
+        # File size too big, return False if normal image
         # Try to compress if a gif
         if "gif" in ext[ext.rfind(".")+1:]:
             tweet_image = video_to_gif(tweet_image)
             # Still too large
-            if ((os.stat(tweet_image).st_size / 1000000) > 2.8):
+            if (os.stat(tweet_image).st_size / 1000000) > 2.8:
                 os.remove(tweet_image)
                 return False
         else:
@@ -275,6 +256,7 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
     config = configparser.ConfigParser()
     config.read(settings['settings'])
     websites = (dict(config.items('Websites')))
+    blacklisted_tags = (config.get('Settings', 'blacklisted_tags')).split(', ')
     if websites['sankakucomplex'] == "False" and site == 0:
         site = 1
     if websites['danbooru'] == "False" and site == 1:
@@ -285,18 +267,16 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                 os.path.join(
                     settings['ignore_loc'],
                     ignore_list), 'r').read().splitlines()
-        except:
+        except FileNotFoundError:
             ignore_urls = []
+
     tried_pages = [high_page + 1]
     last_tries = 0
     try_count = 0
     low_page = 0
-    page = 0
-    x = None
     found_image = False
     found_page = False
     good_image = False
-    no_images = False
     browser = False
     if site == 0:
         cookie_file = "sankakucomplex.txt"
@@ -334,6 +314,8 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
         url_search = "http://konachan.com/post?tags="
         pid = False
         login = False
+    else:
+        return False
     if isinstance(tags, list):
         tag_count = len(tags)
         tags = '+'.join(tags)
@@ -436,7 +418,7 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                     if "/post/show/" not in link['href']:
                         continue
                 good_image_links.append(link['href'])
-            if good_image_links == []:
+            if not good_image_links:
                 return False
             random.shuffle(good_image_links)
             if site == 0:
@@ -448,7 +430,7 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                 while url in ignore_urls:
                     url = "%s/%s" % (url_start,
                                      random.choice(good_image_links))
-                    try_count = try_count + 1
+                    try_count += 1
                     if try_count == 20:
                         break
                 ignore_urls.append(url)
@@ -507,8 +489,8 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                     text = text.text
                     text = text.replace("&#39;", "\'")
                     image_tags.append(text)
-
-            if any([item.lower()in settings['ignore_tags']
+            image_tags = list(map(str.strip, image_tags))
+            if any([item.lower()in blacklisted_tags
                     for item in image_tags]):
                 continue
             if any("(cosplay)" in s for s in image_tags):
@@ -547,22 +529,21 @@ def get_image(path, ignore_list=False):
         try:
             files = [p for p in pathlib.Path(path).iterdir() if p.is_file()]
             img = path_leaf(random.choice(files))
-        except:
+            return os.path.join(path, img)
+        except FileNotFoundError:
             return False
-        return os.path.join(path, img)
     else:
         try:
             ignore_imgs = open(
                 os.path.join(
                     settings['ignore_loc'],
                     ignore_list), 'r').read().splitlines()
-        except:
+        except FileNotFoundError:
             ignore_imgs = []
         try:
             files = [p for p in pathlib.Path(path).iterdir() if p.is_file()]
             img = path_leaf(random.choice(files))
-        except:
-            # Emptry path
+        except FileNotFoundError:
             return False
         hex_data = image_hash(os.path.join(path, img))
         safe_break = 0
@@ -611,19 +592,16 @@ def get_command(string):
 def short_string(string, limit=40):
     if string == "":
         return string
-    elif len(string) < 40:
+    elif len(string) < limit:
         return string
-    try:
-        count = 0
-        if string[limit]:
-            for a in string:
-                count += 1
-                if count >= limit and a == " ":
-                    break
-            string = string[:count].strip()
-            return string + "[..]"
-    except:
-        return string.strip()
+    count = 0
+    if string[limit]:
+        for a in string:
+            count += 1
+            if count >= limit and a == " ":
+                break
+        string = string[:count].strip()
+        return string + "[..]"
 
 
 def gender(string):

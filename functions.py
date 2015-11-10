@@ -18,7 +18,7 @@ import os
 import re
 
 
-def login(REST=True, status=False):
+def login(rest=True, status=False):
     if status:
         consumer_token = status_credentials['consumer_key']
         consumer_secret = status_credentials['consumer_secret']
@@ -31,7 +31,7 @@ def login(REST=True, status=False):
         access_token_secret = credentials['access_token_secret']
     auth = tweepy.OAuthHandler(consumer_token, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
-    if REST:
+    if rest:
         api = tweepy.API(auth)
         return api
     else:
@@ -82,7 +82,7 @@ def config_get(section, key, file=0):
         file = settings['count_file']
     with open(file) as fp:
         config = configparser.RawConfigParser(allow_no_value=True)
-        config.readfp(fp)
+        config.read_file(fp)
         try:
             return config.get(section, key)
         except configparser.NoSectionError:
@@ -98,7 +98,7 @@ def config_save(section, key, result, file=0):
         file = settings['count_file']
     with open(file) as fp:
         config = configparser.ConfigParser(allow_no_value=True)
-        config.readfp(fp)
+        config.read_file(fp)
         config.set(section, key, str(result))
     with open(file, 'w') as fp:
         config.write(fp)
@@ -111,10 +111,10 @@ def config_get_section_items(section, file=0):
         file = settings['count_file']
     with open(file) as fp:
         config = configparser.ConfigParser(allow_no_value=True)
-        config.readfp(fp)
+        config.read_file(fp)
         try:
             return dict(config.items(section))
-        except:
+        except configparser.NoSectionError:
             return False
 
 
@@ -131,13 +131,13 @@ def config_add_section(section, file=0):
         config.write(fp)
 
 
-def count_trigger(command, user_id="Failed"):
+def count_trigger(command, user_id="failed"):
     if not command.strip():
         return
     if "dellimits" in command.lower():
         return
     user_id = str(user_id).title()
-    if user_id == "Failed":
+    if user_id == "failed":
         loc = "failed"
     else:
         loc = "global"
@@ -146,7 +146,7 @@ def count_trigger(command, user_id="Failed"):
     except:
         glob_cur_cont = 1
     user_cur_count = int(config_get(user_id, command, 1)) + 1
-    if user_cur_count == 1 and user_id != "Failed":
+    if user_cur_count == 1 and user_id != "failed":
         try:
             config_add_section(user_id, 1)
         except:
@@ -161,13 +161,14 @@ def count_trigger(command, user_id="Failed"):
 def get_level(user_id):
     cmd_exp = {'default': 1,
                'my{GENDER}': 2,
-               '{GENDER}': 4,
-               'shipgirl': 4,
-               'otp': 4,
+               '{GENDER}': 2,
+               'shipgirl': 2,
+               'otp': 6,
                'vocaloid': 2,
                'imouto': 3,
-               '{GENDER}register': 6,
-               'monstergirl': 10}
+               'senpai': 5,
+               '{GENDER}register': 10,
+               'monstergirl': 3}
     sec = config_get_section_items(str(user_id), 1)
     if not sec:
         return "\nYou are Level: 1 \nCurrent Exp: 0 \nNext Level: 25"
@@ -208,9 +209,9 @@ def get_level(user_id):
                 break
     if level == 1:
         for_next = for_next - user_exp
-    return """\nYou are Level: {0}
-Current Exp: {1}
-Next Level: {2}""".format(level, user_exp, for_next)
+    return ("\nYou are Level: {0}\n"
+            "Current Exp: {1}\n"
+            "Next Level: {2}").format(level, user_exp, for_next)
 
 
 def waifu(gender, args="", otp=False):
@@ -226,29 +227,19 @@ def waifu(gender, args="", otp=False):
                                  list_name + " List.txt"))
     args = ' '.join(args.split()).lower()
     matched = []
-    # Slugify
     ignore = ["high-school-dxd", "love-live",
               "aoki-hagane-no-arpeggio", "kantai-collection",
               "aikatsu", "akb0048", "idolmaster",
               "idolmaster-cinderella-girls"]
     if len(args) > 4:
         for entry in lines:
-            """ Personally not a huge fan of people that
-                keep doing nothing but
-                Waifu High School DxD for weeks!
-                So simply blacklist that show
-                and other ones that a group of people
-                use nothing but that said show,
-                as well as shows that are used in triggers.
-            """
             if slugify(entry[1], word_boundary=True) in ignore:
                 continue
             if slugify(args,
                        word_boundary=True) == slugify(entry[1],
                                                       word_boundary=True):
                 matched.append(entry)
-        # It's not really that random if
-        # thre isn't that many people matched
+        # It's not really that random if there isn't that many people matched.
         if otp:
             t = 2
         else:
@@ -279,7 +270,7 @@ def mywaifu(user_id, gender):
     if gender == 0:
         gender = "Waifu"
         filename = "users_waifus.json"
-    elif gender == 1:
+    else:
         gender = "Husbando"
         filename = "users_husbandos.json"
     user_waifus_file = open(
@@ -292,12 +283,11 @@ def mywaifu(user_id, gender):
             break
     if int(user['twitter_id']) != user_id:
         count_trigger("mywaifu")
-        m = """I don't know who your {0} is!
-Use {1}Register!
-Help: {2}""".format(gender, gender,
-                    config_get('Help URLs', 'include_name'))
+        m = ("I don't know who your {0} is!\n"
+             "Use {1}Register!\n"
+             "Help: {2}").format(gender, gender,
+                                 config_get('Help URLs', 'include_name'))
         return m, False
-
     tags = user['name'] + user['tags']
     if user.get('max_page'):
         max_page = user['max_page']
@@ -309,12 +299,12 @@ Help: {2}""".format(gender, gender,
                         gender.lower(), path_name)
     ignore_list = "user_ignore/{0}".format(user['twitter_id'])
     tweet_image = utils.get_image_online(tags, user['web_index'],
-                                         max_page, ignore_list, path)
+                                         max_page, ignore_list)
     if not tweet_image:
         tweet_image = utils.get_image(path, ignore_list)
     if not tweet_image:
-        m = """Failed to get an image (website could be offline).
-Help: {0}""".format(config_get('Help URLs', 'no_mywaifu_image'))
+        m = ("Failed to get an image (website could be offline).\n"
+             "Help: {0}").format(config_get('Help URLs', 'website_offline'))
         remove_one_limit(user_id, "my" + gender.lower())
         return m, False
     if datetime.datetime.now().isoweekday() == 3:
@@ -411,7 +401,7 @@ def otp_image(img_1, img_2):
     try:
         urllib.request.urlretrieve(img_1, "1.jpg")
         urllib.request.urlretrieve(img_2, "2.jpg")
-    except:
+    except urllib.request.URLError:
         # Timeout
         return False
     otp_one = Image.open("1.jpg")
@@ -486,15 +476,11 @@ def otp(args):
 
 
 def random_list(list_name, args=""):
-    args = args.lower()
     gender = "waifu"
-    name = ""
-    path = ""
     hashtag = ""
     search_for = ""
     m = False
     lines = False
-    tweet_image = False
     show_series = False
     scrape_images = True
     if list_name == "Shipgirl":
@@ -592,6 +578,26 @@ def random_list(list_name, args=""):
         else:
             lines = utils.file_to_list('Sensei Male.txt')
             lines += utils.file_to_list('Sensei Female.txt')
+    elif list_name == "Senpai":
+        show_series = True
+        if "female" in args:
+            lines = utils.file_to_list('Senpai Female.txt')
+        elif "male" in args:
+            gender = "husbando"
+            lines = utils.file_to_list('Senpai Male.txt')
+        else:
+            lines = utils.file_to_list('Senpai Male.txt')
+            lines += utils.file_to_list('Senpai Female.txt')
+    elif list_name == "Kohai":
+        show_series = True
+        if "female" in args:
+            lines = utils.file_to_list('Kohai Female.txt')
+        elif "male" in args:
+            gender = "husbando"
+            lines = utils.file_to_list('Kohai Male.txt')
+        else:
+            lines = utils.file_to_list('Kohai Male.txt')
+            lines += utils.file_to_list('Kohai Female.txt')
     elif list_name == "Monstergirl":
         show_series = True
         scrape_images = True
@@ -701,10 +707,10 @@ def airing(args):
                 anime_time = anime_time.replace(
                     year=datetime.datetime.today().year)
                 result = anime_time - today
-                msg = """{0}
-{1} airing in
-{2} Days, {3} Hours and {4} Minutes""".format(
-                    anime_title, ep_num, result.days,
+                msg = ("{0}\n"
+                       "{1} airing in\n"
+                       "{2} Days, {3} Hours and {4} Minutes").format(
+                        anime_title, ep_num, result.days,
                     result.seconds//3600, (result.seconds//60) % 60)
             except:
                 msg = "{0}\nNew Series\nUnknown air date!".format(anime_title)
@@ -714,8 +720,8 @@ def airing(args):
 
     try:
         found = [s for s in air_list_titles if re.sub(
-            '[^A-Za-z0-9]+', '', args.lower()) in re.sub(
-            '[^A-Za-z0-9]+', '', s.lower())]
+                '[^A-Za-z0-9]+', '', args.lower()) in re.sub(
+                '[^A-Za-z0-9]+', '', s.lower())]
         found = ''.join(found[0])
         index = air_list_titles.index(''.join(found))
         air = air_list_msg[index]
@@ -726,9 +732,9 @@ def airing(args):
     return air
 
 
-def source(_API, status):
+def source(api, status):
     lines = []
-    TAG_RE = re.compile(r'<[^>]+>')
+    tag_re = re.compile(r'<[^>]+>')
 
     def info(image):
         url = "http://iqdb.org/?url=%s" % (str(image))
@@ -810,6 +816,7 @@ def source(_API, status):
                 names = ''.join(name)
         except:
             names = ""
+
         # Translation
         if site == 0:
             url = "https://chan.sankakucomplex.com/note/history?post_id=" + \
@@ -819,74 +826,78 @@ def source(_API, status):
             except:
                 # Site could be down
                 return False, False, False, False
-            if site == 0:
-                tl_text = soup.find(
-                    'table', class_="row-highlight").find_next('tbody')
-                tl_text = tl_text.find_all('tr')
-                for tr in tl_text:
-                    tr = tr.find_all('td')
-                    line = TAG_RE.sub('', tr[3].text).lstrip().rstrip()
-                    lines.append(line)
-            elif site == 1:
-                tl_text = soup.find('h1', text="Note Changes").find_next()
-                tl_text = tl_text.find_all('tr')
-                for tr in tl_text[1:]:
-                    tr = tr.find_all('td')
-                    line = TAG_RE.sub('', tr[3].text).lstrip().rstrip()
-                    lines.append(line)
-            if not lines:
-                translation = ""
-            else:
-                translation = "Notes: " + url + '\n' + '\n'.join(lines[::-1])
-                translation = utils.make_paste(text=translation)
-        else:
+            tl_text = soup.find(
+                     'table', class_="row-highlight").find_next('tbody')
+            tl_text = tl_text.find_all('tr')
+            for tr in tl_text:
+                tr = tr.find_all('td')
+                line = tag_re.sub('', tr[3].text).lstrip().rstrip()
+                lines.append(line)
+        elif site == 1:
+            url = "https://danbooru.donmai.us/note_versions?search%5Bpost_id%5D=" + \
+                    url.split("/")[-1]
+            try:
+                soup = utils.scrape_site(url)
+            except:
+                # Site could be down
+                return False, False, False, False
+            tl_text = soup.find('h1', text="Note Changes").find_next()
+            tl_text = tl_text.find_all('tr')
+            for tr in tl_text[1:]:
+                tr = tr.find_all('td')
+                line = tag_re.sub('', tr[3].text).lstrip().rstrip()
+                lines.append(line)
+        if not lines:
             translation = ""
+        else:
+            translation = "Notes: " + url + '\n' + '\n'.join(lines[::-1])
+            translation = utils.make_paste(text=translation)
 
         return artist, series, names, translation
 
-    def tweeted_image(_API, status):
+    def tweeted_image(api, status):
         """Return the image url from the tweet."""
-        IS_GIF = False
         try:
-            tweet = _API.get_status(status.in_reply_to_status_id)
+            tweet = api.get_status(status.in_reply_to_status_id)
             tweet = tweet.entities['media'][0]['media_url_https']
             if "tweet_video_thumb" in str(tweet):
-                IS_GIF = True
+                is_gif = True
+            else:
+                is_gif = False
             if ".mp4" in tweet:
-                return "Sorry, source is a video and not an image!", IS_GIF
-            return tweet, IS_GIF
+                return "Sorry, source is a video and not an image!", False
+            return tweet, is_gif
         except:
-            return "Are you sure you're asking for source on an image?", IS_GIF
+            return "Are you sure you're asking for source on an image?", False
 
-    tweeted_image, IS_GIF = tweeted_image(_API, status)
+    tweeted_image, is_gif = tweeted_image(api, status)
     if ("Are you sure" in tweeted_image) or ("source is a" in tweeted_image):
         count_trigger("source")
         return tweeted_image
 
     artist, series, names, translation = info(tweeted_image)
     saucenao = u"http://saucenao.com/search.php?urlify=1&url={0}".format(
-        str(tweeted_image))
+                str(tweeted_image))
     if not artist and not series and not names:
-        return "No relevant source infomation found!\n" + saucenao
+        return "No relevant source information found!\n" + saucenao
     else:
         if artist:
             artist = "By: {0}\n".format(artist)
         if names:
-            names = "Based on: {0}\n".format(names)
+            names = "Character(s): {0}\n".format(names)
         if series:
             series = "From: {0}\n".format(utils.short_string(series, 25))
         if translation:
-            translation = "TL: {0}\n".format(translation)
-    seen = set()
+            translation = "Translation: {0}\n".format(translation)
     handles = status.text.lower()
     handles = [word for word in handles.split() if word.startswith('@')]
-    handles = [x for x in handles if x not in seen and not seen.add(x)]
+    handles = list(set(handles))
     handles = ' '.join(handles).replace(
         "@" + settings["twitter_track"][0].lower(), "")
     m = "{0}{1}{2}{3}".format(artist, names, series,
                               translation)
-    if IS_GIF:
-        m = m + "*Source is a gif so this could be inaccurate.\n"
+    if is_gif:
+        m += "*Source is a gif so this could be inaccurate.\n"
     if (len(m) + 24) >= 120:
         m = utils.make_paste(m)
         m = "Source information is too long to Tweet:\n" + m + "\n"
@@ -901,5 +912,5 @@ def spookjoke():
     path = "{0}/{1}".format("spook", path_name)
     tweet_image = utils.get_image(path)
     name = re.sub(r' \([^)]*\)', '', name)
-    m = "Oh oh! Looks like your comamnd was stolen by {0}!! #Sp00ky".format(name)
+    m = "Oh oh! Looks like your command was stolen by {0}!! #Sp00ky".format(name)
     return m, tweet_image

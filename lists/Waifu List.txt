@@ -183,8 +183,6 @@ Jiang Lihua||Code Geass||http://cdn.myanimelist.net/images/characters/9/41258.jp
 
 Maka Albarn||Soul Eater||http://cdn.myanimelist.net/images/characters/15/36826.jpg
 Nakatsukasa Tsubaki||Soul Eater||http://cdn.myanimelist.net/images/characters/10/89667.jpg
-Patricia Thompson||Soul Eater||http://cdn.myanimelist.net/images/characters/9/37585.jpg
-Elizabeth Thompson||Soul Eater||http://cdn.myanimelist.net/images/characters/6/37584.jpg
 Medusa Gorgon||Soul Eater||http://cdn.myanimelist.net/images/characters/10/56590.jpg
 Blair||Soul Eater||http://cdn.myanimelist.net/images/characters/14/75146.jpg
 
@@ -256,7 +254,7 @@ Kusunoki Yua||ChäoS;HEAd||http://cdn.myanimelist.net/images/characters/3/50660.
 Ogata Rina||White Album||http://cdn.myanimelist.net/images/characters/4/54141.jpg
 Yuki Morikawa||White Album||http://cdn.myanimelist.net/images/characters/4/54187.jpg
 
-Shinouji Matsurika||Maria†Holic||http://cdn.myanimelist.net/images/characters/2/42568.jpg
+Shinouji Matsurika||Maria Holic||http://cdn.myanimelist.net/images/characters/2/42568.jpg
 
 Ikaruga Ayame||Asu no Yoichi!||http://cdn.myanimelist.net/images/characters/15/50261.jpg
 Ikaruga Chihaya||Asu no Yoichi!||http://cdn.myanimelist.net/images/characters/3/50787.jpg
@@ -448,7 +446,7 @@ Keikain Yura||Nurarihyon no Mago||http://cdn.myanimelist.net/images/characters/9
 Oikawa Tsurara||Nurarihyon no Mago||http://cdn.myanimelist.net/images/characters/12/95184.jpg
 
 Eris (asobi ni ik yo!)||Asobi ni Iku yo!||http://cdn.myanimelist.net/images/characters/15/94547.jpg
-Futaba Aoi||Asobi ni Iku yo!||http://cdn.myanimelist.net/images/characters/10/98859.jpg
+Futaba Aoi (asobi ni ik yo!||Asobi ni Iku yo!||http://cdn.myanimelist.net/images/characters/10/98859.jpg
 Kinjou Manami||Asobi ni Iku yo!||http://cdn.myanimelist.net/images/characters/10/97878.jpg
 Chaika (asobi ni iku yo!)||Asobi ni Iku yo!||
 Durel||Asobi ni Iku yo!||http://cdn.myanimelist.net/images/characters/13/96368.jpg
@@ -459,7 +457,6 @@ Kousaka Kirino||OreImo||http://cdn.myanimelist.net/images/characters/8/101419.jp
 Aragaki Ayase||OreImo||http://cdn.myanimelist.net/images/characters/10/117839.jpg
 Bridget Evans||OreImo||http://cdn.myanimelist.net/images/characters/5/106195.jpg
 Gokou Ruri||OreImo||http://cdn.myanimelist.net/images/characters/9/101412.jpg
-Gokou Hinata||OreImo||http://cdn.myanimelist.net/images/characters/12/208035.jpg
 Kurusu Kanako||OreImo||http://cdn.myanimelist.net/images/characters/2/103830.jpg
 Makishima Saori||OreImo||http://cdn.myanimelist.net/images/characters/12/102464.jpg
 
@@ -674,7 +671,25 @@ Ikeda Chitose||Yuru Yuri||http://cdn.myanimelist.net/images/characters/4/136395.
 Oomuro Sakurako||Yuru Yuri||http://cdn.myanimelist.net/images/characters/6/134011.jpg
 Sugiura Ayano||Yuru Yuri||http://cdn.myanimelist.net/images/characters/16/136397.jpg
 
-# http://myanimelist.net/anime/season/2011/summer Kamisama 
+Shionji Yuuko||Kamisama no Memochou||http://cdn.myanimelist.net/images/characters/9/120047.jpg
+
+Kisaragi Saya||Blood-C||http://cdn.myanimelist.net/images/characters/10/121715.jpg
+
+Nanami Haruka||Uta No Prince-Sama||http://cdn.myanimelist.net/images/characters/7/128683.jpg
+
+Akizuki Ritsuko||Idolmaster||http://cdn.myanimelist.net/images/characters/2/194853.jpg
+Amami Haruka||Idolmaster||http://cdn.myanimelist.net/images/characters/3/117969.jpg
+Futami Ami||Idolmaster||http://cdn.myanimelist.net/images/characters/8/134637.jpg
+Futami Mami||Idolmaster||http://cdn.myanimelist.net/images/characters/14/139937.jpg
+Ganaha Hibiki||Idolmaster||http://cdn.myanimelist.net/images/characters/10/116463.jpg
+Hagiwara Yukiho||Idolmaster||http://cdn.myanimelist.net/images/characters/3/139929.jpg
+Hoshii Miki||Idolmaster||http://cdn.myanimelist.net/images/characters/13/194855.jpg
+Kikuchi Makoto||Idolmaster||http://cdn.myanimelist.net/images/characters/14/193795.jpg
+Kisaragi Chihaya||Idolmaster||http://cdn.myanimelist.net/images/characters/14/145161.jpg
+Minase Iori||Idolmaster||http://cdn.myanimelist.net/images/characters/16/117961.jpg
+Miura Azusa||Idolmaster||http://cdn.myanimelist.net/images/characters/13/193799.jpg
+Shijou Takane||Idolmaster||http://cdn.myanimelist.net/images/characters/14/140081.jpg
+Takatsuki Yayoi||Idolmaster||http://cdn.myanimelist.net/images/characters/9/288761.jpg
 
 Otosaka Ayumi||Charlotte||http://cdn.myanimelist.net/images/characters/4/288021.jpg
 Kurobane Yusa||Charlotte||http://cdn.myanimelist.net/images/characters/7/288018.jpg
@@ -756,6 +771,10 @@ Ayugase Karen||Joukamachi no Dandelion||http://cdn.myanimelist.net/images/charac
 Sera Mizuki||Classroom Crisis||http://cdn.myanimelist.net/images/characters/2/287524.jpg
 Shirasaki Iris||Classroom Crisis||http://cdn.myanimelist.net/images/characters/13/287523.jpg
 
+Alex Benedetto||Gangsta.||http://cdn.myanimelist.net/images/characters/10/112208.jpg
+
+Shirayuki||Akagami no Shirayukihime||http://cdn.myanimelist.net/images/characters/11/229461.jpg
+
 
 # Video Games
 Samus Aran||Metroid||http://i.imgur.com/x09sloo.jpg
@@ -766,3 +785,4 @@ Princess Zelda||The Legend of Zelda||http://i.imgur.com/nmQUFrk.jpg
 Lucina||Fire Emblem||http://i.imgur.com/o3CPNQ1.jpg
 Palutena||Kid Icarus||http://i.imgur.com/6z2UCA5.jpg
 Bayonetta (Character)||Bayonetta||http://cdn.myanimelist.net/images/characters/16/264599.jpg
+
