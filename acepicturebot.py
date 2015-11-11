@@ -146,11 +146,15 @@ def tweet_command(_API, status, tweet, command):
     if command == "OTP":
         tweet, tweet_image = func.otp(tweet)
 
+    # TEMP
+    # TODO: Remove this over sometime and change kohai to kouhai on the site
+    if command == "Kohai":
+        command = "Kouhai"
     list_cmds = ["Shipgirl", "Touhou", "Vocaloid",
                  "Imouto", "Idol", "Shota",
                  "Onii", "Onee", "Sensei",
                  "Monstergirl", "Witchgirl", "Tankgirl",
-                 "Senpai", "Kohai"]
+                 "Senpai", "Kouhai"]
     if command in list_cmds:
         tweet, tweet_image = func.random_list(command, tweet)
 

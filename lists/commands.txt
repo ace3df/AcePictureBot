@@ -15,6 +15,7 @@ Onii
 Onee
 Sensei
 Senpai
+Kouhai
 Kohai
 {GENDER}
 OTP

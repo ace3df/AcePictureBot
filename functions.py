@@ -588,16 +588,16 @@ def random_list(list_name, args=""):
         else:
             lines = utils.file_to_list('Senpai Male.txt')
             lines += utils.file_to_list('Senpai Female.txt')
-    elif list_name == "Kohai":
+    elif list_name == "Kouhai":
         show_series = True
         if "female" in args:
-            lines = utils.file_to_list('Kohai Female.txt')
+            lines = utils.file_to_list('Kouhai Female.txt')
         elif "male" in args:
             gender = "husbando"
-            lines = utils.file_to_list('Kohai Male.txt')
+            lines = utils.file_to_list('Kouhai Male.txt')
         else:
-            lines = utils.file_to_list('Kohai Male.txt')
-            lines += utils.file_to_list('Kohai Female.txt')
+            lines = utils.file_to_list('Kouhai Male.txt')
+            lines += utils.file_to_list('Kouhai Female.txt')
     elif list_name == "Monstergirl":
         show_series = True
         scrape_images = True
