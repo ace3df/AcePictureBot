@@ -146,7 +146,6 @@ def tweet_command(_API, status, tweet, command):
     if command == "OTP":
         tweet, tweet_image = func.otp(tweet)
 
-    # TEMP
     # TODO: Remove this over sometime and change kohai to kouhai on the site
     if command == "Kohai":
         command = "Kouhai"
@@ -301,7 +300,7 @@ def is_following(user_id):
         return "Limited"
     if user_info.statuses_count < 10:
         return "Not Genuine"
-    elif user_info.followers_count < 6:
+    elif user_info.followers_count < 3:
         return "Not Genuine"
     try:
         ship = API.lookup_friendships(user_ids=(2910211797, user_id))
@@ -404,10 +403,10 @@ class CustomStreamListener(tweepy.StreamListener):
         return True
 
 
-def start_stream(SAPI=None):
-    if SAPI is None:
-        SAPI = func.login(REST=False)
-    sapi = tweepy.Stream(SAPI, CustomStreamListener())
+def start_stream(sapi=None):
+    if sapi is None:
+        sapi = func.login(rest=False)
+    sapi = tweepy.Stream(sapi, CustomStreamListener())
     print("[INFO] Reading Twitter Stream!")
     sapi.filter(track=[x.lower() for x in settings['twitter_track']],
                 async=True)
@@ -417,9 +416,6 @@ def start_stream(SAPI=None):
 def handle_stream(sapi, status_api=False):
     sapi = start_stream(sapi)
     global HANG_TIME
-    # Create a loop which makes sure that the stream
-    # hasn't been hanging at all.
-    # If it has, it will try to reconnect.
     while True:
         time.sleep(5)
         elapsed = (time.time() - HANG_TIME)
@@ -428,11 +424,8 @@ def handle_stream(sapi, status_api=False):
 The bot will catch up on missed messages now!""".format(
                     time.strftime("%Y-%m-%d %H:%M"))
             print(msg)
-            try:
-                if status_api:
-                    post_tweet(status_api, msg)
-            except:
-                pass
+            if status_api:
+                post_tweet(status_api, msg)
             sapi.disconnect()
             time.sleep(3)
             Thread(target=start_stream).start()
@@ -468,15 +461,9 @@ if __name__ == '__main__':
     TWEETS_READ = utils.file_to_list(
                     os.path.join(settings['ignore_loc'],
                                  "tweets_read.txt"))
-    # Get the main bot's API and STREAM request.
     API = func.login(rest=True)
     SAPI = func.login(rest=False)
-    # Get the status account API.
     STATUS_API = func.login(status=True)
-    # Start 2 threads:
-    # First read_notifcations (for late start ups).
-    # status_account (to check if there is a problem).
-    # handle_stream (check if the stream has disconnected/hanging).
     read_notifications(API, True, TWEETS_READ)
     Thread(target=status_account, args=(STATUS_API, )).start()
     Thread(target=handle_stream, args=(SAPI, STATUS_API)).start()

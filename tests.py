@@ -1,4 +1,5 @@
 import functions
+import time
 
 """ Simply Tests.
 These will be done while I look at it so I don't have to worry
@@ -22,7 +23,7 @@ print(functions.waifuregister(123, "Test Username", "admiral", 1))
 # Name should work
 print("\nHusbandoReigster Test:")
 print(functions.waifuregister(123, "Test Username",
-                              "admiral (kantai collection)", 1))
+                                   "admiral (kantai collection)", 1))
 print("\nMyWaifu Test:")
 print(functions.mywaifu(123, 0))
 print("\nMyHusbando Test:")
@@ -39,8 +40,16 @@ print("\nRandom List Imouto Test:")
 print(functions.random_list("Imouto", ""))
 print("\nRandom List Shota Test:")
 print(functions.random_list("Shota", ""))
+print("Sleeping for 10 seconds...")
+time.sleep(10)
 print("\nRandom List Sensei Test:")
 print(functions.random_list("Sensei", ""))
+print("\nRandom List Senpai Test:")
+print(functions.random_list("Senpai", ""))
+print("\nRandom List Kouhai Test:")
+print(functions.random_list("Kouhai", ""))
+print("\nRandom List Kouhai Male Test:")
+print(functions.random_list("Kouhai", "male"))
 print("\nAiring Test:")
 print(functions.airing("One Piece"))
 print("\nFinished all Tests!")
