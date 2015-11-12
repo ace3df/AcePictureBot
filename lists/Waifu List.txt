@@ -691,13 +691,110 @@ Miura Azusa||Idolmaster||http://cdn.myanimelist.net/images/characters/13/193799.
 Shijou Takane||Idolmaster||http://cdn.myanimelist.net/images/characters/14/140081.jpg
 Takatsuki Yayoi||Idolmaster||http://cdn.myanimelist.net/images/characters/9/288761.jpg
 
+
+Maizono Sayaka||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/9/204455.jpg
+Kirigiri Kyouko||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/2/214781.jpg
+Asahina Aoi||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/10/218019.jpg
+Enoshima Junko||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/8/214911.jpg
+Fukawa Touko||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/15/220285.jpg
+Celestia Ludenberck||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/8/218021.jpg
+
+Kuroki Tomoko||Watamote!||http://cdn.myanimelist.net/images/characters/15/212635.jpg
+
+Matsuoka Gou||Free!||http://cdn.myanimelist.net/images/characters/15/213829.jpg
+
+Kiryuuin Satsuki||Kill la Kill||http://cdn.myanimelist.net/images/characters/3/231163.jpg
+Mankanshoku Mako||Kill la Kill||http://cdn.myanimelist.net/images/characters/9/232905.jpg
+Matoi Ryuuko||Kill la Kill||http://cdn.myanimelist.net/images/characters/2/219961.jpg
+Harime Nui||Kill la Kill||http://cdn.myanimelist.net/images/characters/7/229073.jpg
+Jakuzure Nonon||Kill la Kill||http://cdn.myanimelist.net/images/characters/16/285556.jpg
+Kiryuuin Ragyou||Kill la Kill||http://cdn.myanimelist.net/images/characters/4/285260.jpg
+
+Kuriyama Mirai||Kyoukai no Kanata||http://cdn.myanimelist.net/images/characters/14/217075.jpg
+Nase Mitsuki||Kyoukai no Kanata||http://cdn.myanimelist.net/images/characters/5/222649.jpg
+Nase Izumi||Kyoukai no Kanata||http://cdn.myanimelist.net/images/characters/13/223243.jpg
+Shindou Ai||Kyoukai no Kanata||http://cdn.myanimelist.net/images/characters/7/226359.jpg
+
+Hayashida Nana||Golden Time||http://cdn.myanimelist.net/images/characters/13/259773.jpg
+Kaga Kouko||Golden Time||http://cdn.myanimelist.net/images/characters/8/221317.jpg
+
+Aida Riko||Kuroko no Basket||http://cdn.myanimelist.net/images/characters/5/163313.jpg
+Momoi Satsuki||Kuroko no Basket||http://cdn.myanimelist.net/images/characters/8/172733.jpg
+
+Himeragi Yukina||Strike the Blood||http://cdn.myanimelist.net/images/characters/15/229815.jpg
+Aiba Asagi||Strike the Blood||http://cdn.myanimelist.net/images/characters/9/241457.jpg
+Kirasaka Sayaka||Strike the Blood||http://cdn.myanimelist.net/images/characters/4/240229.jpg
+Minamiya Natsuki||Strike the Blood||http://cdn.myanimelist.net/images/characters/2/222563.jpg
+La Folia Rihavein||Strike the Blood||http://cdn.myanimelist.net/images/characters/7/241601.jpg
+
+Hiradaira Chisaki||Nagi no Asukara||http://cdn.myanimelist.net/images/characters/7/224287.jpg
+Mukaido Manaka||Nagi no Asukara||http://cdn.myanimelist.net/images/characters/5/221665.jpg
+Shiodome Miuna||Nagi no Asukara||http://cdn.myanimelist.net/images/characters/2/232907.jpg
+
+Morgiana||Magi||http://cdn.myanimelist.net/images/characters/2/173513.jpg
+Myers||Magi||http://cdn.myanimelist.net/images/characters/12/233537.jpg
+Pisti||Magi||http://cdn.myanimelist.net/images/characters/5/201107.jpg
+Ren Hakuei||Magi||http://cdn.myanimelist.net/images/characters/8/185451.jpg
+Ren Kougyoku||Magi||http://cdn.myanimelist.net/images/characters/15/192841.jpg
+Yamuraiha||Magi||http://cdn.myanimelist.net/images/characters/4/203059.jpg
+
+Yukihira Furano||NouCome||http://cdn.myanimelist.net/images/characters/16/226723.jpg
+Chocolat (NouCome)||NouCome||http://cdn.myanimelist.net/images/characters/15/220783.jpg
+Yuuouji Ouka||NouCome||http://cdn.myanimelist.net/images/characters/10/226725.jpg
+Douraku Utage||NouCome||http://cdn.myanimelist.net/images/characters/2/215509.jpg
+Hakoniwa Yuragi||NouCome||http://cdn.myanimelist.net/images/characters/6/226653.jpg
+Reikadou Ayame||NouCome||http://cdn.myanimelist.net/images/characters/2/226017.jpg
+Seira Kokubyakuin||NouCome||http://cdn.myanimelist.net/images/characters/3/260637.jpg
+
+Tsuchimikado Natsume||Tokyo Ravens||http://cdn.myanimelist.net/images/characters/14/242265.jpg
+Dairenji Suzuka||Tokyo Ravens||http://cdn.myanimelist.net/images/characters/12/242257.jpg
+
+Yaya (Kikou Shoujo wa Kizutsukanai)||Machine-Doll wa Kizutsukanai||http://cdn.myanimelist.net/images/characters/16/223365.jpg
+
+# UP TO OUTBRAKE COMPANY RUN THE SAME SCIPR TWITH EDITED YEAR MONTH
+
+Hinata Yukari||Yuyushiki||http://cdn.myanimelist.net/images/characters/6/203493.jpg
+Ichii Yui||Yuyushiki||http://cdn.myanimelist.net/images/characters/15/205917.jpg
+Nonohara Yuzuko||Yuyushiki||http://cdn.myanimelist.net/images/characters/9/203489.jpg
+
+Nakamura Sawa||Aku no Hana||http://cdn.myanimelist.net/images/characters/8/266281.jpg
+
+Rukino Saki||Kakumeiki Valvrave||http://cdn.myanimelist.net/images/characters/14/219829.jpg
+Sashinami Shouko||Kakumeiki Valvrave||http://cdn.myanimelist.net/images/characters/16/219831.jpg
+Renbokouji Akira||Kakumeiki Valvrave||http://cdn.myanimelist.net/images/characters/5/228487.jpg
+
+Azuki Azusa||Hentai Ouji to Warawanai Neko.||http://cdn.myanimelist.net/images/characters/15/203695.jpg
+Tsutsukakushi Tsukushi||Hentai Ouji to Warawanai Neko.||http://cdn.myanimelist.net/images/characters/10/203807.jpg
+Tsutsukakushi Tsukiko||Hentai Ouji to Warawanai Neko.||http://cdn.myanimelist.net/images/characters/11/217989.jpg
+
+Itsuka Kotori||Date A Live||http://cdn.myanimelist.net/images/characters/16/211505.jpg
+Tobiichi Origami||Date A Live||http://cdn.myanimelist.net/images/characters/11/226431.jpg
+Tokisaki Kurumi||Date A Live||http://cdn.myanimelist.net/images/characters/6/222047.jpg
+Yatogami Tohka||Date A Live||http://cdn.myanimelist.net/images/characters/7/203347.jpg
+Yoshino (Date A Live)||Date A Live|http://cdn.myanimelist.net/images/characters/4/215469.jpg
+
+Yukinoshita Haruno||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/2/205961.jpg
+Yuigahama Yui||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/8/203549.jpg
+Yukinoshita Yukino||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/4/202721.jpg
+Hikigaya Komachi||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/12/208819.jpg
+Hiratsuka Shizuka||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/9/282861.jpg
+
+Sasaki Chiho||Hataraku Maou-sama!||http://cdn.myanimelist.net/images/characters/9/205941.jpg
+Yusa Emi||Hataraku Maou-sama!||http://cdn.myanimelist.net/images/characters/8/205261.jpg
+Kamazuki Suzuno||Hataraku Maou-sama!||http://cdn.myanimelist.net/images/characters/7/206525.jpg
+
+Mikasa Ackerman||Shingeki no Kyojin||http://cdn.myanimelist.net/images/characters/9/215563.jpg
+Sasha Blouse||Shingeki no Kyojin||http://cdn.myanimelist.net/images/characters/13/202273.jpg
+Krista Lenz||Shingeki no Kyojin||http://cdn.myanimelist.net/images/characters/8/248987.jpg
+Annie Leonhart||Shingeki no Kyojin||http://cdn.myanimelist.net/images/characters/9/206357.jpg
+
 Otosaka Ayumi||Charlotte||http://cdn.myanimelist.net/images/characters/4/288021.jpg
 Kurobane Yusa||Charlotte||http://cdn.myanimelist.net/images/characters/7/288018.jpg
 Kurobane Misa||Charlotte||http://cdn.myanimelist.net/images/characters/5/287688.jpg
 Tomori Nao||Charlotte||http://cdn.myanimelist.net/images/characters/10/288020.jpg
 
 Chester Mora||Rokka no Yuusha||http://cdn.myanimelist.net/images/characters/7/291654.jpg
-Nashetania Loei Piena Augustra||Rokka no Yuusha||http://cdn.myanimelist.net/images/characters/14/291600.jpg
+Nashetania Loei Piena Augustra||Rokka no Yuusha||http://cdn.myanimelist.net/images/characters/14/2h91600.jpg
 Chamo Rosso||Rokka no Yuusha||http://cdn.myanimelist.net/images/characters/11/291656.jpg
 Fremy Speeddraw||Rokka no Yuusha||http://cdn.myanimelist.net/images/characters/8/291611.jpg
 
