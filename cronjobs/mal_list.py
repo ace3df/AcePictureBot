@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from requests import Session
 from config import settings
 from splinter import Browser
-import time
+import sys
 import os
 import re
 
@@ -13,6 +13,17 @@ todo:
 try find out if they're girl or boy
 http://myanimelist.net/anime/season/2011/fall
 """
+
+
+def printf(*objects, sep=' ', end='\n', file=sys.stdout):
+    enc = file.encoding
+    if enc == 'UTF-8':
+        print(*objects, sep=sep, end=end, file=file)
+    else:
+        print(*map(
+            lambda obj: str(obj).encode(
+                enc, errors='backslashreplace').decode(
+                enc), objects), sep=sep, end=end, file=file)
 
 
 def scrape_site(url, cookie_file=""):
@@ -104,6 +115,7 @@ def find_images(name):
 
 def start(url):
     complete_list = []
+    not_any_list = []
 
     waifu_list = open(os.path.join(settings['list_loc'],
                                    "Waifu" + " List.txt"), 'r').readlines()
@@ -124,8 +136,8 @@ def start(url):
             member_count = soup.find('span', text="Members:").next.next.string
             if int(member_count.replace(",", "")) < 10000:
                 continue
-            if soup.find('td', text="Prequel:"):
-                continue
+            #if soup.find('td', text="Prequel:"):
+            #    continue
             show_name = soup.find('span', attrs={'itemprop': "name"}).string
             browser.visit(b['href'] + "/characters")
             soup = BeautifulSoup(browser.html, 'html5lib')
@@ -164,8 +176,10 @@ def start(url):
                         mem_fav = int(mem_fav[0].replace("Member Favorites: ", "").strip())
                     except:
                         # Not sure what cases this sometimes
+                        printf(browser.url)
+                        not_any_list.append("{0}||{1}||{2}".format(name, show_name, image))
                         continue
-                    if mem_fav < 70:
+                    if mem_fav < 60:
                         # Not popular enough
                         continue
                     # Check if Girl here full of IF's and such
@@ -175,15 +189,19 @@ def start(url):
                     if not has_imgs_name:
                         # Not enough images/None
                         # Append to list to make sure later
+                        not_any_list.append("{0}||{1}||{2}".format(name, show_name, image))
                         continue
                     guess_string = "{0}||{1}||{2}".format(has_imgs_name, show_name, image)
                     complete_list.append(guess_string)
-
                     for a in complete_list:
-                        print(a)
+                        printf(a)
                     print("================")
-                # Split series
-            complete_list.append("")
+                    for a in not_any_list:
+                        printf(a)
+                    print("=============================================")
+            # Split series
+            if complete_list[-1] != "":
+                complete_list.append("")
 
 
 if __name__ == "__main__":
@@ -191,6 +209,7 @@ if __name__ == "__main__":
 
     current_date = datetime.datetime.now()
     # Go back one season as images should have spawned by now
+    current_date = current_date.replace(year=2013, month=4)
     if current_date.month in range(1, 3):
         # Winter
         season = "summer"
