@@ -752,7 +752,10 @@ def source(api, status):
                 # Haven't broke yet, onto low results
                 return False, False, False, False
             if "chan.sankakucomplex.com/post/show/" in link['href']:
-                url = link['href']
+                if "http" not in link['href']:
+                    url = "http:" + link['href']
+                else:
+                    url = link['href']
                 site = 0
                 break
             elif "http://danbooru.donmai.us/posts/" in link['href']:
@@ -893,7 +896,7 @@ def source(api, status):
     handles = [word for word in handles.split() if word.startswith('@')]
     handles = list(set(handles))
     handles = ' '.join(handles).replace(
-        "@" + settings["twitter_track"][0].lower(), "")
+              "@" + settings["twitter_track"][0].lower(), "")
     m = "{0}{1}{2}{3}".format(artist, names, series,
                               translation)
     if is_gif:
