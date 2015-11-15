@@ -39,12 +39,12 @@ def update_self():
         most_recent_commit = ""
     rss = urlopen(update['repository_rss']).read().decode("utf-8")
     xml = Etree.fromstring(rss)
-    last_updated_id = xml[5].findtext(r"{http://www.w3.org/2005/Atom}id")
-    if most_recent_commit == last_updated_id:
+    latest_commit_id = xml[5].findtext(r"{http://www.w3.org/2005/Atom}id")
+    if most_recent_commit == latest_commit_id:
         # No new commit
         return False
     print("[New Git Commit]")
-    print("[{0}]".format(last_updated_id))
+    print("[{0}]".format(latest_commit_id))
     # New commit!
     if os.path.exists(backup_dir):
         shutil.rmtree(backup_dir, onerror=del_rw)
@@ -77,6 +77,8 @@ def update_self():
             print("[Updating: {0}]".format(src_file))
             shutil.move(src_file, dst_dir)
     shutil.rmtree(update_dir, onerror=del_rw)
+    with open(update['recent_commit_file'], "w") as f:
+        f.write(latest_commit_id)
     print("[Finished Updating]")
     return True
 
