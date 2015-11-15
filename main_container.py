@@ -1,7 +1,6 @@
 from config import update
 from git import Repo
 
-from importlib.machinery import SourceFileLoader
 from urllib.request import urlopen
 from shutil import ignore_patterns
 from hashlib import md5
@@ -106,5 +105,4 @@ if __name__ == '__main__':
                         main_process = subprocess.Popen(update['python_process'])
                     except (KeyboardInterrupt, SystemExit):
                         sys.exit(0)
-        time.sleep(10)
-
+        time.sleep(60 * 5)

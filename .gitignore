@@ -2,10 +2,11 @@ __pycache__/
 _site/
 *.py[cod]
 Gemfile.lock
-.idea/
 Ace.xml
 
 ignore_lists/
+.idea/vcs.xml
+.idea/
 FFmpeg/
 images/
 _update/
