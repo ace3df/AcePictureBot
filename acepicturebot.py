@@ -41,7 +41,6 @@ DEBUG = True
 
 
 def post_tweet(_API, tweet, media="", command=False, rts=False):
-    print("TEMP TEST")
     try:
         if media:
             media = media.replace("\\", "\\\\")
