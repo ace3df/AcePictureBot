@@ -3,6 +3,7 @@ from git import Repo
 
 from importlib.machinery import SourceFileLoader
 from urllib.request import urlopen
+from shutil import ignore_patterns
 from hashlib import md5
 import xml.etree.ElementTree as Etree
 import subprocess
@@ -53,7 +54,7 @@ def update_self():
     # New commit!
     if os.path.exists(backup_dir):
         shutil.rmtree(backup_dir, onerror=del_rw)
-    shutil.copytree(base_dir, backup_dir)
+    shutil.copytree(base_dir, backup_dir, ignore=ignore_patterns('is_busy.txt'))
     if not os.path.exists(update_dir):
         os.makedirs(update_dir)
     else:
