@@ -6,6 +6,7 @@ from utils import printf as print
 from threading import Thread
 from itertools import islice
 from config import settings
+from config import update
 import functions as func
 import urllib.request
 import datetime
@@ -378,6 +379,7 @@ class CustomStreamListener(tweepy.StreamListener):
         tweet, command = acceptable_tweet(status)
         if not command:
             return True
+        open(update['is_busy_file'], 'w')
         print("[{0}] Reading: {1} ({2}): {3}".format(
             time.strftime("%Y-%m-%d %H:%M"),
             status.user.screen_name, status.user.id, status.text))
@@ -388,6 +390,8 @@ class CustomStreamListener(tweepy.StreamListener):
                                "tweets_read.txt"),
                   'w') as file:
             file.write("\n".join(TWEETS_READ))
+        os.remove(update['is_busy_file'])
+
 
     def on_error(self, status_code):
         global LAST_STATUS_CODE

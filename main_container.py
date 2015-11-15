@@ -1,6 +1,7 @@
 from config import update
 from git import Repo
 
+from importlib.machinery import SourceFileLoader
 from urllib.request import urlopen
 from hashlib import md5
 import xml.etree.ElementTree as Etree
@@ -18,12 +19,15 @@ updated_py = True
 
 
 def close_main_process():
-    main_process.communicate()
-    print(main_process.returncode)
-    try:
-        main_process.kill()
-    except NameError:
-        pass
+    while True:
+        if not os.path.exists(update['is_busy_file']):
+            try:
+                main_process.kill()
+            except NameError:
+                # In first update
+                return
+            return
+        time.sleep(5)
 
 
 def del_rw(action, name, exc):
@@ -71,9 +75,10 @@ def update_self():
                 # No change in file
                 continue
             else:
-                if ".py" in src_dir and "main_container" not in src_dir:
+                if ".py" in str(src_file):
                     updated_py = True
                     close_main_process()
+
             if os.path.exists(dst_file):
                 os.remove(dst_file)
             print("[Updating: {0}]".format(src_file))
@@ -85,10 +90,10 @@ def update_self():
     return True
 
 if __name__ == '__main__':
-    if update['auto_update']:
-        update_self()
+    #if update['auto_update']:
+    #    update_self()
     try:
-        main_process = subprocess.Popen(update['python_process'], shell=True)
+        main_process = subprocess.Popen(update['python_process'])
     except (KeyboardInterrupt, SystemExit):
         sys.exit(0)
 
@@ -97,8 +102,8 @@ if __name__ == '__main__':
             if update_self():
                 if updated_py:
                     try:
-                        main_process = subprocess.Popen(update['python_process'], shell=True)
+                        main_process = subprocess.Popen(update['python_process'])
                     except (KeyboardInterrupt, SystemExit):
                         sys.exit(0)
-        time.sleep(60 * 1)
+        time.sleep(10)
 
