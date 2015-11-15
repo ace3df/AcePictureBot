@@ -159,7 +159,6 @@ def acceptable_tweet(status):
 
     tweet = status.text
     user = status.user
-    print("test")
     # Ignore ReTweets.
     if tweet.startswith('RT'):
         return False, False
