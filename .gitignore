@@ -8,6 +8,8 @@ Ace.xml
 ignore_lists/
 FFmpeg/
 images/
+_update/
+_backup/
 
 config.py
 

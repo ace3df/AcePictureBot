@@ -38,6 +38,13 @@ API = None
 STATUS_API = None
 SAPI = None
 DEBUG = True
+# Load read IDs of already read tweets.
+TWEETS_READ = utils.file_to_list(
+                    os.path.join(settings['ignore_loc'],
+                                 "tweets_read.txt"))
+API = func.login(rest=True)
+SAPI = func.login(rest=False)
+STATUS_API = func.login(status=True)
 
 
 def post_tweet(_API, tweet, media="", command=False, rts=False):
@@ -350,7 +357,7 @@ def status_account(status_api):
         msg_msg = re.sub(' +', ' ', os.linesep.join(
                          [s for s in msg_msg.splitlines() if s])).lstrip()
         msg = "{0}{1}\n{2}".format(pre_msg,
-                                   utils.short_str(msg_msg, 90),
+                                   utils.short_string(msg_msg, 90),
                                    msg_url)
         post_tweet(status_api, msg)
 
@@ -456,14 +463,6 @@ def read_notifications(_API, reply, tweets_read):
             file.write("\n".join(TWEETS_READ))
     print("[INFO] Finished reading late tweets!")
 
-if __name__ == '__main__':
-    # Load read IDs of already read tweets.
-    TWEETS_READ = utils.file_to_list(
-                    os.path.join(settings['ignore_loc'],
-                                 "tweets_read.txt"))
-    API = func.login(rest=True)
-    SAPI = func.login(rest=False)
-    STATUS_API = func.login(status=True)
-    read_notifications(API, True, TWEETS_READ)
-    Thread(target=status_account, args=(STATUS_API, )).start()
-    Thread(target=handle_stream, args=(SAPI, STATUS_API)).start()
+read_notifications(API, True, TWEETS_READ)
+Thread(target=status_account, args=(STATUS_API, )).start()
+Thread(target=handle_stream, args=(SAPI, STATUS_API)).start()
