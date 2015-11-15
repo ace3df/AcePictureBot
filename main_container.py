@@ -69,7 +69,7 @@ def update_self():
                 # No change in file
                 continue
             else:
-                if ".py" in src_dir:
+                if ".py" in src_dir and not "main_container" in src_dir:
                     updated_py = True
                     close_main_process()
             if os.path.exists(dst_file):
@@ -94,6 +94,9 @@ if __name__ == '__main__':
         if update['auto_update']:
             if update_self():
                 if updated_py:
-                    main_process = subprocess.Popen(update['python_process'], shell=True)
-        time.sleep(60 * 15)
+                    try:
+                        main_process = subprocess.Popen(update['python_process'], shell=True)
+                    except (KeyboardInterrupt, SystemExit):
+                        sys.exit(0)
+        time.sleep(60 * 1)
 
