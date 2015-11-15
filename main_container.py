@@ -2,6 +2,7 @@ from config import update
 from git import Repo
 
 from urllib.request import urlopen
+from hashlib import md5
 import xml.etree.ElementTree as Etree
 import subprocess
 import shutil
@@ -65,11 +66,12 @@ def update_self():
         for file_ in files:
             src_file = os.path.join(src_dir, file_)
             dst_file = os.path.join(dst_dir, file_)
-            if open(src_file, 'r') == open(dst_file, 'r'):
+            if md5(open(src_file, 'rb').read()).hexdigest() ==\
+               md5(open(dst_file, 'rb').read()).hexdigest():
                 # No change in file
                 continue
             else:
-                if ".py" in src_dir and not "main_container" in src_dir:
+                if ".py" in src_dir and "main_container" not in src_dir:
                     updated_py = True
                     close_main_process()
             if os.path.exists(dst_file):
