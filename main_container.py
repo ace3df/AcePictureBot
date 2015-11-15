@@ -91,8 +91,8 @@ def update_self():
     return True
 
 if __name__ == '__main__':
-    #if update['auto_update']:
-    #    update_self()
+    if update['auto_update']:
+        update_self()
     try:
         main_process = subprocess.Popen(update['python_process'])
     except (KeyboardInterrupt, SystemExit):

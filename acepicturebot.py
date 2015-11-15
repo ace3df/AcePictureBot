@@ -18,27 +18,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.3.5"
-
-BLOCKED_IDS = utils.file_to_list(
-                os.path.join(settings['list_loc'],
-                             "Blocked Users.txt"))
-IGNORE_WORDS = utils.file_to_list(
-                os.path.join(settings['list_loc'],
-                             "Blocked Words.txt"))
-LIMITED = False
-HAD_ERROR = False
-LAST_STATUS_CODE = 0
-TWEETS_READ = []
-MOD_IDS = [2780494890, 121144139]
-RATE_LIMIT_DICT = {}
-USER_LAST_COMMAND = OrderedDict()
-START_TIME = time.time()
-HANG_TIME = time.time()
-API = None
-STATUS_API = None
-SAPI = None
-DEBUG = True
+__version__ = "2.4.0"
 
 
 def post_tweet(_API, tweet, media="", command=False, rts=False):
@@ -392,7 +372,6 @@ class CustomStreamListener(tweepy.StreamListener):
             file.write("\n".join(TWEETS_READ))
         os.remove(update['is_busy_file'])
 
-
     def on_error(self, status_code):
         global LAST_STATUS_CODE
         global HANG_TIME
@@ -461,7 +440,25 @@ def read_notifications(_API, reply, tweets_read):
     print("[INFO] Finished reading late tweets!")
 
 if __name__ == '__main__':
-    # Load read IDs of already read tweets.
+    BLOCKED_IDS = utils.file_to_list(
+                    os.path.join(settings['list_loc'],
+                                 "Blocked Users.txt"))
+    IGNORE_WORDS = utils.file_to_list(
+                    os.path.join(settings['list_loc'],
+                                 "Blocked Words.txt"))
+    LIMITED = False
+    HAD_ERROR = False
+    LAST_STATUS_CODE = 0
+    TWEETS_READ = []
+    MOD_IDS = [2780494890, 121144139]
+    RATE_LIMIT_DICT = {}
+    USER_LAST_COMMAND = OrderedDict()
+    START_TIME = time.time()
+    HANG_TIME = time.time()
+    API = None
+    STATUS_API = None
+    SAPI = None
+    DEBUG = True
     TWEETS_READ = utils.file_to_list(
                     os.path.join(settings['ignore_loc'],
                                  "tweets_read.txt"))
