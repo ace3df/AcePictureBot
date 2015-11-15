@@ -457,7 +457,7 @@ if __name__ == '__main__':
     API = None
     STATUS_API = None
     SAPI = None
-    DEBUG = True
+    DEBUG = False
     TWEETS_READ = utils.file_to_list(
                     os.path.join(settings['ignore_loc'],
                                  "tweets_read.txt"))
