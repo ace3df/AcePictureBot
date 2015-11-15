@@ -1,5 +1,4 @@
-# Full list of husbando. Type=||
-#
+﻿# Full list of husbando. Type=||
 # Anime/Manga
 Aono Tsukune||Rosario to Vampire||http://cdn.myanimelist.net/images/characters/11/134613.jpg
 
