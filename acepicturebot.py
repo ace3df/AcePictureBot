@@ -14,6 +14,7 @@ import random
 import tweepy
 import utils
 import time
+import sys
 import os
 import re
 
@@ -388,10 +389,14 @@ class CustomStreamListener(tweepy.StreamListener):
 def start_stream(sapi=None):
     if sapi is None:
         sapi = func.login(rest=False)
-    sapi = tweepy.Stream(sapi, CustomStreamListener())
-    print("[INFO] Reading Twitter Stream!")
-    sapi.filter(track=[x.lower() for x in settings['twitter_track']],
-                async=True)
+    try:
+        sapi = tweepy.Stream(sapi, CustomStreamListener())
+        print("[INFO] Reading Twitter Stream!")
+        sapi.filter(track=[x.lower() for x in settings['twitter_track']],
+                    async=True)
+    except (KeyboardInterrupt, SystemExit):
+        sapi.disconnect()
+        sys.exit(0)
     return sapi
 
 
@@ -410,7 +415,7 @@ The bot will catch up on missed messages now!""".format(
                 post_tweet(status_api, msg)
             sapi.disconnect()
             time.sleep(3)
-            if stream_thread.is_alive():
+            if not sapi.running:
                 sapi = start_stream(sapi)
             Thread(target=read_notifications,
                    args=(API, True, TWEETS_READ)).start()

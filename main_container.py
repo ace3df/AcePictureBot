@@ -107,4 +107,4 @@ if __name__ == '__main__':
                     except (KeyboardInterrupt, SystemExit):
                         main_process.kill()
                         sys.exit(0)
-        time.sleep(60 * 5)
+        time.sleep(60)
