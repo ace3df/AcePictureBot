@@ -26,6 +26,16 @@ settings = dict(
     webm_script='script.bat',
 )
 
+update = dict(
+    auto_update=True,
+    python_process=r"python acepicturebot.py",
+    is_busy_file=r"is_busy.txt",
+    repository=r"https://github.com/ace3df/AcePictureBot.git",
+    repository_rss=r"https://github.com/ace3df/AcePictureBot/commits/master.atom",
+    recent_commit_file=r"GitCommitUpdate.txt",
+    only_restart_on_py=True,  # Only restart if a updated file is .py
+)
+
 extra_api_keys = dict(
     pastebin='',
     pasteee='',
