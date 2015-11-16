@@ -182,6 +182,15 @@ Sai Akuto||Ichiban Ushiro no Daimaou||http://cdn.myanimelist.net/images/characte
 Ichinomiya Kou||Arakawa Under the Bridge||http://cdn.myanimelist.net/images/characters/5/151031.jpg
 Hoshi (Arakawa)||Arakawa Under the Bridge||http://cdn.myanimelist.net/images/characters/10/85129.jpg
 
+Aoi Tori||Kyoukaisenjou no Horizon||http://cdn.myanimelist.net/images/characters/2/176149.jpg
+
+Asaba Yuuta||Kimi to Boku.||http://cdn.myanimelist.net/images/characters/15/164665.jpg
+Matsuoka Shun||Kimi to Boku.||http://cdn.myanimelist.net/images/characters/16/163035.jpg
+Tachibana Chizuru||Kimi to Boku.||http://cdn.myanimelist.net/images/characters/2/141735.jpg
+Tsukahara Kaname||Kimi to Boku.||http://cdn.myanimelist.net/images/characters/2/141739.jpg
+
+Daimon Kaito||Phi Brain||http://cdn.myanimelist.net/images/characters/2/162189.jpg
+
 Komuro Takashi||Highschool of the Dead||http://cdn.myanimelist.net/images/characters/7/85770.jpg
 
 Ozaki Toshio||Shiki||http://cdn.myanimelist.net/images/characters/6/94100.jpg
@@ -298,6 +307,31 @@ Shinomiya Natsuki||Uta No Prince-Sama||http://cdn.myanimelist.net/images/charact
 
 Producer (Idolmaster)||Idolmaster||http://cdn.myanimelist.net/images/characters/11/122171.jpg
 
+Amano Yukiteru||Mirai Nikki||http://cdn.myanimelist.net/images/characters/13/134331.jpg
+Akise Aru||Mirai Nikki||http://cdn.myanimelist.net/images/characters/13/144245.jpg
+
+Ouma Shuu||Guilty Crown||http://cdn.myanimelist.net/images/characters/14/139133.jpg
+Tsutsugami Gai||Guilty Crown||http://cdn.myanimelist.net/images/characters/4/153537.jpg
+
+Emiya Kiritsugu||Fate (Series)||http://cdn.myanimelist.net/images/characters/16/175883.jpg
+Archer (Fate/Stay Night)||Fate (Series)||http://cdn.myanimelist.net/images/characters/15/265629.jpg
+Emiya Shirou||Fate (Series)||http://cdn.myanimelist.net/images/characters/13/173271.jpg
+Gilgamesh||Fate (Series)||http://cdn.myanimelist.net/images/characters/15/135563.jpg
+Lancer (Fate/Zero)||Fate (Series)||http://cdn.myanimelist.net/images/characters/11/280846.jpg
+
+Gon Freecss||Hunter x Hunter (2011)||http://cdn.myanimelist.net/images/characters/11/174517.jpg
+Killua Zoldyck||Hunter x Hunter (2011)||http://cdn.myanimelist.net/images/characters/9/174559.jpg
+
+Hasegawa Kodaka||Boku wa Tomodachi ga Sukunai||http://cdn.myanimelist.net/images/characters/6/136401.jpg
+
+Mashima Taichi||Chihayafuru||http://cdn.myanimelist.net/images/characters/6/239401.jpg
+Wataya Arata||Chihayafuru||http://cdn.myanimelist.net/images/characters/5/203279.jpg
+
+Hanamura Yousuke||Persona 4||http://cdn.myanimelist.net/images/characters/13/138015.jpg
+Narukami Yuu||Persona 4||http://cdn.myanimelist.net/images/characters/16/138009.jpg
+Tatsumi Kanji||Persona 4||http://cdn.myanimelist.net/images/characters/13/138017.jpg
+
+Sakai Yuuji||Shakugan no Shana||http://cdn.myanimelist.net/images/characters/5/50363.jpg
 
 Naegi Makoto||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/16/211593.jpg
 Fujisaki Chihiro||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/3/222673.jpg
@@ -309,8 +343,38 @@ Nitori Aiichirou||Free!||http://cdn.myanimelist.net/images/characters/9/249861.j
 Nanase Haruka||Free!||http://cdn.myanimelist.net/images/characters/2/203959.jpg
 Ryuugazaki Rei||Free!||http://cdn.myanimelist.net/images/characters/2/219131.jpg
 
+Sakamaki Reiji||Diabolik Lovers||http://cdn.myanimelist.net/images/characters/6/290868.jpg
+Sakamaki Subaru||Diabolik Lovers||http://cdn.myanimelist.net/images/characters/4/290843.jpg
+Sakamaki Shuu||Diabolik Lovers||http://cdn.myanimelist.net/images/characters/7/266367.jpg
+Sakamaki Laito||Diabolik Lovers||http://cdn.myanimelist.net/images/characters/14/290390.jpg
+Sakamaki Ayato||Diabolik Lovers||http://cdn.myanimelist.net/images/characters/13/265249.jpg
+Sakamaki Kanato||Diabolik Lovers||http://cdn.myanimelist.net/images/characters/8/265247.jpg
 
+Imaizumi Shunsuke||Yowamushi Pedal||http://cdn.myanimelist.net/images/characters/6/266439.jpg
+Naruko Shoukichi||Yowamushi Pedal||http://cdn.myanimelist.net/images/characters/4/266433.jpg
+Onoda Sakamichi||Yowamushi Pedal||http://cdn.myanimelist.net/images/characters/9/234881.jpg
+Arakita Yasutomo||Yowamushi Pedal||http://cdn.myanimelist.net/images/characters/8/245995.jpg
+Makishima Yuusuke||Yowamushi Pedal||http://cdn.myanimelist.net/images/characters/7/218599.jpg
+Manami Sangaku||Yowamushi Pedal||http://cdn.myanimelist.net/images/characters/5/229377.jpg
+Midousuji Akira||Yowamushi Pedal||http://cdn.myanimelist.net/images/characters/4/247295.jpg
+Shinkai Hayato||Yowamushi Pedal||http://cdn.myanimelist.net/images/characters/15/266381.jpg
+Toudou Jinpachi||Yowamushi Pedal||http://cdn.myanimelist.net/images/characters/16/260639.jpg
 
+Gotou Hidenori||Samurai Flamenco||http://cdn.myanimelist.net/images/characters/10/222745.jpg
+Hazama Masayoshi||Samurai Flamenco||http://cdn.myanimelist.net/images/characters/5/222747.jpg
+
+Furuya Satoru||Diamond no Ace||http://cdn.myanimelist.net/images/characters/5/225749.jpg
+Kominato Haruichi||Diamond no Ace||http://cdn.myanimelist.net/images/characters/8/225753.jpg
+Miyuki Kazuya||Diamond no Ace||http://cdn.myanimelist.net/images/characters/8/225757.jpg
+Sawamura Eijun||Diamond no Ace||http://cdn.myanimelist.net/images/characters/5/235393.jpg
+Kuramochi Youichi||Diamond no Ace||http://cdn.myanimelist.net/images/characters/4/224655.jpg
+
+Inohara Masato||Little Busters!||http://cdn.myanimelist.net/images/characters/7/184003.jpg
+Miyazawa Kengo||Little Busters!||http://cdn.myanimelist.net/images/characters/7/184001.jpg
+Naoe Riki||Little Busters!||http://cdn.myanimelist.net/images/characters/14/229877.jpg
+Natsume Kyousuke||Little Busters!||http://cdn.myanimelist.net/images/characters/9/241453.jpg
+
+Makunouchi Ippo||Hajime no Ippo||http://cdn.myanimelist.net/images/characters/11/32678.jpg
 
 L-elf Karlstein||Kakumeiki Valvrave||http://cdn.myanimelist.net/images/characters/5/202055.jpg
 Tokishima Haruto||Kakumeiki Valvrave||http://cdn.myanimelist.net/images/characters/3/210335.jpg

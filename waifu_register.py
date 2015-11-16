@@ -70,7 +70,7 @@ class WaifuRegisterClass:
                       ["zelda", "princess_zelda"],
                       ["asuka", "asuka_langley"]]
         for [known, work] in self.known:
-            if self.name == known:
+            if self.name == known or '_'.join(reversed(self.name.split("_"))) == known:
                 self.name = work
                 self.override = True
                 break

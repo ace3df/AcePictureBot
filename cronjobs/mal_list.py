@@ -200,8 +200,12 @@ def start(url):
                         printf(a)
                     print("=============================================")
             # Split series
-            if complete_list[-1] != "":
-                complete_list.append("")
+            try:
+                if complete_list[-1] != "":
+                    complete_list.append("")
+            except:
+                # No entries yet
+                pass
 
 
 if __name__ == "__main__":
@@ -209,7 +213,7 @@ if __name__ == "__main__":
 
     current_date = datetime.datetime.now()
     # Go back one season as images should have spawned by now
-    current_date = current_date.replace(year=2013, month=4)
+    current_date = current_date.replace(year=2011, month=7)
     if current_date.month in range(1, 3):
         # Winter
         season = "summer"

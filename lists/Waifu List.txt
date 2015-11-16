@@ -1,5 +1,4 @@
 ﻿# Full list of waifus. Type=||
-#
 # Anime/Manga
 Nagato (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/16/262025.jpg
 Mutsu (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/259455.jpg
@@ -691,6 +690,71 @@ Miura Azusa||Idolmaster||http://cdn.myanimelist.net/images/characters/13/193799.
 Shijou Takane||Idolmaster||http://cdn.myanimelist.net/images/characters/14/140081.jpg
 Takatsuki Yayoi||Idolmaster||http://cdn.myanimelist.net/images/characters/9/288761.jpg
 
+Gasai Yuno||Mirai Nikki||http://cdn.myanimelist.net/images/characters/2/280586.jpg
+Kasugano Tsubaki||Mirai Nikki||http://cdn.myanimelist.net/images/characters/5/139773.jpg
+Uryuu Minene||Mirai Nikki||http://cdn.myanimelist.net/images/characters/15/160081.jpg
+
+Yuzuriha Inori||Guilty Crown||http://cdn.myanimelist.net/images/characters/10/139621.jpg
+Menjou Hare||Guilty Crown||http://cdn.myanimelist.net/images/characters/10/187769.jpg
+Shinomiya Ayase||Guilty Crown||http://cdn.myanimelist.net/images/characters/5/141619.jpg
+
+Irisviel von Einzbern||Fate (Series)||http://cdn.myanimelist.net/images/characters/15/112995.jpg
+Matou Sakura||Fate (Series)||http://cdn.myanimelist.net/images/characters/4/165044.jpg
+Toosaka Rin||Fate (Series)||http://cdn.myanimelist.net/images/characters/8/272601.jpg
+Illyasviel von Einzbern||Fate (Series)||http://cdn.myanimelist.net/images/characters/6/31610.jpg
+Saber||Fate (Series)||http://cdn.myanimelist.net/images/characters/6/275276.jpg
+Rider||Fate (Series)||http://cdn.myanimelist.net/images/characters/2/31612.jpg
+
+Biscuit Krueger||Hunter x Hunter (2011)||http://cdn.myanimelist.net/images/characters/5/194667.jpg
+Alluka Zoldyck||Hunter x Hunter (2011)||http://cdn.myanimelist.net/images/characters/4/294552.jpg
+
+Kashiwazaki Sena||Boku wa Tomodachi ga Sukunai||http://cdn.myanimelist.net/images/characters/13/132289.jpg
+Mikazuki Yozora||Boku wa Tomodachi ga Sukunai||http://cdn.myanimelist.net/images/characters/11/132287.jpg
+Hasegawa Kobato||Boku wa Tomodachi ga Sukunai||http://cdn.myanimelist.net/images/characters/8/126895.jpg
+Kusunoki Yukimura||Boku wa Tomodachi ga Sukunai||http://cdn.myanimelist.net/images/characters/5/205391.jpg
+Shiguma Rika||Boku wa Tomodachi ga Sukunai||http://cdn.myanimelist.net/images/characters/14/198519.jpg
+Takayama Maria||Boku wa Tomodachi ga Sukunai||http://cdn.myanimelist.net/images/characters/15/178131.jpg
+
+Ayase Chihaya||Chihayafuru||http://cdn.myanimelist.net/images/characters/7/136261.jpg
+Wakamiya Shinobu||Chihayafuru||http://cdn.myanimelist.net/images/characters/12/203563.jpg
+
+Amagi Yukiko||Persona 4||http://cdn.myanimelist.net/images/characters/14/138019.jpg
+Kujikawa Rise||Persona 4||http://cdn.myanimelist.net/images/characters/7/138021.jpg
+Satonaka Chie||Persona 4||http://cdn.myanimelist.net/images/characters/7/138011.jpg
+Shirogane Naoto||Persona 4||http://cdn.myanimelist.net/images/characters/16/138013.jpg
+
+Yarizui Sen||Ben-To||http://cdn.myanimelist.net/images/characters/2/147149.jpg
+Inoue Asebi||Ben-To||http://cdn.myanimelist.net/images/characters/7/197735.jpg
+
+Shana (Shakugan no Shana)||Shakugan no Shana||http://cdn.myanimelist.net/images/characters/5/68310.jpg
+Wilhelmina Carmel||Shakugan no Shana||http://cdn.myanimelist.net/images/characters/9/50367.jpg
+Margery Daw||Shakugan no Shana||http://cdn.myanimelist.net/images/characters/8/72829.jpg
+
+Kawakami Momoyo||Maji de Watashi ni Koi Shinasai!||http://cdn.myanimelist.net/images/characters/7/155133.jpg
+Kawakami Kazuko||Maji de Watashi ni Koi Shinasai!||http://cdn.myanimelist.net/images/characters/4/127975.jpg
+Mayuzumi Yukie||Maji de Watashi ni Koi Shinasai!||http://cdn.myanimelist.net/images/characters/5/127977.jpg
+Shiina Miyako||Maji de Watashi ni Koi Shinasai!||http://cdn.myanimelist.net/images/characters/4/155137.jpg
+
+Fear Kubrick||C³||http://cdn.myanimelist.net/images/characters/2/130281.jpg
+
+Horizon Ariadust||Kyoukaisenjou no Horizon||http://cdn.myanimelist.net/images/characters/9/176135.jpg
+Aoi Kimi||Kyoukaisenjou no Horizon||http://cdn.myanimelist.net/images/characters/11/136289.jpg
+Mitotsudaira Nate||Kyoukaisenjou no Horizon||http://cdn.myanimelist.net/images/characters/14/176143.jpg
+Honda Masazumi||Kyoukaisenjou no Horizon||http://cdn.myanimelist.net/images/characters/8/176145.jpg
+Asama Tomo||Kyoukaisenjou no Horizon||http://cdn.myanimelist.net/images/characters/13/176141.jpg
+Adele Balfetto||Kyoukaisenjou no Horizon||http://cdn.myanimelist.net/images/characters/15/172157.jpg
+Oriotorai Makiko||Kyoukaisenjou no Horizon||http://cdn.myanimelist.net/images/characters/7/138089.jpg
+Mukai Suzu||Kyoukaisenjou no Horizon||http://cdn.myanimelist.net/images/characters/12/172165.jpg
+Honda Futayo||Kyoukaisenjou no Horizon||http://cdn.myanimelist.net/images/characters/4/170697.jpg
+Neito Mitotsudaira||Kyoukaisenjou no Horizon||http://cdn.myanimelist.net/images/characters/14/176143.jpg
+
+Amaha Miu||Mashiro-iro Symphony||http://cdn.myanimelist.net/images/characters/16/137253.jpg
+Inui Sana||Mashiro-iro Symphony||http://cdn.myanimelist.net/images/characters/14/136727.jpg
+Sena Airi||Mashiro-iro Symphony||http://cdn.myanimelist.net/images/characters/4/136403.jpg
+Angelina Nanatsu Sewell||Mashiro-iro Symphony||http://cdn.myanimelist.net/images/characters/8/139939.jpg
+Uryuu Sakuno||Mashiro-iro Symphony||http://cdn.myanimelist.net/images/characters/11/136389.jpg
+
+Ika Musume||Shinryaku!? Ika Musume||http://cdn.myanimelist.net/images/characters/13/107764.jpg
 
 Maizono Sayaka||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/9/204455.jpg
 Kirigiri Kyouko||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/2/214781.jpg
@@ -751,7 +815,28 @@ Dairenji Suzuka||Tokyo Ravens||http://cdn.myanimelist.net/images/characters/12/2
 
 Yaya (Kikou Shoujo wa Kizutsukanai)||Machine-Doll wa Kizutsukanai||http://cdn.myanimelist.net/images/characters/16/223365.jpg
 
-# UP TO OUTBRAKE COMPANY RUN THE SAME SCIPR TWITH EDITED YEAR MONTH
+Myucel Foaran||Outbreak Company||http://cdn.myanimelist.net/images/characters/11/222505.jpg
+Petralka Anne Eldant III||Outbreak Company||http://cdn.myanimelist.net/images/characters/6/217019.jpg
+Elbia Hernaiman||Outbreak Company||http://cdn.myanimelist.net/images/characters/4/220395.jpg
+
+Ichijou Hotaru||Non Non Biyori||http://cdn.myanimelist.net/images/characters/15/222839.jpg
+Koshigaya Komari||Non Non Biyori||http://cdn.myanimelist.net/images/characters/3/225067.jpg
+Koshigaya Natsumi||Non Non Biyori||http://cdn.myanimelist.net/images/characters/14/222841.jpg
+Miyauchi Renge||Non Non Biyori||http://cdn.myanimelist.net/images/characters/15/288781.jpg
+Kagayama Kaede||Non Non Biyori||http://cdn.myanimelist.net/images/characters/7/225829.jpg
+
+Fino Bloodstone||Yuushibu||http://cdn.myanimelist.net/images/characters/7/223503.jpg
+Seara August||Yuushibu||http://cdn.myanimelist.net/images/characters/13/224885.jpg
+
+Ogiso Setsuna||White Album 2||http://cdn.myanimelist.net/images/characters/14/244679.jpg
+Touma Kazusa||White Album 2||http://cdn.myanimelist.net/images/characters/5/244681.jpg
+
+Natsume Rin||Little Busters!||http://cdn.myanimelist.net/images/characters/3/182839.jpg
+Kamikita Komari||Little Busters!||http://cdn.myanimelist.net/images/characters/4/178963.jpg
+Kurugaya Yuiko||Little Busters!||http://cdn.myanimelist.net/images/characters/11/229813.jpg
+Nishizono Mio||Little Busters!||http://cdn.myanimelist.net/images/characters/7/194995.jpg
+Noumi Kudryavka||Little Busters!||http://cdn.myanimelist.net/images/characters/4/210933.jpg
+Saigusa Haruka||Little Busters!||http://cdn.myanimelist.net/images/characters/10/186205.jpg
 
 Hinata Yukari||Yuyushiki||http://cdn.myanimelist.net/images/characters/6/203493.jpg
 Ichii Yui||Yuyushiki||http://cdn.myanimelist.net/images/characters/15/205917.jpg
@@ -771,7 +856,7 @@ Itsuka Kotori||Date A Live||http://cdn.myanimelist.net/images/characters/16/2115
 Tobiichi Origami||Date A Live||http://cdn.myanimelist.net/images/characters/11/226431.jpg
 Tokisaki Kurumi||Date A Live||http://cdn.myanimelist.net/images/characters/6/222047.jpg
 Yatogami Tohka||Date A Live||http://cdn.myanimelist.net/images/characters/7/203347.jpg
-Yoshino (Date A Live)||Date A Live|http://cdn.myanimelist.net/images/characters/4/215469.jpg
+Yoshino (Date A Live)||Date A Live||http://cdn.myanimelist.net/images/characters/4/215469.jpg
 
 Yukinoshita Haruno||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/2/205961.jpg
 Yuigahama Yui||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/8/203549.jpg

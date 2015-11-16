@@ -95,6 +95,7 @@ if __name__ == '__main__':
     try:
         main_process = subprocess.Popen(update['python_process'])
     except (KeyboardInterrupt, SystemExit):
+        main_process.kill()
         sys.exit(0)
 
     while True:
@@ -104,5 +105,6 @@ if __name__ == '__main__':
                     try:
                         main_process = subprocess.Popen(update['python_process'])
                     except (KeyboardInterrupt, SystemExit):
+                        main_process.kill()
                         sys.exit(0)
         time.sleep(60 * 5)

@@ -410,7 +410,8 @@ The bot will catch up on missed messages now!""".format(
                 post_tweet(status_api, msg)
             sapi.disconnect()
             time.sleep(3)
-            Thread(target=start_stream).start()
+            if stream_thread.is_alive():
+                sapi = start_stream(sapi)
             Thread(target=read_notifications,
                    args=(API, True, TWEETS_READ)).start()
             HANG_TIME = time.time()
@@ -466,4 +467,4 @@ if __name__ == '__main__':
     STATUS_API = func.login(status=True)
     read_notifications(API, True, TWEETS_READ)
     Thread(target=status_account, args=(STATUS_API, )).start()
-    Thread(target=handle_stream, args=(SAPI, STATUS_API)).start()
+    handle_stream(SAPI, STATUS_API)

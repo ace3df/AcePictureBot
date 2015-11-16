@@ -208,6 +208,9 @@ def download_image(url, path="", filename="", ignore_list=""):
         tweet_image = video_to_gif(tweet_image)
         if not tweet_image:
             return False
+    # TODO: Debug around here to find out why the .gif gets lost
+    if not os.path.exists(tweet_image):
+        return False
 
     if (os.stat(tweet_image).st_size / 1000000) > 2.8:
         # File size too big, return False if normal image
