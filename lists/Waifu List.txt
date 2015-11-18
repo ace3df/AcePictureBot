@@ -253,6 +253,7 @@ Kusunoki Yua||ChäoS;HEAd||http://cdn.myanimelist.net/images/characters/3/50660.
 Ogata Rina||White Album||http://cdn.myanimelist.net/images/characters/4/54141.jpg
 Yuki Morikawa||White Album||http://cdn.myanimelist.net/images/characters/4/54187.jpg
 
+Miyamae Kanako||Maria Holic||http://cdn.myanimelist.net/images/characters/2/110877.jpg
 Shinouji Matsurika||Maria Holic||http://cdn.myanimelist.net/images/characters/2/42568.jpg
 
 Ikaruga Ayame||Asu no Yoichi!||http://cdn.myanimelist.net/images/characters/15/50261.jpg
@@ -538,6 +539,23 @@ Shinonono Tabane||Infinite Stratos||http://cdn.myanimelist.net/images/characters
 
 Victorique de Blois||Gosick||http://cdn.myanimelist.net/images/characters/5/108860.jpg
 
+Kanoe Yuuko||Tasogare Otome x Amnesia||http://cdn.myanimelist.net/images/characters/16/164633.jpg
+
+Eureka||Eureka Seven||http://cdn.myanimelist.net/images/characters/13/109619.jpg
+
+Kurokami Medaka||Medaka Box||http://cdn.myanimelist.net/images/characters/8/163881.jpg
+
+Urabe Mikoto||Nazo no Kanojo X||http://cdn.myanimelist.net/images/characters/5/168007.jpg
+
+Motomiya Nagisa||AKB0048||http://cdn.myanimelist.net/images/characters/7/167279.jpg
+Sono Chieri||AKB0048||http://cdn.myanimelist.net/images/characters/10/188758.jpg
+
+Katase Mayoi||Acchi Kocchi (TV)||http://cdn.myanimelist.net/images/characters/15/170999.jpg
+Miniwa Tsumiki||Acchi Kocchi (TV)||http://cdn.myanimelist.net/images/characters/5/161551.jpg
+
+Koko Hekmatyar||Jormungand||http://cdn.myanimelist.net/images/characters/5/164387.jpg
+Sofia Valmer||Jormungand||http://cdn.myanimelist.net/images/characters/10/203087.jpg
+
 Hildegard||Beelzebub||http://cdn.myanimelist.net/images/characters/12/115466.jpg
 Hanazawa Yuka||Beelzebub||http://cdn.myanimelist.net/images/characters/13/126407.jpg
 Lamia (beelzebub)||Beelzebub||http://cdn.myanimelist.net/images/characters/14/135639.jpg
@@ -561,7 +579,7 @@ Akiha Rumiho||Steins;Gate||http://cdn.myanimelist.net/images/characters/2/142621
 Amane Suzuha||Steins;Gate||http://cdn.myanimelist.net/images/characters/3/148223.jpg
 Kiryuu Moeka||Steins;Gate||http://cdn.myanimelist.net/images/characters/12/275310.jpg
 
-Kamiki izumo||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/16/159265.jpg
+Kamiki Izumo||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/16/159265.jpg
 Kirigakure Shura||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/6/159263.jpg
 Moriyama Shiemi||Ao no Exorcist||http://cdn.myanimelist.net/images/characters/13/134333.jpg
 
@@ -621,13 +639,16 @@ Asahina Kikuno||SKET Dance||http://cdn.myanimelist.net/images/characters/10/1669
 Kibitsu Momoka||SKET Dance||http://cdn.myanimelist.net/images/characters/3/116906.jpg
 
 Koumoto Madoka||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/characters/11/159151.jpg
-Nakatsugawa_Ui||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/characters/6/118556.jpg
+Nakatsugawa Ui||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/characters/6/118556.jpg
 Sakai Hina||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/characters/8/114408.jpg
 Toudou Koyori||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/characters/13/112931.jpg
 Toudou Tsumugi||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/characters/6/114454.jpg
 Toudou Kasane||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/characters/7/116362.jpg
 Yorozu Senka||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/characters/5/114403.jpg
 Hinata Ibuki||Hoshizora e Kakaru Hashi||http://cdn.myanimelist.net/images/characters/8/112933.jpg
+
+Ekaterina Kurae||Seikon no Qwaser||http://cdn.myanimelist.net/images/characters/8/84615.jpg
+Oribe Mafuyu||Seikon no Qwaser||http://cdn.myanimelist.net/images/characters/5/79038.jpg
 
 Astarotte Ygvar||Astarotte no Omocha!||http://cdn.myanimelist.net/images/characters/6/113053.jpg
 Isadora Finnsdottir||Astarotte no Omocha!||http://cdn.myanimelist.net/images/characters/11/150371.jpg
@@ -754,7 +775,8 @@ Sena Airi||Mashiro-iro Symphony||http://cdn.myanimelist.net/images/characters/4/
 Angelina Nanatsu Sewell||Mashiro-iro Symphony||http://cdn.myanimelist.net/images/characters/8/139939.jpg
 Uryuu Sakuno||Mashiro-iro Symphony||http://cdn.myanimelist.net/images/characters/11/136389.jpg
 
-Ika Musume||Shinryaku!? Ika Musume||http://cdn.myanimelist.net/images/characters/13/107764.jpg
+Tokura Misaki||Cardfight!! Vanguard||http://cdn.myanimelist.net/images/characters/6/111141.jpg
+
 
 Maizono Sayaka||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/9/204455.jpg
 Kirigiri Kyouko||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/2/214781.jpg
@@ -762,6 +784,35 @@ Asahina Aoi||Danganronpa The Animation||http://cdn.myanimelist.net/images/charac
 Enoshima Junko||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/8/214911.jpg
 Fukawa Touko||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/15/220285.jpg
 Celestia Ludenberck||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/8/218021.jpg
+
+Misaki Mei||Another||http://cdn.myanimelist.net/images/characters/12/237389.jpg
+Akazawa Izumi||Another||http://cdn.myanimelist.net/images/characters/14/264327.jpg
+
+Shirakiin Ririchiyo||Inu x Boku SS||http://cdn.myanimelist.net/images/characters/4/146293.jpg
+Roromiya Karuta||Inu x Boku SS||http://cdn.myanimelist.net/images/characters/6/164673.jpg
+
+Takatsuki Ichika||Ano Natsu de Matteru||http://cdn.myanimelist.net/images/characters/3/155623.jpg
+Tanigawa Kanna||Ano Natsu de Matteru||http://cdn.myanimelist.net/images/characters/2/148207.jpg
+Yamano Remon||Ano Natsu de Matteru||http://cdn.myanimelist.net/images/characters/9/148237.jpg
+
+Takanashi Sora||Papa no Iukoto wo Kikinasai!||http://cdn.myanimelist.net/images/characters/14/139951.jpg
+Takanashi Miu||Papa no Iukoto wo Kikinasai!||http://cdn.myanimelist.net/images/characters/5/139953.jpg
+
+Goshiki Agiri||Kill Me Baby||http://cdn.myanimelist.net/images/characters/13/173323.jpg
+Oribe Yasuna||Kill Me Baby||http://cdn.myanimelist.net/images/characters/12/284428.jpg
+
+Katou Marika||Mouretsu Pirates||http://cdn.myanimelist.net/images/characters/16/238019.jpg
+
+Kazanari Tsubasa||Senki Zesshou Symphogear||http://cdn.myanimelist.net/images/characters/15/154597.jpg
+Tachibana Hibiki||Senki Zesshou Symphogear||http://cdn.myanimelist.net/images/characters/7/214527.jpg
+Yukine Chris||Senki Zesshou Symphogear||http://cdn.myanimelist.net/images/characters/10/214505.jpg
+
+Chitanda Eru||Hyouka||http://cdn.myanimelist.net/images/characters/15/165713.jpg
+Ibara Mayaka||Hyouka||http://cdn.myanimelist.net/images/characters/11/164303.jpg
+
+Kurashima Chiyuri||Accel World||http://cdn.myanimelist.net/images/characters/13/185405.jpg
+Kouzuki Yuniko||Accel World||http://cdn.myanimelist.net/images/characters/6/176635.jpg
+Kuroyukihime||Accel World||http://cdn.myanimelist.net/images/characters/3/185407.jpg
 
 Kuroki Tomoko||Watamote!||http://cdn.myanimelist.net/images/characters/15/212635.jpg
 
@@ -778,6 +829,8 @@ Kuriyama Mirai||Kyoukai no Kanata||http://cdn.myanimelist.net/images/characters/
 Nase Mitsuki||Kyoukai no Kanata||http://cdn.myanimelist.net/images/characters/5/222649.jpg
 Nase Izumi||Kyoukai no Kanata||http://cdn.myanimelist.net/images/characters/13/223243.jpg
 Shindou Ai||Kyoukai no Kanata||http://cdn.myanimelist.net/images/characters/7/226359.jpg
+
+Sanka Rea||Sankarea||http://cdn.myanimelist.net/images/characters/15/167177.jpg
 
 Hayashida Nana||Golden Time||http://cdn.myanimelist.net/images/characters/13/259773.jpg
 Kaga Kouko||Golden Time||http://cdn.myanimelist.net/images/characters/8/221317.jpg
@@ -858,11 +911,78 @@ Tokisaki Kurumi||Date A Live||http://cdn.myanimelist.net/images/characters/6/222
 Yatogami Tohka||Date A Live||http://cdn.myanimelist.net/images/characters/7/203347.jpg
 Yoshino (Date A Live)||Date A Live||http://cdn.myanimelist.net/images/characters/4/215469.jpg
 
-Yukinoshita Haruno||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/2/205961.jpg
-Yuigahama Yui||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/8/203549.jpg
-Yukinoshita Yukino||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/4/202721.jpg
-Hikigaya Komachi||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/12/208819.jpg
-Hiratsuka Shizuka||Yahari Ore no Seishun Love Comedy wa Machigatteiru.||http://cdn.myanimelist.net/images/characters/9/282861.jpg
+Yukinoshita Haruno||Oregairu||http://cdn.myanimelist.net/images/characters/2/205961.jpg
+Yuigahama Yui||Oregairu||http://cdn.myanimelist.net/images/characters/8/203549.jpg
+Yukinoshita Yukino||Oregairu||http://cdn.myanimelist.net/images/characters/4/202721.jpg
+Hikigaya Komachi||Oregairu||http://cdn.myanimelist.net/images/characters/12/208819.jpg
+Hiratsuka Shizuka||Oregairu||http://cdn.myanimelist.net/images/characters/9/282861.jpg
+
+Senomiya Akiho||Robotics;Notes||http://cdn.myanimelist.net/images/characters/8/180173.jpg
+Koujiro Frau||Robotics;Notes||http://cdn.myanimelist.net/images/characters/11/239525.jpg
+
+Himenokouji Akiko||OniAi||http://cdn.myanimelist.net/images/characters/5/184047.jpg
+Nasuhara Anastasia||OniAi||http://cdn.myanimelist.net/images/characters/11/184041.jpg
+Nikaidou Arashi||OniAi||http://cdn.myanimelist.net/images/characters/7/191434.jpg
+
+Kirigaya Suguha||Sword Art Online||http://cdn.myanimelist.net/images/characters/9/192515.jpg
+Yuuki Asuna||Sword Art Online||http://cdn.myanimelist.net/images/characters/15/262053.jpg
+Ayano Keiko||Sword Art Online||http://cdn.myanimelist.net/images/characters/5/166545.jpg
+Shinozaki Rika||Sword Art Online||http://cdn.myanimelist.net/images/characters/9/166543.jpg
+
+Lisara Restall||Dakara Boku wa, H ga Dekinai.||http://cdn.myanimelist.net/images/characters/6/173241.jpg
+
+Binboda Momiji||Binbougami ga!||http://cdn.myanimelist.net/images/characters/12/177231.jpg
+Sakura Ichiko||Binbougami ga!||http://cdn.myanimelist.net/images/characters/15/177301.jpg
+Rindou Ranmaru||Binbougami ga!||http://cdn.myanimelist.net/images/characters/15/177481.jpg
+
+Morishita Michiru||Koi to Senkyo to Chocolate||http://cdn.myanimelist.net/images/characters/15/144123.jpg
+Shinonome Satsuki||Koi to Senkyo to Chocolate||http://cdn.myanimelist.net/images/characters/3/173233.jpg
+
+Miyamoto Konatsu||Tari Tari||http://cdn.myanimelist.net/images/characters/14/166703.jpg
+Okita Sawa||Tari Tari||http://cdn.myanimelist.net/images/characters/13/193627.jpg
+Sakai Wakana||Tari Tari||http://cdn.myanimelist.net/images/characters/8/173377.jpg
+
+Ousawa Miu||Hagure Yuusha no Aesthetica||http://cdn.myanimelist.net/images/characters/12/176485.jpg
+
+Tsunemori Akane||Psycho-Pass||http://cdn.myanimelist.net/images/characters/9/179601.jpg
+
+Dekomori Sanae||Chuunibyou demo Koi ga Shitai!||http://cdn.myanimelist.net/images/characters/8/210127.jpg
+Nibutani Shinka||Chuunibyou demo Koi ga Shitai!||http://cdn.myanimelist.net/images/characters/2/254697.jpg
+Takanashi Rikka||Chuunibyou demo Koi ga Shitai!||http://cdn.myanimelist.net/images/characters/2/257273.jpg
+Tsuyuri Kumin||Chuunibyou demo Koi ga Shitai!||http://cdn.myanimelist.net/images/characters/15/190318.jpg
+Takanashi Tooka||Chuunibyou demo Koi ga Shitai!||http://cdn.myanimelist.net/images/characters/14/219051.jpg
+
+Aoyama Nanami||Sakurasou no Pet na Kanojo||http://cdn.myanimelist.net/images/characters/4/198773.jpg
+Kamiigusa Misaki||Sakurasou no Pet na Kanojo||http://cdn.myanimelist.net/images/characters/9/188630.jpg
+Shiina Mashiro||Sakurasou no Pet na Kanojo||http://cdn.myanimelist.net/images/characters/5/183449.jpg
+
+Mizutani Shizuku||Tonari no Kaibutsu-kun||http://cdn.myanimelist.net/images/characters/8/183459.jpg
+Natsume Asako||Tonari no Kaibutsu-kun||http://cdn.myanimelist.net/images/characters/14/189984.jpg
+
+Ren Kougyoku||Magi: The Labyrinth of Magic||http://cdn.myanimelist.net/images/characters/15/192841.jpg
+
+Akizuki Maria||Shinsekai yori||http://cdn.myanimelist.net/images/characters/4/187035.jpg
+Watanabe Saki||Shinsekai yori||http://cdn.myanimelist.net/images/characters/12/183069.jpg
+
+Fuwa Aika||Zetsuen no Tempest||http://cdn.myanimelist.net/images/characters/14/223529.jpg
+Kusaribe Hakaze||Zetsuen no Tempest||http://cdn.myanimelist.net/images/characters/3/183203.jpg
+
+Tachibana Mei||Sukitte Ii na yo.||http://cdn.myanimelist.net/images/characters/8/189952.jpg
+
+Nanami Momozono||Kamisama Hajimemashita||http://cdn.myanimelist.net/images/characters/16/185573.jpg
+
+Erica Blandelli||Campione!||http://cdn.myanimelist.net/images/characters/15/173245.jpg
+
+Takamura Yui||Muv-Luv Alternative||http://cdn.myanimelist.net/images/characters/13/191720.jpg
+
+Anrakutei Kukuru||Joshiraku||http://cdn.myanimelist.net/images/characters/7/173549.jpg
+Buratei Marii||Joshiraku||http://cdn.myanimelist.net/images/characters/13/145959.jpg
+
+Oda Nobuna||Oda Nobuna no Yabou||http://cdn.myanimelist.net/images/characters/13/180735.jpg
+Hachisuka Goemon||Oda Nobuna no Yabou||http://cdn.myanimelist.net/images/characters/15/180199.jpg
+
+Inaba Himeko||Kokoro Connect||http://cdn.myanimelist.net/images/characters/12/172239.jpg
+Nagase Iori||Kokoro Connect||http://cdn.myanimelist.net/images/characters/12/170227.jpg
 
 Sasaki Chiho||Hataraku Maou-sama!||http://cdn.myanimelist.net/images/characters/9/205941.jpg
 Yusa Emi||Hataraku Maou-sama!||http://cdn.myanimelist.net/images/characters/8/205261.jpg

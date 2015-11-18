@@ -217,10 +217,10 @@ def get_level(user_id):
 def waifu(gender, args="", otp=False):
     if gender == 0:
         list_name = "Waifu"
-        end_tag = "1girl"
+        end_tag = "1girl+solo"
     else:
         list_name = "Husbando"
-        end_tag = "1boy"
+        end_tag = "-1girl+-female"
     result = ""
     lines = utils.file_to_list(
                     os.path.join(settings['list_loc'],
@@ -235,16 +235,11 @@ def waifu(gender, args="", otp=False):
         for entry in lines:
             if slugify(entry[1], word_boundary=True) in ignore:
                 continue
-            if slugify(args,
-                       word_boundary=True) == slugify(entry[1],
-                                                      word_boundary=True):
+            if slugify(args, word_boundary=True) ==\
+               slugify(entry[1], word_boundary=True):
                 matched.append(entry)
         # It's not really that random if there isn't that many people matched.
-        if otp:
-            t = 2
-        else:
-            t = 5
-        if len(matched) > t:
+        if len(matched) > 5:
             result = random.choice(matched)
     if not result:
         result = random.choice(lines)
@@ -628,7 +623,7 @@ def random_list(list_name, args=""):
                     names[0].replace(" ", "_"),
                     names[1].replace(" ", "_"))
         else:
-            tags = "{0}+{1}+2girls+-asai_genji+-comic".format(
+            tags = "{0}+{1}+yuri+2girls+-comic".format(
                     names[0].replace(" ", "_"),
                     names[1].replace(" ", "_"))
         name = "{0}(x){1}".format(names[0], names[1])

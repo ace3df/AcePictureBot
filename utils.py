@@ -102,6 +102,7 @@ def scrape_site(url, cookie_file=""):
         browser.open(url)
         return browser
     except:
+        # TODO: find what exception happens here
         printf("[WARNING] TIMEOUT WITH WEBSITE: {0}".format(url))
         return False
 
@@ -437,7 +438,11 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                     if try_count == 20:
                         break
                 ignore_urls.append(url)
-            browser.open(url)
+            try:
+                browser.open(url)
+            except:
+                # TODO: find what exception happens here
+                browser = False
             if not browser:
                 return False
             if ignore_list:
@@ -595,16 +600,15 @@ def get_command(string):
 def short_string(string, limit=40):
     if string == "":
         return string
-    elif len(string) < limit:
+    elif len(string) <= limit:
         return string
     count = 0
-    if string[limit]:
-        for a in string:
-            count += 1
-            if count >= limit and a == " ":
-                break
-        string = string[:count].strip()
-        return string + "[..]"
+    for a in string:
+        count += 1
+        if count >= limit and a == " ":
+            break
+    string = string[:count].strip()
+    return string + "[..]"
 
 
 def gender(string):

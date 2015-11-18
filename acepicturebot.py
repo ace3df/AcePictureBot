@@ -390,18 +390,18 @@ def start_stream(sapi=None):
     if sapi is None:
         sapi = func.login(rest=False)
     try:
-        sapi = tweepy.Stream(sapi, CustomStreamListener())
+        stream_sapi = tweepy.Stream(sapi, CustomStreamListener())
         print("[INFO] Reading Twitter Stream!")
-        sapi.filter(track=[x.lower() for x in settings['twitter_track']],
+        stream_sapi.filter(track=[x.lower() for x in settings['twitter_track']],
                     async=True)
     except (KeyboardInterrupt, SystemExit):
-        sapi.disconnect()
+        stream_sapi.disconnect()
         sys.exit(0)
-    return sapi
+    return stream_sapi
 
 
 def handle_stream(sapi, status_api=False):
-    sapi = start_stream(sapi)
+    stream_sapi = start_stream(sapi)
     global HANG_TIME
     while True:
         time.sleep(5)
@@ -413,10 +413,10 @@ The bot will catch up on missed messages now!""".format(
             print(msg)
             if status_api:
                 post_tweet(status_api, msg)
-            sapi.disconnect()
+            stream_sapi.disconnect()
             time.sleep(3)
-            if not sapi.running:
-                sapi = start_stream(sapi)
+            if not stream_sapi.running:
+                stream_sapi = start_stream(sapi)
             Thread(target=read_notifications,
                    args=(API, True, TWEETS_READ)).start()
             HANG_TIME = time.time()
