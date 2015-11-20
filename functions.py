@@ -739,7 +739,7 @@ def source(api, status):
         soup = utils.scrape_site(url)
         if soup.find('th', text="No relevant matches"):
             return False, False, False, False
-        site = ""
+        site = None
         links = soup.find_all('a')
         for link in links:
             try:
@@ -760,7 +760,7 @@ def source(api, status):
                 url = link['href']
                 site = 1
                 break
-        if not site:
+        if site is None:
             # No link found!
             return False, False, False, False
         soup = utils.scrape_site(url)
