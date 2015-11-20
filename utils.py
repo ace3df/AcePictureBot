@@ -257,7 +257,7 @@ def download_image(url, path="", filename="", ignore_list=""):
 def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
     if ":" not in path:
         path = os.path.join(settings['image_loc'], path)
-    config = configparser.ConfigParser()
+    config = configparser.RawConfigParser(allow_no_value=True)
     config.read(settings['settings'])
     websites = (dict(config.items('Websites')))
     blacklisted_tags = (config.get('Settings', 'blacklisted_tags')).split(', ')
@@ -538,7 +538,7 @@ def get_image(path, ignore_list=False):
             files = [p for p in pathlib.Path(path).iterdir() if p.is_file()]
             img = path_leaf(random.choice(files))
             return os.path.join(path, img)
-        except FileNotFoundError:
+        except (FileNotFoundError, IndexError):
             return False
     else:
         try:
@@ -551,7 +551,7 @@ def get_image(path, ignore_list=False):
         try:
             files = [p for p in pathlib.Path(path).iterdir() if p.is_file()]
             img = path_leaf(random.choice(files))
-        except FileNotFoundError:
+        except (FileNotFoundError, IndexError):
             return False
         hex_data = image_hash(os.path.join(path, img))
         safe_break = 0

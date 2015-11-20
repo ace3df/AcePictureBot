@@ -97,7 +97,7 @@ def config_save(section, key, result, file=0):
     elif file == 1:
         file = settings['count_file']
     with open(file) as fp:
-        config = configparser.ConfigParser(allow_no_value=True)
+        config = configparser.RawConfigParser(allow_no_value=True)
         config.read_file(fp)
         config.set(section, key, str(result))
     with open(file, 'w') as fp:
@@ -110,7 +110,7 @@ def config_get_section_items(section, file=0):
     elif file == 1:
         file = settings['count_file']
     with open(file) as fp:
-        config = configparser.ConfigParser(allow_no_value=True)
+        config = configparser.RawConfigParser(allow_no_value=True)
         config.read_file(fp)
         try:
             return dict(config.items(section))
@@ -124,8 +124,8 @@ def config_add_section(section, file=0):
     elif file == 1:
         file = settings['count_file']
     with open(file) as fp:
-        config = configparser.ConfigParser(allow_no_value=True)
-        config.readfp(fp)
+        config = configparser.RawConfigParser(allow_no_value=True)
+        config.read_file(fp)
         config.add_section(section)
     with open(file, 'w') as fp:
         config.write(fp)
@@ -258,6 +258,7 @@ def waifu(gender, args="", otp=False):
     name = re.sub(r' \([^)]*\)', '', name)
     m = "Your {0} is {1} ({2})".format(list_name.title(),
                                        name, show)
+    count_trigger(name, list_name.lower())
     return m, tweet_image
 
 
@@ -310,7 +311,7 @@ def mywaifu(user_id, gender):
 
 
 def waifuregister(user_id, username, name, gender):
-    config = configparser.ConfigParser()
+    config = configparser.RawConfigParser(allow_no_value=True)
     config.read(settings['settings'])
     help_urls = (dict(config.items('Help URLs')))
     if config_get('Websites', 'sankakucomplex') == "False":
@@ -652,6 +653,8 @@ def random_list(list_name, args=""):
         name = "{0} x {1}".format(name_one, name_two)
     if not m:
         m = "Your {0} is {1} {2}".format(list_name, name, hashtag)
+        if not list_name.endswith("OTP"):
+            count_trigger(name, gender)
     return m, tweet_image
 
 
@@ -757,13 +760,11 @@ def source(api, status):
                 url = link['href']
                 site = 1
                 break
-        if site == "":
-            # No scrapable link found!
+        if not site:
+            # No link found!
             return False, False, False, False
-        try:
-            soup = utils.scrape_site(url)
-        except:
-            # Site could be down
+        soup = utils.scrape_site(url)
+        if not soup:
             return False, False, False, False
         try:
             if site == 0:
@@ -819,10 +820,8 @@ def source(api, status):
         if site == 0:
             url = "https://chan.sankakucomplex.com/note/history?post_id=" + \
                     url.split("/")[-1]
-            try:
-                soup = utils.scrape_site(url)
-            except:
-                # Site could be down
+            soup = utils.scrape_site(url)
+            if not soup:
                 return False, False, False, False
             tl_text = soup.find(
                      'table', class_="row-highlight").find_next('tbody')
@@ -834,10 +833,8 @@ def source(api, status):
         elif site == 1:
             url = "https://danbooru.donmai.us/note_versions?search%5Bpost_id%5D=" + \
                     url.split("/")[-1]
-            try:
-                soup = utils.scrape_site(url)
-            except:
-                # Site could be down
+            soup = utils.scrape_site(url)
+            if not soup:
                 return False, False, False, False
             tl_text = soup.find('h1', text="Note Changes").find_next()
             tl_text = tl_text.find_all('tr')

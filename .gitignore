@@ -11,6 +11,8 @@ FFmpeg/
 images/
 _update/
 _backup/
+tweepy/
+tools/
 
 config.py
 
