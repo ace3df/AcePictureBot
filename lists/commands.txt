@@ -7,7 +7,7 @@ SetBirthday
 Spoiler
 Shipgirl
 Touhou
-Bocaloid
+Vocaloid
 Imouto
 Idol
 Shota
