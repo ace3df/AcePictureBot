@@ -1,4 +1,4 @@
-Alice Margatroid
+﻿Alice Margatroid
 Aya Shameimaru
 Byakuren Hijiri
 Chen
@@ -82,7 +82,6 @@ Shizuha Aki
 Soga no Tojiko
 Sokrates
 Star Sapphire
-Sukuma Shınmyoumaru
 Sunny Milk
 Suwako Moriya
 Tenshi Hinanawi
