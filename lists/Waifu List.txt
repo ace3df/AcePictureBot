@@ -1,4 +1,4 @@
-﻿# Full list of waifus. Type=||
+﻿# This list does NOT reflect what is possible when using WaifuRegister. Type=||
 # Anime/Manga
 Nagato (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/16/262025.jpg
 Mutsu (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/259455.jpg
@@ -165,8 +165,6 @@ Minamoto Chizuru||Kanokon||http://cdn.myanimelist.net/images/characters/5/226751
 Ezomori Nozomu||Kanokon||http://cdn.myanimelist.net/images/characters/10/226749.jpg
 
 Fatina||Tower of Druaga||http://cdn.myanimelist.net/images/characters/15/45810.jpg
-Kaaya||Tower of Druaga||http://cdn.myanimelist.net/images/characters/14/43575.jpg
-Ahmey||Tower of Druaga||http://cdn.myanimelist.net/images/characters/5/45756.jpg
 
 C.C.||Code Geass||http://cdn.myanimelist.net/images/characters/13/33815.jpg
 Kallen Stadtfeld||Code Geass||http://cdn.myanimelist.net/images/characters/8/31533.jpg
@@ -203,7 +201,6 @@ Yuno (hidamari sketch)||Hidamari Sketch||http://cdn.myanimelist.net/images/chara
 Sae (hidamari sketch)||Hidamari Sketch||http://cdn.myanimelist.net/images/characters/16/38859.jpg
 Hiro (hidamari sketch)||Hidamari Sketch||http://cdn.myanimelist.net/images/characters/15/38858.jpg
 Natsume (hidamari sketch)||Hidamari Sketch||http://cdn.myanimelist.net/images/characters/6/215843.jpg
-
 
 Miyafuji Yoshika||Strike Witches||http://cdn.myanimelist.net/images/characters/16/51296.jpg
 Sakamoto Mio||Strike Witches||http://cdn.myanimelist.net/images/characters/13/51299.jpg
@@ -777,7 +774,6 @@ Uryuu Sakuno||Mashiro-iro Symphony||http://cdn.myanimelist.net/images/characters
 
 Tokura Misaki||Cardfight!! Vanguard||http://cdn.myanimelist.net/images/characters/6/111141.jpg
 
-
 Maizono Sayaka||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/9/204455.jpg
 Kirigiri Kyouko||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/2/214781.jpg
 Asahina Aoi||Danganronpa The Animation||http://cdn.myanimelist.net/images/characters/10/218019.jpg
@@ -1032,14 +1028,6 @@ Papi (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.ne
 Suu (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/11/288087.jpg
 Rachnera Arachnera||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/12/278394.jpg
 Meroune Lorelei||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/15/220541.jpg
-Doppel (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/16/292252.jpg
-Kii (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/10/292261.jpg
-Lala (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/5/292260.jpg
-Lilith (monster musume)||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/12/292259.jpg
-Manako||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/5/292253.jpg
-Zombina||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/2/292255.jpg
-Tionishia||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/13/292254.jpg
-Ms. Smith||Monster Musume no Iru Nichijou||http://cdn.myanimelist.net/images/characters/12/292256.jpg
 
 Ebisuzawa Kurumi||Gakkougurashi!||http://cdn.myanimelist.net/images/characters/13/286725.jpg
 Naoki Miki||Gakkougurashi!||http://cdn.myanimelist.net/images/characters/10/286723.jpg
@@ -1077,8 +1065,6 @@ Alex Benedetto||Gangsta.||http://cdn.myanimelist.net/images/characters/10/112208
 
 Shirayuki||Akagami no Shirayukihime||http://cdn.myanimelist.net/images/characters/11/229461.jpg
 
-
-# Video Games
 Samus Aran||Metroid||http://i.imgur.com/x09sloo.jpg
 Trainer (Wii Fit)||Wii Fit||http://i.imgur.com/Kv56TI6.jpg
 Princess Peach||Super Mario Bros.||http://i.imgur.com/MeJOYMN.jpg
@@ -1087,4 +1073,3 @@ Princess Zelda||The Legend of Zelda||http://i.imgur.com/nmQUFrk.jpg
 Lucina||Fire Emblem||http://i.imgur.com/o3CPNQ1.jpg
 Palutena||Kid Icarus||http://i.imgur.com/6z2UCA5.jpg
 Bayonetta (Character)||Bayonetta||http://cdn.myanimelist.net/images/characters/16/264599.jpg
-

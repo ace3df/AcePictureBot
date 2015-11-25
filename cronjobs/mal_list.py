@@ -4,15 +4,11 @@ from bs4 import BeautifulSoup
 from requests import Session
 from config import settings
 from splinter import Browser
+import datetime
+import time
 import sys
 import os
 import re
-
-"""
-todo:
-try find out if they're girl or boy
-http://myanimelist.net/anime/season/2011/fall
-"""
 
 
 def printf(*objects, sep=' ', end='\n', file=sys.stdout):
@@ -86,8 +82,12 @@ def find_images(name):
     name = name.replace(" ", "_")
     flipped = False
     while True:
-        soup = scrape_site("https://chan.sankakucomplex.com/?tags=rating%3Asafe+solo+" + name,
-                           r"..\sankakucomplex.txt")
+        while True:
+            soup = scrape_site("https://chan.sankakucomplex.com/?tags=rating%3Asafe+solo+" + name,
+                               r"..\sankakucomplex.txt")
+            if soup:
+                break
+            time.sleep(10)
         if soup.find('div', text="No matching posts"):
             # Flip name
             if not flipped:
@@ -126,20 +126,24 @@ def start(url):
     with Browser() as browser:
         # Visit URL
         browser.visit(url)
+        printf(url)
         soup = BeautifulSoup(browser.html, 'html5lib')
         class_airing = "seasonal-anime-list js-seasonal-anime-list" \
                        " js-seasonal-anime-list-key-1 clearfix"
         airing_div = soup.find('div', class_=class_airing)
         for b in airing_div.find_all('a', class_="link-title"):
             browser.visit(b['href'])
+            time.sleep(0.5)
             soup = BeautifulSoup(browser.html, 'html5lib')
-            member_count = soup.find('span', text="Members:").next.next.string
-            if int(member_count.replace(",", "")) < 10000:
+            member_count = soup.find('span', text="Members:")
+            member_count = member_count.next.next.string
+            if int(member_count.replace(",", "")) < 30000:
                 continue
             #if soup.find('td', text="Prequel:"):
             #    continue
             show_name = soup.find('span', attrs={'itemprop': "name"}).string
             browser.visit(b['href'] + "/characters")
+            time.sleep(0.5)
             soup = BeautifulSoup(browser.html, 'html5lib')
             for a in soup.find_all('a'):
                 try:
@@ -156,7 +160,10 @@ def start(url):
                         continue
                     # Check if they are already in the list
                     # (manually been added)
-                    image = str(a.find('img').get('src')).replace("t.jpg", ".jpg")
+                    browser.visit("http://myanimelist.net" + a['href'])
+                    time.sleep(1.5)
+                    soup = BeautifulSoup(browser.html, 'html5lib')
+                    image = str(soup.find_all('img')[1].get('src')).replace("t.jpg", ".jpg")
                     name = a['href'].split('/')[-1].replace("_", " ")
                     if " " not in name:
                         # Single name put in own list file
@@ -169,16 +176,8 @@ def start(url):
                     guess_string = "{0}||{1}||{2}\n".format(name, show_name, image)
                     if guess_string in waifu_list or guess_string in husbando_list:
                         continue
-                    browser.visit("http://myanimelist.net" + a['href'])
-                    soup = BeautifulSoup(browser.html, 'html5lib')
-                    mem_fav = soup.find_all(text=re.compile("Member Favorites:"))
-                    try:
-                        mem_fav = int(mem_fav[0].replace("Member Favorites: ", "").strip())
-                    except:
-                        # Not sure what cases this sometimes
-                        printf(browser.url)
-                        not_any_list.append("{0}||{1}||{2}".format(name, show_name, image))
-                        continue
+                    mem_fav = soup.find_all(text=re.compile("Member Favorites: "))
+                    mem_fav = int(mem_fav[0].replace("Member Favorites: ", "").strip())
                     if mem_fav < 60:
                         # Not popular enough
                         continue
@@ -209,23 +208,30 @@ def start(url):
 
 
 if __name__ == "__main__":
-    import datetime
-
+    """ This script will automatically run 6 weeks into the current anime season and target last season's anime.
+    It will script the MyAnimeList season page, check if the anime is popular (30,000 "members").
+    If it passes it will then go through each character filtering
+    out people without an image and ones without more than 20 fans.
+    The last check is to see if the person has any images.
+    If the name doesn't have images it will put it into a side list for manual check up later.
+    """
     current_date = datetime.datetime.now()
-    # Go back one season as images should have spawned by now
-    current_date = current_date.replace(year=2011, month=7)
+    # Uncomment this to manually do a year/season.
+    current_date = current_date.replace(year=2013, month=4)
     if current_date.month in range(1, 3):
         # Winter
-        season = "summer"
+        #current_date = current_date.replace(year=current_date.year - 1)
+        season = "fall"
     elif current_date.month in range(4, 6):
         # Spring
-        season = "fall"
+        season = "winter"
     elif current_date.month in range(7, 9):
         # Summer
-        season = "winter"
+        #
+        season = "spring"
     else:
         # Fall
-        season = "spring"
+        season = "summer"
     # http://myanimelist.net/anime/season/2015/summer
     url = "http://myanimelist.net/anime/season/{year}/{season}".format(
         year=current_date.year, season=season)

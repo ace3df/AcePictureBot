@@ -13,6 +13,7 @@ _update/
 _backup/
 tweepy/
 tools/
+is_busy/
 
 config.py
 
@@ -24,6 +25,5 @@ sankakucomplex.txt
 users_waifus.json
 users_husbandos.json
 count.ini
-is_busy.txt
 
 palette.png
