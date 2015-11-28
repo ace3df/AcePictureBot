@@ -832,10 +832,12 @@ def source(api, status):
             url = "https://chan.sankakucomplex.com/note/history?post_id=" + \
                     url.split("/")[-1]
             soup = utils.scrape_site(url)
-            if not soup:
-                return False, False, False, False
+            if not soup or soup is None:
+                return artist, series, names, False
             tl_text = soup.find(
                      'table', class_="row-highlight").find_next('tbody')
+            if tl_text is None:
+                return artist, series, names, False
             tl_text = tl_text.find_all('tr')
             for tr in tl_text:
                 tr = tr.find_all('td')
@@ -845,8 +847,8 @@ def source(api, status):
             url = "https://danbooru.donmai.us/note_versions?search%5Bpost_id%5D=" + \
                     url.split("/")[-1]
             soup = utils.scrape_site(url)
-            if not soup:
-                return False, False, False, False
+            if not soup or soup is None:
+                return artist, series, names, False
             tl_text = soup.find('h1', text="Note Changes").find_next()
             tl_text = tl_text.find_all('tr')
             for tr in tl_text[1:]:
