@@ -102,7 +102,7 @@ def scrape_site(url, cookie_file=""):
         browser.open(url)
         return browser
     except:
-        # TODO: find what exception happens here
+        # TODO: find what exceptions happens here
         printf("[WARNING] TIMEOUT WITH WEBSITE: {0}".format(url))
         return False
 

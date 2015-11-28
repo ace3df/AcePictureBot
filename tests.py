@@ -10,7 +10,6 @@ or go more into testing other than simply this.
 def run_tests():
     print("Login Test:")
     print(functions.login())
-    print(functions.login())
     print("\nGet Level Test:")
     print(functions.get_level(123))
     print("\nRandom Waifu Test:")

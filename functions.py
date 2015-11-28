@@ -99,7 +99,12 @@ def config_save(section, key, result, file=0):
     with open(file) as fp:
         config = configparser.RawConfigParser(allow_no_value=True)
         config.read_file(fp)
-        config.set(section, key, str(result))
+        try:
+            config.set(section, key, str(result))
+        except configparser.NoSectionError:
+            return False
+        except configparser.NoOptionError:
+            return False
     with open(file, 'w') as fp:
         config.write(fp)
 
@@ -115,6 +120,8 @@ def config_get_section_items(section, file=0):
         try:
             return dict(config.items(section))
         except configparser.NoSectionError:
+            return False
+        except configparser.NoOptionError:
             return False
 
 
@@ -666,6 +673,8 @@ def airing(args):
     air_list_msg = []
     url = "https://www.livechart.me/summer-2015/all"
     soup = utils.scrape_site(url)
+    if not soup:
+        return False
     show_list = soup.find_all('h3', class_="main-title")
     today = datetime.datetime.today()
     today = today + datetime.timedelta(hours=8)
@@ -737,6 +746,8 @@ def source(api, status):
     def info(image):
         url = "http://iqdb.org/?url=%s" % (str(image))
         soup = utils.scrape_site(url)
+        if not soup:
+            return False, False, False, False
         if soup.find('th', text="No relevant matches"):
             return False, False, False, False
         site = None

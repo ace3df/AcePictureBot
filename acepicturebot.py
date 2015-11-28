@@ -227,9 +227,9 @@ def acceptable_tweet(status):
     if command == "Reroll":
         try:
             command = USER_LAST_COMMAND[user.id]
-            if "register" in command:
+            if "Register" in command:
                 return False, False
-            elif "my" in command:
+            elif "My" in command:
                 return False, False
         except ValueError:
             return False, False
