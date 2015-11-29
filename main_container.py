@@ -91,6 +91,8 @@ def update_self():
     return True
 
 if __name__ == '__main__':
+    if os.path.exists(update['is_busy_file']):
+        os.remove(update['is_busy_file'])
     if update['auto_update']:
         update_self()
     try:

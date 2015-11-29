@@ -19,7 +19,8 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.4.0"
+__version__ = "2.4.2"
+DEBUG = False
 
 
 def post_tweet(_API, tweet, media="", command=False, rts=False):
@@ -198,7 +199,8 @@ def acceptable_tweet(status):
     tweet = re.sub(' +', ' ', tweet).lstrip()
 
     # Remove @UserNames (usernames could trigger commands alone)
-    tweet = ' '.join(re.sub('(^|\n| )(@[A-Za-z0-9_]+)', ' ', tweet).split())
+    tweet = tweet.replace("🚢👧", "Shipgirl")
+    tweet = ' '.join(re.sub('(^|\n| )(@[A-Za-z0-9_🚢👧.]+)', ' ', tweet).split())
     tweet = tweet.replace("#", "")
 
     # Find the command they used.
@@ -463,7 +465,6 @@ if __name__ == '__main__':
     API = None
     STATUS_API = None
     SAPI = None
-    DEBUG = False
     TWEETS_READ = utils.file_to_list(
                     os.path.join(settings['ignore_loc'],
                                  "tweets_read.txt"))
