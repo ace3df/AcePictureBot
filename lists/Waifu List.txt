@@ -1,5 +1,4 @@
 # This list does NOT reflect what is possible when using WaifuRegister. Type=||
-# Anime/Manga
 Nagato (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/16/262025.jpg
 Mutsu (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/2/259455.jpg
 Akagi (Kantai Collection)||Kantai Collection||http://cdn.myanimelist.net/images/characters/15/240533.jpg
@@ -412,7 +411,6 @@ Umenomori Chise||Mayoi Neko Overrun!||http://cdn.myanimelist.net/images/characte
 Lina Davis||Heroman||http://cdn.myanimelist.net/images/characters/10/84272.jpg
 
 Busujima Saeko||Highschool of the Dead||http://cdn.myanimelist.net/images/characters/4/98052.jpg
-Maresato Alice||Highschool of the Dead||http://cdn.myanimelist.net/images/characters/10/108107.jpg
 Marikawa Shizuka||Highschool of the Dead||http://cdn.myanimelist.net/images/characters/10/108104.jpg
 Miyamoto Rei||Highschool of the Dead||http://cdn.myanimelist.net/images/characters/7/75686.jpg
 Takagi Saya||Highschool of the Dead||http://cdn.myanimelist.net/images/characters/9/105914.jpg
@@ -889,8 +887,6 @@ Hinata Yukari||Yuyushiki||http://cdn.myanimelist.net/images/characters/6/203493.
 Ichii Yui||Yuyushiki||http://cdn.myanimelist.net/images/characters/15/205917.jpg
 Nonohara Yuzuko||Yuyushiki||http://cdn.myanimelist.net/images/characters/9/203489.jpg
 
-Nakamura Sawa||Aku no Hana||http://cdn.myanimelist.net/images/characters/8/266281.jpg
-
 Rukino Saki||Kakumeiki Valvrave||http://cdn.myanimelist.net/images/characters/14/219829.jpg
 Sashinami Shouko||Kakumeiki Valvrave||http://cdn.myanimelist.net/images/characters/16/219831.jpg
 Renbokouji Akira||Kakumeiki Valvrave||http://cdn.myanimelist.net/images/characters/5/228487.jpg
@@ -945,6 +941,7 @@ Nibutani Shinka||Chuunibyou demo Koi ga Shitai!||http://cdn.myanimelist.net/imag
 Takanashi Rikka||Chuunibyou demo Koi ga Shitai!||http://cdn.myanimelist.net/images/characters/2/257273.jpg
 Tsuyuri Kumin||Chuunibyou demo Koi ga Shitai!||http://cdn.myanimelist.net/images/characters/15/190318.jpg
 Takanashi Tooka||Chuunibyou demo Koi ga Shitai!||http://cdn.myanimelist.net/images/characters/14/219051.jpg
+Shichimiya Satone||Chuunibyou demo Koi ga Shitai!||http://cdn.myanimelist.net/images/characters/3/241789.jpg
 
 Aoyama Nanami||Sakurasou no Pet na Kanojo||http://cdn.myanimelist.net/images/characters/4/198773.jpg
 Kamiigusa Misaki||Sakurasou no Pet na Kanojo||http://cdn.myanimelist.net/images/characters/9/188630.jpg
@@ -986,6 +983,139 @@ Mikasa Ackerman||Shingeki no Kyojin||http://cdn.myanimelist.net/images/character
 Sasha Blouse||Shingeki no Kyojin||http://cdn.myanimelist.net/images/characters/13/202273.jpg
 Krista Lenz||Shingeki no Kyojin||http://cdn.myanimelist.net/images/characters/8/248987.jpg
 Annie Leonhart||Shingeki no Kyojin||http://cdn.myanimelist.net/images/characters/9/206357.jpg
+
+Kasukabe You||Mondaiji-tachi||http://cdn.myanimelist.net/images/characters/9/192541.jpg
+Kudou Asuka||Mondaiji-tachi||http://cdn.myanimelist.net/images/characters/13/192535.jpg
+Kurousagi (Mondaiji)||Mondaiji-tachi||http://cdn.myanimelist.net/images/characters/11/192533.jpg
+
+Fuyuumi Ai||Oreshura||http://cdn.myanimelist.net/images/characters/10/191830.jpg
+Harusaki Chiwa||Oreshura||http://cdn.myanimelist.net/images/characters/9/191834.jpg
+Natsukawa Masuzu||Oreshura||http://cdn.myanimelist.net/images/characters/12/191838.jpg
+
+Ayase Eri||Love Live!||http://cdn.myanimelist.net/images/characters/10/200925.jpg
+Hoshizora Rin||Love Live!||http://cdn.myanimelist.net/images/characters/14/196147.jpg
+Koizumi Hanayo||Love Live!||http://cdn.myanimelist.net/images/characters/4/201133.jpg
+Kousaka Honoka||Love Live!||http://cdn.myanimelist.net/images/characters/2/245793.jpg
+Minami Kotori||Love Live!||http://cdn.myanimelist.net/images/characters/3/201135.jpg
+Nishikino Maki||Love Live!||http://cdn.myanimelist.net/images/characters/9/196139.jpg
+Sonoda Umi||Love Live!||http://cdn.myanimelist.net/images/characters/5/196143.jpg
+Toujou Nozomi||Love Live!||http://cdn.myanimelist.net/images/characters/10/295027.jpg
+Yazawa Niko||Love Live!||http://cdn.myanimelist.net/images/characters/9/200929.jpg
+
+Kitashirakawa Tamako||Tamako Market||http://cdn.myanimelist.net/images/characters/11/188208.jpg
+Makino Kanna||Tamako Market||http://cdn.myanimelist.net/images/characters/12/191850.jpg
+
+Kotoura Haruka||Kotoura-san||http://cdn.myanimelist.net/images/characters/7/192631.jpg
+
+Amatsuka Megumi||GJ-bu||http://cdn.myanimelist.net/images/characters/4/192751.jpg
+Amatsuka Mao||GJ-bu||http://cdn.myanimelist.net/images/characters/5/192753.jpg
+Bernstein Kirara||GJ-bu||http://cdn.myanimelist.net/images/characters/15/192749.jpg
+Sumeragi Shion||GJ-bu||http://cdn.myanimelist.net/images/characters/16/192745.jpg
+
+Sasami Tsukuyomi||Sasami-san at Ganbaranai||http://cdn.myanimelist.net/images/characters/14/179739.jpg
+Yagami Tsurugi||Sasami-san at Ganbaranai||http://cdn.myanimelist.net/images/characters/5/192489.jpg
+Yagami Kagami||Sasami-san at Ganbaranai||http://cdn.myanimelist.net/images/characters/5/195929.jpg
+
+Asuka (Senran Kagura)||Senran Kagura||http://cdn.myanimelist.net/images/characters/2/201087.jpg
+Hibari (Senran Kagura)||Senran Kagura||http://cdn.myanimelist.net/images/characters/14/192953.jpg
+Ikaruga (Senran Kagura)||Senran Kagura||http://cdn.myanimelist.net/images/characters/3/201085.jpg
+Katsuragi (Senran Kagura)||Senran Kagura||http://cdn.myanimelist.net/images/characters/12/192965.jpg
+Yagyuu (Senran Kagura)||Senran Kagura||http://cdn.myanimelist.net/images/characters/9/192957.jpg
+Haruka (Senran Kagura)||Senran Kagura||http://cdn.myanimelist.net/images/characters/7/194241.jpg
+Mirai (Senran Kagura)||Senran Kagura||http://cdn.myanimelist.net/images/characters/7/176025.jpg
+Suzune (Senran Kagura)||Senran Kagura||http://cdn.myanimelist.net/images/characters/15/199409.jpg
+Yomi (Senran Kagura)||Senran Kagura||http://cdn.myanimelist.net/images/characters/13/280650.jpg
+
+Iki Hiyori||Noragami||http://cdn.myanimelist.net/images/characters/7/295009.jpg
+Bishamonten (Noragami)||Noragami||http://cdn.myanimelist.net/images/characters/13/237153.jpg
+
+Kirisaki Chitoge||Nisekoi||http://cdn.myanimelist.net/images/characters/7/241651.jpg
+Onodera Kosaki||Nisekoi||http://cdn.myanimelist.net/images/characters/9/241653.jpg
+Miyamoto Ruri||Nisekoi||http://cdn.myanimelist.net/images/characters/9/235033.jpg
+Tachibana Marika||Nisekoi||http://cdn.myanimelist.net/images/characters/13/241915.jpg
+Tsugumi Seishirou||Nisekoi||http://cdn.myanimelist.net/images/characters/8/241659.jpg
+
+Hajime (Hamatora)||Hamatora The Animation||http://cdn.myanimelist.net/images/characters/16/241763.jpg
+
+Honey (Space Dandy)||Space Dandy||http://cdn.myanimelist.net/images/characters/5/231169.jpg
+
+Uka-no-Mitama-no-Kami (Inakon)||Inari, Konkon, Koi Iroha.||http://cdn.myanimelist.net/images/characters/5/225125.jpg
+
+Mizukami Sakura||D-Frag!||http://cdn.myanimelist.net/images/characters/9/232753.jpg
+Shibasaki Roka||D-Frag!||http://cdn.myanimelist.net/images/characters/4/286776.jpg
+Sakai Tama||D-Frag!||http://cdn.myanimelist.net/images/characters/11/244937.jpg
+
+Mitsumine Mashiro||Mikakunin de Shinkoukei||http://cdn.myanimelist.net/images/characters/8/232935.jpg
+Yonomori Kobeni||Mikakunin de Shinkoukei||http://cdn.myanimelist.net/images/characters/7/232941.jpg
+Yonomori Benio||Mikakunin de Shinkoukei||http://cdn.myanimelist.net/images/characters/2/236085.jpg
+
+Kagari Ayaka||Witch Craft Works||http://cdn.myanimelist.net/images/characters/14/232453.jpg
+
+Aiba Mui||Mahou Sensou||http://cdn.myanimelist.net/images/characters/12/236367.jpg
+
+Sonoda Yuu||Sakura Trick||http://cdn.myanimelist.net/images/characters/16/231761.jpg
+Takayama Haruka||Sakura Trick||http://cdn.myanimelist.net/images/characters/6/231763.jpg
+
+Hoshimiya Kate||Sekai Seifuku||http://cdn.myanimelist.net/images/characters/6/233469.jpg
+Shikabane Itsuka||Sekai Seifuku||http://cdn.myanimelist.net/images/characters/8/237187.jpg
+
+Super Sonico||SoniAni||http://cdn.myanimelist.net/images/characters/3/229803.jpg
+
+Shiro (No Game No Life)||No Game No Life||http://cdn.myanimelist.net/images/characters/16/246723.jpg
+Jibril (No Game No Life)||No Game No Life||http://cdn.myanimelist.net/images/characters/12/248121.jpg
+Stephanie Dora||No Game No Life||http://cdn.myanimelist.net/images/characters/12/274341.jpg
+Hatsuse Izuna||No Game No Life||http://cdn.myanimelist.net/images/characters/11/252987.jpg
+
+Aihara Enju||Black Bullet||http://cdn.myanimelist.net/images/characters/5/241787.jpg
+Tina Sprout||Black Bullet||http://cdn.myanimelist.net/images/characters/9/245907.jpg
+Tendou Kisara||Black Bullet||http://cdn.myanimelist.net/images/characters/15/241785.jpg
+Fuse Midori||Black Bullet||http://cdn.myanimelist.net/images/characters/15/248953.jpg
+
+Shiba Miyuki||Mahouka Koukou no Rettousei||http://cdn.myanimelist.net/images/characters/4/240187.jpg
+Chiba Erika||Mahouka Koukou no Rettousei||http://cdn.myanimelist.net/images/characters/13/190004.jpg
+Saegusa Mayumi||Mahouka Koukou no Rettousei||http://cdn.myanimelist.net/images/characters/16/242365.jpg
+
+Shimizu Kiyoko||Haikyuu!!||http://cdn.myanimelist.net/images/characters/3/245493.jpg
+
+Enomoto Takane||Mekakucity Actors||http://cdn.myanimelist.net/images/characters/12/276478.jpg
+Kido Tsubomi||Mekakucity Actors||http://cdn.myanimelist.net/images/characters/3/239701.jpg
+Kisaragi Momo||Mekakucity Actors||http://cdn.myanimelist.net/images/characters/12/233349.jpg
+Tateyama Ayano||Mekakucity Actors||http://cdn.myanimelist.net/images/characters/16/244607.jpg
+
+Kuroha Neko||Gokukoku no Brynhildr||http://cdn.myanimelist.net/images/characters/10/241213.jpg
+Kazumi Schlierenzauer||Gokukoku no Brynhildr||http://cdn.myanimelist.net/images/characters/10/244613.jpg
+
+Acura Akari||Hitsugi no Chaika||http://cdn.myanimelist.net/images/characters/13/243157.jpg
+Chaika Trabant||Hitsugi no Chaika||http://cdn.myanimelist.net/images/characters/16/251337.jpg
+Chaika Bohdan||Hitsugi no Chaika||http://cdn.myanimelist.net/images/characters/6/258629.jpg
+Fredrika (Hitsugi no Chaika)||Hitsugi no Chaika||http://cdn.myanimelist.net/images/characters/7/249877.jpg
+
+Kawai Ritsu||Bokura wa Minna Kawaisou||http://cdn.myanimelist.net/images/characters/14/250569.jpg
+Nishikino Mayumi||Bokura wa Minna Kawaisou||http://cdn.myanimelist.net/images/characters/13/251189.jpg
+
+Fujimiya Kaori||Isshuukan Friends.||http://cdn.myanimelist.net/images/characters/4/251803.jpg
+Yamagishi Saki||Isshuukan Friends.||http://cdn.myanimelist.net/images/characters/9/243145.jpg
+
+Azuma Tokaku||Akuma no Riddle||http://cdn.myanimelist.net/images/characters/12/245309.jpg
+Ichinose Haru||Akuma no Riddle||http://cdn.myanimelist.net/images/characters/4/264213.jpg
+Banba Mahiru||Akuma no Riddle||http://cdn.myanimelist.net/images/characters/16/242075.jpg
+Hashiri Nio||Akuma no Riddle||http://cdn.myanimelist.net/images/characters/16/264033.jpg
+Inukai Isuke||Akuma no Riddle||http://cdn.myanimelist.net/images/characters/10/240269.jpg
+Sagae Haruki||Akuma no Riddle||http://cdn.myanimelist.net/images/characters/2/242077.jpg
+
+Ashisu Sahoto||Mangaka-san to Assistant-san to The Animation||http://cdn.myanimelist.net/images/characters/5/243275.jpg
+
+Ikkyuu Tensai||Ryuugajou Nanana no Maizoukin (TV)||http://cdn.myanimelist.net/images/characters/9/242623.jpg
+Ryuugajou Nanana||Ryuugajou Nanana no Maizoukin (TV)||http://cdn.myanimelist.net/images/characters/16/246599.jpg
+
+Aoi Akira||Selector Infected WIXOSS||http://cdn.myanimelist.net/images/characters/11/241619.jpg
+Kominato Ruuko||Selector Infected WIXOSS||http://cdn.myanimelist.net/images/characters/10/237537.jpg
+
+Hoto Kokoa||Gochuumon wa Usagi Desu ka?||http://cdn.myanimelist.net/images/characters/11/242945.jpg
+Kafuu Chino||Gochuumon wa Usagi Desu ka?||http://cdn.myanimelist.net/images/characters/16/244251.jpg
+Kirima Sharo||Gochuumon wa Usagi Desu ka?||http://cdn.myanimelist.net/images/characters/13/294263.jpg
+Tedeza Rize||Gochuumon wa Usagi Desu ka?||http://cdn.myanimelist.net/images/characters/15/243377.jpg
+Ujimatsu Chiya||Gochuumon wa Usagi Desu ka?||http://cdn.myanimelist.net/images/characters/7/294262.jpg
 
 Otosaka Ayumi||Charlotte||http://cdn.myanimelist.net/images/characters/4/288021.jpg
 Kurobane Yusa||Charlotte||http://cdn.myanimelist.net/images/characters/7/288018.jpg

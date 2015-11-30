@@ -53,6 +53,7 @@ Takayama Maria||Boku wa Tomodachi ga Sukunai
 Miyauchi Kazuho||Non Non Biyori
 Saotome Kazuko||Mahou Shoujo Madoka Magica
 Kyoko-sensei||Nisekoi
+Saegusa Mayumi||Mahouka Koukou no Rettousei
 Takahashi Maya||Amagami
 Yamada Maya||Infinite Stratos
 Ootani Momoko||Photo Kano
@@ -78,3 +79,4 @@ Koumoto Akari||Jitsu wa Watashi wa
 Akatsuki Mimori||Strike the Blood
 Minamiya Natsuki||Strike the Blood
 Oriotorai Makiko||Kyoukaisenjou no Horizon
+Yagami Tsurugi||Sasami-san at Ganbaranai

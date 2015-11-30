@@ -13,6 +13,8 @@ Araragi Karen||Monogatari (Series)
 Kousaka Kirino||Oreimo
 Hasegawa Kobato||Boku Wa Tomodachi ga Sukunai
 Mitsumine Mashiro||Mikakunin de Shinkoukei
+Kisaragi Momo||Mekakucity Actors
+Acura Akari||Hitsugi no Chaika
 Takayama Maria||Boku Wa Tomodachi ga Sukunai
 Yonomori Kobeni||Mikakunin de Shinkoukei
 Kurome||Akame Ga Kill
@@ -91,6 +93,7 @@ Minami Chiaki||Minami-Ke
 Kurosaki Karin||Bleach
 Kurosaki Yuzu||Bleach
 Patricia Thompson||Soul Eater
+Hiruko Kohina||Black Bullet
 Nishijou Nanami||Chäos;Head
 Isara Gunther||Valkyria Chronicles
 Gokou Hinata||OreImo
@@ -115,3 +118,5 @@ Kawakami Kazuko||Maji de Watashi ni Koi Shinasai!
 Honda Masazumi||Kyoukaisenjou no Horizon
 Furuya Mero||Sankarea
 Fuwa Aika||Zetsuen no Tempest
+Tsukuyomi Sasami||Sasami-san at Ganbaranai
+Yagami Kagami||Sasami-san at Ganbaranai

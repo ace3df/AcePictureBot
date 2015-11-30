@@ -1,5 +1,4 @@
-﻿# Full list of husbando. Type=||
-# Anime/Manga
+# This list does NOT reflect what is possible when using HusbandoReigster. Type=||
 Aono Tsukune||Rosario to Vampire||http://cdn.myanimelist.net/images/characters/11/134613.jpg
 
 Nakagami Shinichiro||True Tears||http://cdn.myanimelist.net/images/characters/2/13342.jpg
@@ -484,7 +483,6 @@ Dio Brando||JoJo no Kimyou na Bouken (TV)||http://cdn.myanimelist.net/images/cha
 Jonathan Joestar||JoJo no Kimyou na Bouken (TV)||http://cdn.myanimelist.net/images/characters/10/182715.jpg
 Joseph Joestar||JoJo no Kimyou na Bouken (TV)||http://cdn.myanimelist.net/images/characters/6/252863.jpg
 
-
 Sanada Yuki||Tsuritama||http://cdn.myanimelist.net/images/characters/9/162921.jpg
 Usami Natsuki||Tsuritama||http://cdn.myanimelist.net/images/characters/3/168095.jpg
 Akira Agarkar Yamada||Tsuritama||http://cdn.myanimelist.net/images/characters/13/168097.jpg
@@ -511,6 +509,48 @@ Sinbad (Magi)||Magi||http://cdn.myanimelist.net/images/characters/6/181341.jpg
 Ato Touji||Tokyo Ravens||http://cdn.myanimelist.net/images/characters/12/227039.jpg
 Tsuchimikado Harutora||Tokyo Ravens||http://cdn.myanimelist.net/images/characters/2/242263.jpg
 
+Sakamaki Izayoi||Mondaiji-tachi||http://cdn.myanimelist.net/images/characters/10/192915.jpg
+
+Ooji Mochizou||Tamako Market||http://cdn.myanimelist.net/images/characters/5/192145.jpg
+
+Ichijou Raku||Nisekoi||http://cdn.myanimelist.net/images/characters/12/242215.jpg
+
+Yato (Noragami)||Noragami||http://cdn.myanimelist.net/images/characters/8/232687.jpg
+Yukine (Noragami)||Noragami||http://cdn.myanimelist.net/images/characters/16/233653.jpg
+
+Nice (Hamatora)||Hamatora The Animation||http://cdn.myanimelist.net/images/characters/6/231475.jpg
+Art (Hamatora)||Hamatora The Animation||http://cdn.myanimelist.net/images/characters/5/240763.jpg
+Birthday (Hamatora)||Hamatora The Animation||http://cdn.myanimelist.net/images/characters/2/259025.jpg
+
+Dandy (Space Dandy)||Space Dandy||http://cdn.myanimelist.net/images/characters/7/231179.jpg
+
+Sora (No Game No Life)||No Game No Life||http://cdn.myanimelist.net/images/characters/12/274345.jpg
+
+Satomi Rentarou||Black Bullet||http://cdn.myanimelist.net/images/characters/3/244717.jpg
+
+Shiba Tatsuya||Mahouka Koukou no Rettousei||http://cdn.myanimelist.net/images/characters/16/236781.jpg
+
+Hinata Shouyou||Haikyuu!!||http://cdn.myanimelist.net/images/characters/11/243919.jpg
+Kageyama Tobio||Haikyuu!!||http://cdn.myanimelist.net/images/characters/12/249029.jpg
+Iwaizumi Hajime||Haikyuu!!||http://cdn.myanimelist.net/images/characters/3/258959.jpg
+Kozume Kenma||Haikyuu!!||http://cdn.myanimelist.net/images/characters/2/195911.jpg
+Kuroo Tetsurou||Haikyuu!!||http://cdn.myanimelist.net/images/characters/9/250903.jpg
+Nishinoya Yuu||Haikyuu!!||http://cdn.myanimelist.net/images/characters/14/238027.jpg
+Sugawara Koushi||Haikyuu!!||http://cdn.myanimelist.net/images/characters/11/243917.jpg
+Tsukishima Kei||Haikyuu!!||http://cdn.myanimelist.net/images/characters/13/273847.jpg
+
+Kano Shuuya||Mekakucity Actors||http://cdn.myanimelist.net/images/characters/14/239697.jpg
+Kisaragi Shintarou||Mekakucity Actors||http://cdn.myanimelist.net/images/characters/4/248963.jpg
+
+Acura Tooru||Hitsugi no Chaika||http://cdn.myanimelist.net/images/characters/14/270271.jpg
+
+Usa Kazunari||Bokura wa Minna Kawaisou||http://cdn.myanimelist.net/images/characters/12/238051.jpg
+
+Hase Yuuki||Isshuukan Friends.||http://cdn.myanimelist.net/images/characters/10/243821.jpg
+
+Hades Aidoneus||Kamigami no Asobi||http://cdn.myanimelist.net/images/characters/14/282983.jpg
+Balder Hringhorni||Kamigami no Asobi||http://cdn.myanimelist.net/images/characters/15/282982.jpg
+Totsuka Takeru||Kamigami no Asobi||http://cdn.myanimelist.net/images/characters/6/228315.jpg
 
 Otosaka Yuu||Charlotte||http://cdn.myanimelist.net/images/characters/15/288011.jpg
 Takajou Joujirou||Charlotte||http://cdn.myanimelist.net/images/characters/9/288012.jpg
@@ -545,6 +585,3 @@ Worick Arcangelo||Gangsta.||http://cdn.myanimelist.net/images/characters/15/2229
 
 Obi (Akagami no Shirayukihime)||Akagami no Shirayukihime||http://cdn.myanimelist.net/images/characters/14/292272.jpg
 Zen Wistalia||Akagami no Shirayuki-hime||http://cdn.myanimelist.net/images/characters/5/229453.jpg
-
-
-# Video Games

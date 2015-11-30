@@ -5,7 +5,7 @@ Mitsukuni Haninozuka||Ouran Koukou Host Club
 Sohma Momiji||Fruits Basket
 Killua Zoldyck||Hunter x Hunter
 Gon Freecss||Hunter x Hunter
-Aladdin (magi)||Magi
+Aladdin (Magi)||Magi
 July (Darker Than Black)||Darker Than Black
 Houjou Reisuke||Mirai Nikki
 Asagi Seiran||Barajou no Kiss
@@ -16,8 +16,7 @@ Fuuta||Katekyo Hitman Reborn!
 Ion||Tales of The Abyss
 Selim Bradley||Fullmetal Alchemist
 Pharos||Persona 3
-Young Tatsuya Himuro||Kurokono Basuke
-Young Taiga Kagami||Kurokono Basuke
+Amamiya Hibiya||Mekakucity Actors
 Mizutani Takaya||Tonari no Kaibutsukun
 Young Suzuya Tohzuki||Starry Sky
 Mizuhara Tomoya||Onee-chan ga Kita
