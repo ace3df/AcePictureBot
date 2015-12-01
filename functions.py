@@ -747,9 +747,9 @@ def source(api, status):
         url = "http://iqdb.org/?url=%s" % (str(image))
         soup = utils.scrape_site(url)
         if not soup:
-            return False, False, False, False
+            return False, False, False
         if soup.find('th', text="No relevant matches"):
-            return False, False, False, False
+            return False, False, False
         site = None
         links = soup.find_all('a')
         for link in links:
@@ -759,7 +759,7 @@ def source(api, status):
                 continue
             if link.string == "(hide)":
                 # Haven't broke yet, onto low results
-                return False, False, False, False
+                return False, False, False
             if "chan.sankakucomplex.com/post/show/" in link['href']:
                 if "http" not in link['href']:
                     url = "http:" + link['href']
@@ -773,10 +773,10 @@ def source(api, status):
                 break
         if site is None:
             # No link found!
-            return False, False, False, False
+            return False, False, False
         soup = utils.scrape_site(url)
         if not soup:
-            return False, False, False, False
+            return False, False, False
         try:
             if site == 0:
                 # Sankaku
@@ -827,41 +827,7 @@ def source(api, status):
         except:
             names = ""
 
-        # Translation
-        if site == 0:
-            url = "https://chan.sankakucomplex.com/note/history?post_id=" + \
-                    url.split("/")[-1]
-            soup = utils.scrape_site(url)
-            if not soup or soup is None:
-                return artist, series, names, False
-            tl_text = soup.find(
-                     'table', class_="row-highlight").find_next('tbody')
-            if tl_text is None:
-                return artist, series, names, False
-            tl_text = tl_text.find_all('tr')
-            for tr in tl_text:
-                tr = tr.find_all('td')
-                line = tag_re.sub('', tr[3].text).lstrip().rstrip()
-                lines.append(line)
-        elif site == 1:
-            url = "https://danbooru.donmai.us/note_versions?search%5Bpost_id%5D=" + \
-                    url.split("/")[-1]
-            soup = utils.scrape_site(url)
-            if not soup or soup is None:
-                return artist, series, names, False
-            tl_text = soup.find('h1', text="Note Changes").find_next()
-            tl_text = tl_text.find_all('tr')
-            for tr in tl_text[1:]:
-                tr = tr.find_all('td')
-                line = tag_re.sub('', tr[3].text).lstrip().rstrip()
-                lines.append(line)
-        if not lines:
-            translation = ""
-        else:
-            translation = "Notes: " + url + '\n' + '\n'.join(lines[::-1])
-            translation = utils.make_paste(text=translation)
-
-        return artist, series, names, translation
+        return artist, series, names
 
     def tweeted_image(api, status):
         """Return the image url from the tweet."""
@@ -883,7 +849,7 @@ def source(api, status):
         count_trigger("source")
         return tweeted_image
 
-    artist, series, names, translation = info(tweeted_image)
+    artist, series, names = info(tweeted_image)
     saucenao = u"http://saucenao.com/search.php?urlify=1&url={0}".format(
                 str(tweeted_image))
     if not artist and not series and not names:
@@ -895,15 +861,12 @@ def source(api, status):
             names = "Character(s): {0}\n".format(names)
         if series:
             series = "From: {0}\n".format(utils.short_string(series, 25))
-        if translation:
-            translation = "Translation: {0}\n".format(translation)
     handles = status.text.lower()
     handles = [word for word in handles.split() if word.startswith('@')]
     handles = list(set(handles))
     handles = ' '.join(handles).replace(
               "@" + settings["twitter_track"][0].lower(), "")
-    m = "{0}{1}{2}{3}".format(artist, names, series,
-                              translation)
+    m = "{0}{1}{2}".format(artist, names, series)
     if is_gif:
         m += "*Source is a gif so this could be inaccurate.\n"
     if (len(m) + 24) >= 120:
