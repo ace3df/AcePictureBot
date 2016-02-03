@@ -13,6 +13,8 @@ Nakamura Yuri||Angel Beats!
 Shigure Asa||Shuffle!
 Nerine||Shuffle!
 Lisianthus||Shuffle!
+Kongou (Kantai Collection)||Kantai Collection
+Akagi (Kantai Collection)||Kantai Collection
 Yukinoshita Haruno||Oregairu
 Kasumigaoka Utaha||Saenai Heroine no Sodatekata
 Ichijou Hotaru||Non Non Biyori
@@ -35,4 +37,3 @@ Kawakami Momoyo||Maji de Watashi ni Koi Shinasai!
 Kawai Ritsu||Bokura wa Minna Kawaisou
 Kanzaki H Aria||Hidan no Aria
 Kurugaya Yuiko||Little Busters!
-Akagi (Kantai Collection)||Kantai Collection

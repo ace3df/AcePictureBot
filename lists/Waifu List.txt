@@ -1201,3 +1201,6 @@ Princess Zelda||The Legend of Zelda||http://i.imgur.com/nmQUFrk.jpg
 Lucina||Fire Emblem||http://i.imgur.com/o3CPNQ1.jpg
 Palutena||Kid Icarus||http://i.imgur.com/6z2UCA5.jpg
 Bayonetta (Character)||Bayonetta||http://cdn.myanimelist.net/images/characters/16/264599.jpg
+
+Fubuki (one_punch_man)||One Punch Man||http://cdn.myanimelist.net/images/characters/5/294843.jpg
+Tatsumaki (one-punch_man)||One Punch Man||http://cdn.myanimelist.net/images/characters/16/296299.jpg
