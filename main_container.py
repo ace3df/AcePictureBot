@@ -53,8 +53,9 @@ def update_self():
     # New commit!
     if os.path.exists(backup_dir):
         shutil.rmtree(backup_dir, onerror=del_rw)
-    shutil.copytree(base_dir, backup_dir, ignore=ignore_patterns('main_container.py', 'is_busy.txt',
-                                                                 'images', 'user_ignore'))
+    shutil.copytree(base_dir, backup_dir,
+        ignore=ignore_patterns('main_container.py', 'is_busy.txt',
+                               'images', 'user_ignore'))
     if not os.path.exists(update_dir):
         os.makedirs(update_dir)
     else:
@@ -106,7 +107,8 @@ if __name__ == '__main__':
             if update_self():
                 if updated_py:
                     try:
-                        main_process = subprocess.Popen(update['python_process'])
+                        main_process = subprocess.Popen(
+                            update['python_process'])
                     except (KeyboardInterrupt, SystemExit):
                         main_process.kill()
                         sys.exit(0)

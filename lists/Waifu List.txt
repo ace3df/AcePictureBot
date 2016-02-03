@@ -1204,3 +1204,17 @@ Bayonetta (Character)||Bayonetta||http://cdn.myanimelist.net/images/characters/1
 
 Fubuki (one_punch_man)||One Punch Man||http://cdn.myanimelist.net/images/characters/5/294843.jpg
 Tatsumaki (one-punch_man)||One Punch Man||http://cdn.myanimelist.net/images/characters/16/296299.jpg
+
+Kurogane Shizuku||Rakudai Kishi no Cavalry||http://cdn.myanimelist.net/images/characters/13/297020.jpg
+Stella Vermillion||Rakudai Kishi no Cavalry||http://cdn.myanimelist.net/images/characters/8/277837.jpg
+
+Sasamiya Saya||Gakusen Toshi Asterisk||http://cdn.myanimelist.net/images/characters/15/296326.jpg
+Toudou Kirin||Gakusen Toshi Asterisk||http://cdn.myanimelist.net/images/characters/7/291296.jpg
+Claudia Enfield||Gakusen Toshi Asterisk||http://cdn.myanimelist.net/images/characters/9/292991.jpg
+Julis-Alexia von Riessfeld||Gakusen Toshi Asterisk||http://cdn.myanimelist.net/images/characters/14/293702.jpg
+
+Kujou Sakurako||Sakurako-san no Ashimoto||http://cdn.myanimelist.net/images/characters/14/292949.jpg
+
+Frolaytia Capistrano||Heavy Object||http://cdn.myanimelist.net/images/characters/13/294413.jpg
+
+Kuon (utawarerumono)||Utawarerumono||http://cdn.myanimelist.net/images/characters/15/292337.jpg

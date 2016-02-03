@@ -87,8 +87,8 @@ def tweet_command(_API, status, tweet, command):
         tweet, tweet_image = func.spookjoke()
     if command == "Spoiler":
         tweet = random.choice(utils.file_to_list(
-                    os.path.join(settings['list_loc'],
-                                 "spoilers.txt")))
+            os.path.join(settings['list_loc'],
+                         "spoilers.txt")))
     elif command == "!Level":
         tweet = func.get_level(user.id)
 
@@ -111,10 +111,12 @@ def tweet_command(_API, status, tweet, command):
             func.remove_one_limit(user.id, gender.lower() + "register")
         elif follow_result == "Not Genuine":
             tweet = ("Your account wasn't found to be genuine.\n"
-                     "Help: {url}").format(url=func.config_get('Help URLs', 'not_genuine'))
+                     "Help: {url}").format(
+                url=func.config_get('Help URLs', 'not_genuine'))
         elif not follow_result:
             tweet = ("You must follow @AcePictureBot to register!\n"
-                     "Help: {url}").format(url=func.config_get('Help URLs', 'must_follow'))
+                     "Help: {url}").format(
+                url=func.config_get('Help URLs', 'must_follow'))
         else:
             tweet, tweet_image = func.waifuregister(user.id,
                                                     user.screen_name,
@@ -171,11 +173,11 @@ def acceptable_tweet(status):
 
     # Reload in case of manual updates.
     BLOCKED_IDS = utils.file_to_list(
-                    os.path.join(settings['list_loc'],
-                                 "Blocked Users.txt"))
+        os.path.join(settings['list_loc'],
+                     "Blocked Users.txt"))
     IGNORE_WORDS = utils.file_to_list(
-                    os.path.join(settings['list_loc'],
-                                 "Blocked Words.txt"))
+        os.path.join(settings['list_loc'],
+                     "Blocked Words.txt"))
 
     # Ignore bots and bad boys.
     if str(user.id) in BLOCKED_IDS:
@@ -191,7 +193,7 @@ def acceptable_tweet(status):
                for a in settings['twitter_track']):
         return False, False
 
-    # If the user @sauce_plz add "source" to the text as every @ is later removed.
+    # If the user @sauce_plz add "source" to the text
     if "sauce" in tweet.lower():
         tweet += " source"
 
@@ -200,7 +202,8 @@ def acceptable_tweet(status):
 
     # Remove @UserNames (usernames could trigger commands alone)
     tweet = tweet.replace("🚢👧", "Shipgirl")
-    tweet = ' '.join(re.sub('(^|\n| )(@[A-Za-z0-9_🚢👧.]+)', ' ', tweet).split())
+    tweet = ' '.join(
+            re.sub('(^|\n| )(@[A-Za-z0-9_🚢👧.]+)', ' ', tweet).split())
     tweet = tweet.replace("#", "")
 
     # Find the command they used.
@@ -381,8 +384,9 @@ class CustomStreamListener(tweepy.StreamListener):
         if int(status_code) != int(LAST_STATUS_CODE):
             LAST_STATUS_CODE = status_code
             msg = ("[{0}] Twitter Returning Status Code: {1}.\n"
-                   "More Info: https://dev.twitter.com/overview/api/response-codes").format(
-                    time.strftime("%Y-%m-%d %H:%M"), status_code)
+                   "More Info: "
+                   "https://dev.twitter.com/overview/api/response-codes")
+            .format(time.strftime("%Y-%m-%d %H:%M"), status_code)
             print(msg)
             post_tweet(func.login(status=True), msg)
         return True
@@ -394,8 +398,8 @@ def start_stream(sapi=None):
     try:
         stream_sapi = tweepy.Stream(sapi, CustomStreamListener())
         print("[INFO] Reading Twitter Stream!")
-        stream_sapi.filter(track=[x.lower() for x in settings['twitter_track']],
-                    async=True)
+        stream_sapi.filter(
+            track=[x.lower() for x in settings['twitter_track']], async=True)
     except (KeyboardInterrupt, SystemExit):
         stream_sapi.disconnect()
         sys.exit(0)
@@ -409,12 +413,17 @@ def handle_stream(sapi, status_api=False):
         time.sleep(5)
         elapsed = (time.time() - HANG_TIME)
         if elapsed > 600:
-            msg = """[{0}] Crashed/Hanging!
-The bot will catch up on missed messages now!""".format(
-                    time.strftime("%Y-%m-%d %H:%M"))
-            print(msg)
-            if status_api:
-                post_tweet(status_api, msg)
+            # TODO: Temp to try and stop crash tweet spam for now
+            if os.path.exists(update['last_crash_file']):
+                if time.time() - os.path.getctime(update['last_crash_file']) > 20000:
+                    os.remove(update['last_crash_file'])
+                    open(update['last_crash_file'], 'w')
+                    msg = """[{0}] Crashed/Hanging!
+        The bot will catch up on missed messages now!""".format(
+                        time.strftime("%Y-%m-%d %H:%M"))
+                    print(msg)
+                    if status_api:
+                        post_tweet(status_api, msg)
             stream_sapi.disconnect()
             time.sleep(3)
             if not stream_sapi.running:
@@ -448,11 +457,11 @@ def read_notifications(_API, reply, tweets_read):
 
 if __name__ == '__main__':
     BLOCKED_IDS = utils.file_to_list(
-                    os.path.join(settings['list_loc'],
-                                 "Blocked Users.txt"))
+        os.path.join(settings['list_loc'],
+                     "Blocked Users.txt"))
     IGNORE_WORDS = utils.file_to_list(
-                    os.path.join(settings['list_loc'],
-                                 "Blocked Words.txt"))
+        os.path.join(settings['list_loc'],
+                     "Blocked Words.txt"))
     LIMITED = False
     HAD_ERROR = False
     LAST_STATUS_CODE = 0
@@ -466,8 +475,10 @@ if __name__ == '__main__':
     STATUS_API = None
     SAPI = None
     TWEETS_READ = utils.file_to_list(
-                    os.path.join(settings['ignore_loc'],
-                                 "tweets_read.txt"))
+        os.path.join(settings['ignore_loc'],
+                     "tweets_read.txt"))
+    # TODO: TEMP (Read above)
+    open(update['last_crash_file'], 'w')
     API = func.login(rest=True)
     SAPI = func.login(rest=False)
     STATUS_API = func.login(status=True)
