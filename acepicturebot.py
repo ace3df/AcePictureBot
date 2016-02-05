@@ -385,8 +385,8 @@ class CustomStreamListener(tweepy.StreamListener):
             LAST_STATUS_CODE = status_code
             msg = ("[{0}] Twitter Returning Status Code: {1}.\n"
                    "More Info: "
-                   "https://dev.twitter.com/overview/api/response-codes")
-            .format(time.strftime("%Y-%m-%d %H:%M"), status_code)
+                   "https://dev.twitter.com/overview/api/response-codes"
+                   ).format(time.strftime("%Y-%m-%d %H:%M"), status_code)
             print(msg)
             post_tweet(func.login(status=True), msg)
         return True
