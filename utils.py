@@ -91,6 +91,7 @@ def scrape_site(url, cookie_file=""):
             s.cookies.load(ignore_discard=True)
         except:
             # Cookies don't exist yet
+            # TODO: Make flexable login code
             pass
     s.headers['User-Agent'] = 'Mozilla/5.0 (X11; Ubuntu; rv:39.0)'
     s.headers['Accept'] = 'text/html'
@@ -447,8 +448,8 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                 return False
             if ignore_list:
                 with open(os.path.join(
-                            settings['ignore_loc'], ignore_list), 'w') as file:
-                    file.write('\n'.join(ignore_urls))
+                        settings['ignore_loc'], ignore_list), 'w') as file:
+                        file.write('\n'.join(ignore_urls))
             image_tags = []
             if site == 0:
                 site_tag = browser.find('ul', id="tag-sidebar")
@@ -584,7 +585,7 @@ def get_command(string):
     pattern = re.compile("|".join(rep.keys()))
     string = pattern.sub(lambda m: rep[re.escape(m.group(0))], string)
     triggers = file_to_list(
-                    os.path.join(settings['list_loc'],
+                os.path.join(settings['list_loc'],
                                  "commands.txt"))
     command = [s for s in triggers if str(s).lower() in string.lower()]
     if not command:

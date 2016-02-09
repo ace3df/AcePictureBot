@@ -462,6 +462,10 @@ if __name__ == '__main__':
     IGNORE_WORDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "Blocked Words.txt"))
+
+    # TODO: This is temp if waifuregister command is used first
+    # I just need to move how login code is handled to scrape site function
+    utils.get_image_online("1girl", 0)
     LIMITED = False
     HAD_ERROR = False
     LAST_STATUS_CODE = 0
