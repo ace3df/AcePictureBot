@@ -20,6 +20,7 @@ class WaifuRegisterClass:
         self.override = False
         self.multinames = False
         self.noimages = False
+        self.TEMP_bug = False
         self.notenough = False
         self.offline = False
         self.soup = False
@@ -190,6 +191,9 @@ Spanish: {2}
 
     def start(self):
         self.soup = self.get_soup(0)
+        if "error" in str(self.soup):
+            self.TEMP_bug = True
+            return self.TEMP_bug
         if not self.soup:
             self.offline = True
             return self.offline

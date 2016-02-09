@@ -341,7 +341,10 @@ def waifuregister(user_id, username, name, gender):
     name = name.replace("( ", "(").replace(" )", ")")
 
     register_object = WaifuRegisterClass(
-            user_id, username, name, gender)
+        user_id, username, name, gender)
+    if register_object.TEMP_bug:
+        remove_one_limit(user_id, gender.lower() + "register")
+        return "Some websites are offline. Try again later!"
     if register_object.offline:
         remove_one_limit(user_id, gender.lower() + "register")
         return "Some websites are offline. Try again later!"
