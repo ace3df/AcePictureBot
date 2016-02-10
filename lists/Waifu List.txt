@@ -135,8 +135,6 @@ Matsumoto Rangiku||Bleach||http://cdn.myanimelist.net/images/characters/8/97855.
 Kusajishi Yachiru||Bleach||http://cdn.myanimelist.net/images/characters/9/85348.jpg
 Sarugaki Hiyori||Bleach||http://cdn.myanimelist.net/images/characters/4/72982.jpg
 Unohana Retsu||Bleach||http://cdn.myanimelist.net/images/characters/2/33252.jpg
-Kurosaki Karin||Bleach||http://cdn.myanimelist.net/images/characters/7/158885.jpg
-Kurosaki Yuzu||Bleach||http://cdn.myanimelist.net/images/characters/12/208305.jpg
 Shiba Kuukaku||Bleach||http://cdn.myanimelist.net/images/characters/3/33245.jpg
 Dokugamine Riruka||Bleach||http://cdn.myanimelist.net/images/characters/14/139193.jpg
 
@@ -713,7 +711,7 @@ Shinomiya Ayase||Guilty Crown||http://cdn.myanimelist.net/images/characters/5/14
 
 Irisviel von Einzbern||Fate (Series)||http://cdn.myanimelist.net/images/characters/15/112995.jpg
 Matou Sakura||Fate (Series)||http://cdn.myanimelist.net/images/characters/4/165044.jpg
-Toosaka Rin||Fate (Series)||http://cdn.myanimelist.net/images/characters/8/272601.jpg
+Tohsaka Rin||Fate (Series)||http://cdn.myanimelist.net/images/characters/8/272601.jpg
 Illyasviel von Einzbern||Fate (Series)||http://cdn.myanimelist.net/images/characters/6/31610.jpg
 Saber||Fate (Series)||http://cdn.myanimelist.net/images/characters/6/275276.jpg
 Rider||Fate (Series)||http://cdn.myanimelist.net/images/characters/2/31612.jpg
