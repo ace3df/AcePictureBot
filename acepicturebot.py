@@ -236,7 +236,7 @@ def acceptable_tweet(status):
                 return False, False
             elif "My" in command:
                 return False, False
-        except ValueError:
+        except (ValueError, KeyError):
             return False, False
     else:
         USER_LAST_COMMAND[user.id] = command
