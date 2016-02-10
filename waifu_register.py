@@ -38,8 +38,8 @@ class WaifuRegisterClass:
             self.pic_limit = 25
 
         blocked_waifus = file_to_list(
-                            os.path.join(settings['list_loc'],
-                                         'Blocked Waifus.txt'))
+            os.path.join(settings['list_loc'],
+                         'Blocked Waifus.txt'))
         self.disable = any([
             True for i in blocked_waifus if i in self.name])
         if self.disable:
@@ -71,7 +71,8 @@ class WaifuRegisterClass:
                       ["zelda", "princess_zelda"],
                       ["asuka", "asuka_langley"]]
         for [known, work] in self.known:
-            if self.name == known or '_'.join(reversed(self.name.split("_"))) == known:
+            if self.name == known or '_'.join(
+                    reversed(self.name.split("_"))) == known:
                 self.name = work
                 self.override = True
                 break
@@ -94,10 +95,10 @@ class WaifuRegisterClass:
 
     def get_soup(self, site):
         if site == 0:
-            cookie_file = "sankakucomplex.txt"
+            cookie_file = settings['secret_key'] + "-sankakucomplex.txt"
             url_search = "https://chan.sankakucomplex.com/?tags="
         elif site == 2:
-            cookie_file = "safebooru.txt"
+            cookie_file = settings['secret_key'] + "-safebooru.txt"
             a = "http://safebooru.org/"
             url_search = a + "index.php?page=post&s=list&tags="
         tags = self.name + self.end_tags
@@ -167,7 +168,7 @@ Spanish: {2}
                 post_count = int(post_count.replace(",", ""))
             except:
                 post_count = int(len(
-                        self.soup.find_all('img', attrs={'class': 'preview'})))
+                    self.soup.find_all('img', attrs={'class': 'preview'})))
         if post_count >= self.pic_limit:
             return post_count
         else:

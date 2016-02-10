@@ -415,15 +415,16 @@ def handle_stream(sapi, status_api=False):
         if elapsed > 600:
             # TODO: Temp to try and stop crash tweet spam for now
             if os.path.exists(update['last_crash_file']):
-                if time.time() - os.path.getctime(update['last_crash_file']) > 20000:
+                if time.time() - os.path.getctime(update['last_crash_file']) > 80000:
                     os.remove(update['last_crash_file'])
                     open(update['last_crash_file'], 'w')
-                    msg = """[{0}] Crashed/Hanging!
-        The bot will catch up on missed messages now!""".format(
+                    msg = """[{0}] Restarting!
+The bot will catch up on missed messages now!""".format(
                         time.strftime("%Y-%m-%d %H:%M"))
-                    print(msg)
                     if status_api:
                         post_tweet(status_api, msg)
+                    else:
+                        print(msg)
             stream_sapi.disconnect()
             time.sleep(3)
             if not stream_sapi.running:
@@ -462,10 +463,6 @@ if __name__ == '__main__':
     IGNORE_WORDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "Blocked Words.txt"))
-
-    # TODO: This is temp if waifuregister command is used first
-    # I just need to move how login code is handled to scrape site function
-    utils.get_image_online("1girl", 0)
     LIMITED = False
     HAD_ERROR = False
     LAST_STATUS_CODE = 0

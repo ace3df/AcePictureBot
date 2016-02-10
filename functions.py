@@ -230,8 +230,8 @@ def waifu(gender, args="", otp=False):
         end_tag = "-1girl+-female"
     result = ""
     lines = utils.file_to_list(
-                    os.path.join(settings['list_loc'],
-                                 list_name + " List.txt"))
+        os.path.join(settings['list_loc'],
+                     list_name + " List.txt"))
     args = ' '.join(args.split()).lower()
     matched = []
     ignore = ["high-school-dxd", "love-live",
@@ -627,16 +627,16 @@ def random_list(list_name, args=""):
         names = entry.split("(x)")
         if list_name == "Touhou":
             tags = "{0}+{1}+2girls+yuri+touhou+-asai_genji+-comic".format(
-                    names[0].replace(" ", "_"),
-                    names[1].replace(" ", "_"))
+                names[0].replace(" ", "_"),
+                names[1].replace(" ", "_"))
         if "love live" in list_name.lower():
             tags = "{0}+{1}+2girls+yuri+-comic".format(
-                    names[0].replace(" ", "_"),
-                    names[1].replace(" ", "_"))
+                names[0].replace(" ", "_"),
+                names[1].replace(" ", "_"))
         else:
             tags = "{0}+{1}+yuri+2girls+-comic".format(
-                    names[0].replace(" ", "_"),
-                    names[1].replace(" ", "_"))
+                names[0].replace(" ", "_"),
+                names[1].replace(" ", "_"))
         name = "{0}(x){1}".format(names[0], names[1])
     else:
         if isinstance(entry, list):
@@ -720,7 +720,7 @@ def airing(args):
                 msg = ("{0}\n"
                        "{1} airing in\n"
                        "{2} Days, {3} Hours and {4} Minutes").format(
-                        anime_title, ep_num, result.days,
+                    anime_title, ep_num, result.days,
                     result.seconds//3600, (result.seconds//60) % 60)
             except:
                 msg = "{0}\nNew Series\nUnknown air date!".format(anime_title)
@@ -730,8 +730,8 @@ def airing(args):
 
     try:
         found = [s for s in air_list_titles if re.sub(
-                '[^A-Za-z0-9]+', '', args.lower()) in re.sub(
-                '[^A-Za-z0-9]+', '', s.lower())]
+            '[^A-Za-z0-9]+', '', args.lower()) in re.sub(
+            '[^A-Za-z0-9]+', '', s.lower())]
         found = ''.join(found[0])
         index = air_list_titles.index(''.join(found))
         air = air_list_msg[index]
@@ -854,7 +854,7 @@ def source(api, status):
 
     artist, series, names = info(tweeted_image)
     saucenao = u"http://saucenao.com/search.php?urlify=1&url={0}".format(
-                str(tweeted_image))
+        str(tweeted_image))
     if not artist and not series and not names:
         return "No relevant source information found!\n" + saucenao
     else:
@@ -886,5 +886,6 @@ def spookjoke():
     path = "{0}/{1}".format("spook", path_name)
     tweet_image = utils.get_image(path)
     name = re.sub(r' \([^)]*\)', '', name)
-    m = "Oh oh! Looks like your command was stolen by {0}!! #Sp00ky".format(name)
+    m = "Oh oh! Looks like your command was stolen by {0}!! #Sp00ky".format(
+        name)
     return m, tweet_image

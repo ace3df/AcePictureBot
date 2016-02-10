@@ -85,17 +85,35 @@ def file_to_list(file):
 def scrape_site(url, cookie_file=""):
     global s
     s = Session()
-    if cookie_file:
-        s.cookies = LWPCookieJar(cookie_file)
-        try:
-            s.cookies.load(ignore_discard=True)
-        except:
-            # Cookies don't exist yet
-            # TODO: Make flexable login code
-            pass
     s.headers['User-Agent'] = 'Mozilla/5.0 (X11; Ubuntu; rv:39.0)'
     s.headers['Accept'] = 'text/html'
     s.headers['Connection'] = 'keep-alive'
+    if cookie_file:
+        s.cookies = LWPCookieJar(cookie_file)
+        try:
+            s.cookies.load()
+            if not s.cookies._cookies:
+                # Cookies have expired
+                raise Exception
+        except (FileNotFoundError, Exception):
+            if os.path.exists(cookie_file):
+                os.remove(cookie_file)
+            browser = RoboBrowser(session=s,
+                                  parser='html5lib',
+                                  timeout=15)
+            if "sankakucomplex.com" in url:
+                url_login = "https://chan.sankakucomplex.com/user/login/"
+                form_num = 0
+                form_user = "user[name]"
+                form_password = "user[password]"
+                username = website_logins['sankakucomplex_username']
+                password = website_logins['sankakucomplex_password']
+                browser.open(url_login)
+                form = browser.get_form(form_num)
+                form[form_user].value = username
+                form[form_password].value = password
+                browser.submit_form(form)
+                s.cookies.save()
     browser = RoboBrowser(session=s,
                           parser='html5lib',
                           timeout=15)
@@ -216,6 +234,7 @@ def download_image(url, path="", filename="", ignore_list=""):
 
     if (os.stat(tweet_image).st_size / 1000000) > 2.8:
         # File size too big, return False if normal image
+        # TODO: Compress if it's a large image
         # Try to compress if a gif
         if "gif" in ext[ext.rfind(".")+1:]:
             tweet_image = video_to_gif(tweet_image)
@@ -234,7 +253,7 @@ def download_image(url, path="", filename="", ignore_list=""):
             return False
         ignore_imgs.append(hex_data)
         with open(os.path.join(
-                    settings['ignore_loc'], ignore_list), 'w') as file:
+                settings['ignore_loc'], ignore_list), 'w') as file:
             file.write('\n'.join(ignore_imgs))
     pil_image.load()
     width, height = pil_image.size
@@ -245,10 +264,7 @@ def download_image(url, path="", filename="", ignore_list=""):
     else:
         max_size = -610
         min_size = 610
-    if (width - height) <= max_size:
-        os.remove(tweet_image)
-        return False
-    elif (width - height) >= min_size:
+    if (width - height) <= max_size or (width - height) >= min_size:
         os.remove(tweet_image)
         return False
 
@@ -284,37 +300,32 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
     good_image = False
     browser = False
     if site == 0:
-        cookie_file = "sankakucomplex.txt"
+        cookie_file = settings['secret_key'] + "-sankakucomplex.txt"
         url_start = "https://chan.sankakucomplex.com"
         url_search = "https://chan.sankakucomplex.com/?tags="
         url_login = "https://chan.sankakucomplex.com/user/login/"
         pid = False
         login = True
-        form_num = 0
-        form_user = "user[name]"
-        form_password = "user[password]"
-        username = website_logins['sankakucomplex_username']
-        password = website_logins['sankakucomplex_password']
     elif site == 1:
-        cookie_file = "danbooru.txt"
+        cookie_file = settings['secret_key'] + "-danbooru.txt"
         url_start = "https://danbooru.donmai.us"
         url_search = "https://danbooru.donmai.us/posts?tags="
         pid = False
         login = False
     elif site == 2:
-        cookie_file = "safebooru.txt"
+        cookie_file = settings['secret_key'] + "-safebooru.txt"
         url_start = "http://safebooru.org"
         url_search = "http://safebooru.org/index.php?page=post&s=list&tags="
         pid = True
         login = False
     elif site == 3:
-        cookie_file = "yande.txt"
+        cookie_file = settings['secret_key'] + "-yande.txt"
         url_start = "https://yande.re"
         url_search = "https://yande.re/post?tags="
         pid = False
         login = False
     elif site == 4:
-        cookie_file = "konachan.txt"
+        cookie_file = settings['secret_key'] + "-konachan.txt"
         url_start = "http://konachan.com"
         url_search = "http://konachan.com/post?tags="
         pid = False
@@ -332,15 +343,6 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
         if "order:popular" not in tags:
             if tag_count < 7:
                 tags += "+order:popular"
-    if login:
-        if not os.path.exists(cookie_file):
-            global s
-            browser = scrape_site(url_login, cookie_file)
-            form = browser.get_form(form_num)
-            form[form_user].value = username
-            form[form_password].value = password
-            browser.submit_form(form)
-            s.cookies.save()
     if pid:
         rand = 40
         tried_pages = [high_page * rand]
@@ -566,7 +568,7 @@ def get_image(path, ignore_list=False):
                 continue
         ignore_imgs.append(hex_data)
         with open(os.path.join(
-                    settings['ignore_loc'], ignore_list), 'w') as file:
+                settings['ignore_loc'], ignore_list), 'w') as file:
             file.write('\n'.join(ignore_imgs))
         return os.path.join(path, img)
 
@@ -585,8 +587,8 @@ def get_command(string):
     pattern = re.compile("|".join(rep.keys()))
     string = pattern.sub(lambda m: rep[re.escape(m.group(0))], string)
     triggers = file_to_list(
-                os.path.join(settings['list_loc'],
-                                 "commands.txt"))
+        os.path.join(settings['list_loc'],
+                     "commands.txt"))
     command = [s for s in triggers if str(s).lower() in string.lower()]
     if not command:
         return False
