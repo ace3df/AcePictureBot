@@ -205,7 +205,7 @@ def download_image(url, path="", filename="", ignore_list=""):
     try:
         response = urllib.request.urlopen(req)
         data = response.read()
-    except urllib.request.URLError:
+    except (urllib.request.URLError, Exception):
         # Loss data / IncompleteRead
         return False
     if path:
