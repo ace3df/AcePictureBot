@@ -208,7 +208,7 @@ def download_image(url, path="", filename="", ignore_list=""):
     except (urllib.request.URLError, Exception):
         # Loss data / IncompleteRead
         return False
-    if path:
+    if not path:
         path = os.path.join(settings['image_loc'], "downloads")
     if filename == "":
         img_hash = hashlib.md5(data).hexdigest()

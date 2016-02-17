@@ -221,7 +221,7 @@ def get_level(user_id):
             "Next Level: {2}").format(level, user_exp, for_next)
 
 
-def waifu(gender, args="", otp=False):
+def waifu(gender, args="", otp=False, DISCORD=False):
     if gender == 0:
         list_name = "Waifu"
         end_tag = "1girl+solo"
@@ -258,7 +258,7 @@ def waifu(gender, args="", otp=False):
                         word_boundary=True, separator="_")
     path = os.path.join(list_name, path_name)
     tweet_image = utils.get_image(path)
-    if not tweet_image:
+    if not tweet_image and not DISCORD:
         tags = [name.replace(" ", "_"), "solo", "-genderswap", end_tag]
         tweet_image = utils.get_image_online(tags, 0, 1,
                                              "", path)
@@ -267,7 +267,7 @@ def waifu(gender, args="", otp=False):
                                        name, show)
     count_trigger(name, list_name.lower())
     return m, tweet_image
-
+print(waifu(0))
 
 def mywaifu(user_id, gender):
     if gender == 0:
@@ -481,7 +481,7 @@ def otp(args):
     return m, tweet_image
 
 
-def random_list(list_name, args=""):
+def random_list(list_name, args="", DISCORD=False):
     gender = "waifu"
     hashtag = ""
     search_for = ""
@@ -650,7 +650,7 @@ def random_list(list_name, args=""):
                         word_boundary=True, separator="_")
     path = "{0}/{1}".format(gender.lower(), path_name)
     tweet_image = utils.get_image(path)
-    if scrape_images and not tweet_image:
+    if scrape_images and not tweet_image and not DISCORD:
         tweet_image = utils.get_image_online(tags, 0, 1, "", path)
 
     name = re.sub(r' \([^)]*\)', '', name)
