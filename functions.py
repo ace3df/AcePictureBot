@@ -267,7 +267,7 @@ def waifu(gender, args="", otp=False, DISCORD=False):
                                        name, show)
     count_trigger(name, list_name.lower())
     return m, tweet_image
-print(waifu(0))
+
 
 def mywaifu(user_id, gender):
     if gender == 0:
@@ -650,7 +650,7 @@ def random_list(list_name, args="", DISCORD=False):
                         word_boundary=True, separator="_")
     path = "{0}/{1}".format(gender.lower(), path_name)
     tweet_image = utils.get_image(path)
-    if scrape_images and not tweet_image and not DISCORD:
+    if scrape_images and not DISCORD or not tweet_image and not DISCORD:
         tweet_image = utils.get_image_online(tags, 0, 1, "", path)
 
     name = re.sub(r' \([^)]*\)', '', name)
@@ -889,3 +889,12 @@ def spookjoke():
     m = "Oh oh! Looks like your command was stolen by {0}!! #Sp00ky".format(
         name)
     return m, tweet_image
+
+c = 0
+import time
+for x in range(0, 100):
+    c = c + 1
+    print(random_list("Shipgirl"))
+    if c == 10:
+        time.sleep(60)
+        c = 0
