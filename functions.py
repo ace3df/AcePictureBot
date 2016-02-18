@@ -889,12 +889,3 @@ def spookjoke():
     m = "Oh oh! Looks like your command was stolen by {0}!! #Sp00ky".format(
         name)
     return m, tweet_image
-
-c = 0
-import time
-for x in range(0, 100):
-    c = c + 1
-    print(random_list("Shipgirl"))
-    if c == 10:
-        time.sleep(60)
-        c = 0
