@@ -1,6 +1,6 @@
+from utils import get_image_online
 import functions
 import time
-
 """ Simply Tests.
 These will be done while I look at it so I don't have to worry
 or go more into testing other than simply this.
@@ -9,7 +9,11 @@ or go more into testing other than simply this.
 
 def run_tests():
     print("Login Test:")
-    print(functions.login())
+    api = functions.login()
+    print(api)
+    print("\nTest Tweet")
+    msg = "@AceStatusBot Running Tests..."
+    api.update_status(status=msg)
     print("\nGet Level Test:")
     print(functions.get_level(123))
     print("\nRandom Waifu Test:")
@@ -37,9 +41,13 @@ def run_tests():
     print("\nRandom OTP Test:")
     print(functions.otp(""))
     print("\nRandom List Shipgirl Test:")
-    print(functions.random_list("Shipgirl", ""))
+    m, i = functions.random_list("Shipgirl", "")
+    print(m, i)
     print("\nRandom List Imouto Test:")
-    print(functions.random_list("Imouto", ""))
+    m, ii = functions.random_list("Imouto", "")
+    if not i:
+        i = ii
+    print(m, ii)
     print("\nRandom List Shota Test:")
     print(functions.random_list("Shota", ""))
     print("Sleeping for 10 seconds...")
@@ -47,15 +55,30 @@ def run_tests():
     print("\nRandom List Sensei Test:")
     print(functions.random_list("Sensei", ""))
     print("\nRandom List Senpai Test:")
-    print(functions.random_list("Senpai", ""))
+    m, ii = functions.random_list("Senpai", "")
+    if not i:
+        i = ii
+    print(m, ii)
     print("\nRandom List Kouhai Test:")
     print(functions.random_list("Kouhai", ""))
     print("\nRandom List Kouhai Male Test:")
     print(functions.random_list("Kouhai", "male"))
     print("\nAiring Test:")
     print(functions.airing("One Piece"))
+    print("\nTest Tweet (with Image)")
+    msg = "@AceStatusBot Test Tweet with Image..."
+    api.update_with_media(i, status=msg)
+    print("\nTest Tweet (with Video)")
+    tags = ["rating:safe", "webm", "-extremely_large_filesize",
+            "-large_filesize", "-no_audio"]
+    i = get_image_online(tags, 0, 1, "")
+    msg = "@AceStatusBot Test Tweet with Video..."
+    api.update_with_media(i, status=msg)
     print("\nFinished all Tests!")
 
 
 if __name__ == '__main__':
+    import sys
+    print("Running Python Version:", sys.version)
+    print()
     run_tests()

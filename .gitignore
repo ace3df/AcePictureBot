@@ -17,7 +17,8 @@ is_busy/
 cronjobs/
 
 mal_list.py
-
+run.bat
+server_settings.ini
 config.py
 
 Blocked Waifus.txt

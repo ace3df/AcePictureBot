@@ -1,6 +1,7 @@
 import sys
 sys.path.append('..')
 from utils import get_command
+from utils import printf as print
 from config import discord_settings
 from collections import OrderedDict
 import functions as func
@@ -8,6 +9,7 @@ import json
 import datetime
 import discord
 import re
+
 
 client = discord.Client()
 # Commands not allowed through discord.
@@ -22,37 +24,151 @@ USER_LAST_COMMAND = OrderedDict()
 @client.event
 async def on_message(message):
     global USER_LAST_COMMAND
-
+    print("{} ({}) | {} ({}) - {}".format(message.server, message.server.id,
+                                          message.author, message.author.id,
+                                          message.content))
     if message.author == client.user:
         return
+    # print(message.author.id)
+    # print(message.server.owner.id)
+
     server_settings = func.config_get_section_items(
-        str(message.server).lower(),
+        message.server.id,
         discord_settings['server_settings'])
-    if str(message.author).lower() in server_settings['mods'].split(", "):
+    if not server_settings:
+        # Joined a new server!
+        # Save default settings and send welcome message.
+        func.config_add_section(message.server.id,
+                                discord_settings['server_settings'])
+        func.config_save(message.server.id, "turned_on",
+                         "True", discord_settings['server_settings'])
+        func.config_save(message.server.id, "allow_imgs",
+                         "True", discord_settings['server_settings'])
+        func.config_save(message.server.id, "must_mention",
+                         "False", discord_settings['server_settings'])
+        func.config_save(message.server.id, "mods",
+                         "81515803085639680, " + str(message.server.owner.id),
+                         discord_settings['server_settings'])
+        server_settings = func.config_get_section_items(
+            message.server.id,
+            discord_settings['server_settings'])
+        msg = """Hello, my name is AcePictureBot!
+You can use over 10 commands including: Waifu, Shipgirl, OTP and many more!
+To start simply say: "Waifu"!
+For many more commands read: http://ace3df.github.io/AcePictureBot/commands/
+Don't forget to cheak out all the Ace Bots on Twitter:
+https://twitter.com/AcePictureBot
+If you're the server owner you should read this for a list of mod only commands:
+https://gist.github.com/ace3df/cd8e233fe9fe796d297d
+"""
+        await client.send_message(message.channel, msg)
+
+    if str(message.author.id) in server_settings['mods'].split(", "):
         if "!apb turn off" in message.content:
-            if server_settings['turned_on']:
-                func.config_save(str(message.server).lower(),
+            if server_settings['turned_on'] == "True":
+                func.config_save(message.server.id,
                                  'turned_on', "False",
                                  discord_settings['server_settings'])
+                await client.send_message(
+                    message.channel, "I will now ignore commands!")
+
         if "!apb turn on" in message.content:
-            if not server_settings['turned_on']:
-                func.config_save(str(message.server).lower(),
+            if server_settings['turned_on'] == "False":
+                func.config_save(message.server.id,
                                  'turned_on', "True",
                                  discord_settings['server_settings'])
+                await client.send_message(
+                    message.channel, "I will now run commands!")
 
         if "!apb images off" in message.content:
-            if server_settings['allow_imgs']:
-                func.config_save(str(message.server).lower(),
+            if server_settings['allow_imgs'] == "True":
+                func.config_save(message.server.id,
                                  'allow_imgs', "False",
                                  discord_settings['server_settings'])
+                await client.send_message(
+                    message.channel,
+                    "No image will be posted when using commands!")
         if "!apb images on" in message.content:
-            if not server_settings['allow_imgs']:
-                func.config_save(str(message.server).lower(),
+            if server_settings['allow_imgs'] == "False":
+                func.config_save(message.server.id,
                                  'allow_imgs', "True",
                                  discord_settings['server_settings'])
+                await client.send_message(
+                    message.channel,
+                    "If possible an image will be posted when using commands!")
+
+        if "!apb mentions off" in message.content:
+            if server_settings['must_mention'] == "True":
+                func.config_save(message.server.id,
+                                 'must_mention', "False",
+                                 discord_settings['server_settings'])
+                await client.send_message(message.channel,
+                        "You can use commands without mentioning me!")
+        if "!apb mentions on" in message.content:
+            if server_settings['must_mention'] == "False":
+                func.config_save(message.server.id,
+                                 'must_mention', "True",
+                                 discord_settings['server_settings'])
+                await client.send_message(message.channel,
+                    "You will now have to mention the bot to use a command!")
+
+        if "!apb mods remove" in message.content:
+                current_mod_list = func.config_get(message.server.id, 'mods',
+                                         discord_settings['server_settings'])
+                current_mod_list = current_mod_list.split(", ")
+                for user in message.mentions:
+                    if user.id == message.server.owner.id:
+                        # Can't remove yourself
+                        continue
+                    if str(user.id) in current_mod_list:
+                        current_mod_list.remove(str(user.id))
+                if len(current_mod_list) < 2:
+                    current_mod_list = ', '.join(current_mod_list) + ", "
+                else:
+                    current_mod_list = ', '.join(current_mod_list)
+                func.config_save(message.server.id,
+                                 'mods',
+                                 current_mod_list,
+                                 discord_settings['server_settings'])
+                await client.send_message(message.channel, "Mods removed!")
+        if "!apb mods add" in message.content:
+            current_mod_list = func.config_get(message.server.id, 'mods',
+                                     discord_settings['server_settings'])
+            current_mod_list = current_mod_list.split(", ")
+            for user in message.mentions:
+                if user.id == message.server.owner.id:
+                    # Can't remove yourself
+                    continue
+                if str(user.id) in current_mod_list:
+                    continue
+                else:
+                    current_mod_list.append(user.id)
+            if len(current_mod_list) < 2:
+                current_mod_list = ', '.join(current_mod_list) + ", "
+            else:
+                current_mod_list = ', '.join(current_mod_list)
+            func.config_save(message.server.id, 'mods', current_mod_list,
+                             discord_settings['server_settings'])
+            await client.send_message(message.channel, "Mods added!")
+
+        if "!apb help" in message.content:
+            await client.send_message(
+                message.channel,
+                """
+Commands: http://ace3df.github.io/AcePictureBot/commands/
+Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d
+""")
 
     if server_settings['turned_on'] == "False":
         return
+
+    if server_settings['must_mention'] == "True":
+        is_in = False
+        for user in message.mentions:
+            if "acepicturebot" in user.name.lower():
+                is_in = True
+        if not is_in:
+            return
 
     msg = message.content.replace("🚢👧", "Shipgirl")
     msg = ' '.join(re.sub('(^|\n| )(@[A-Za-z0-9_🚢👧.]+)',
@@ -82,12 +198,12 @@ async def on_message(message):
 
     # Stop someone limiting the bot on their own.
     rate_time = datetime.datetime.now()
-    rate_limit_secs = 10800
+    rate_limit_secs = 120
     if message.author in RATE_LIMIT_DICT:
         # User is now limited (3 hours).
         if ((rate_time - RATE_LIMIT_DICT[message.author][0])
                 .total_seconds() < rate_limit_secs)\
-           and (RATE_LIMIT_DICT[message.author][1] >= 15):
+           and (RATE_LIMIT_DICT[message.author][1] >= 5):
             return False, False
         # User limit is over.
         elif ((rate_time - RATE_LIMIT_DICT[message.author][0])
