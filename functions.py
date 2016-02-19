@@ -89,6 +89,8 @@ def config_get(section, key, file=0):
             return False
         except configparser.NoOptionError:
             return False
+        except configparser.DuplicateSectionError:
+            return False
 
 
 def config_save(section, key, result, file=0):

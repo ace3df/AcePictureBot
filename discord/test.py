@@ -20,19 +20,24 @@ NO_DISCORD_CMDS = ["WaifuRegister", "HusbandoRegister",
 RATE_LIMIT_DICT = {}
 USER_LAST_COMMAND = OrderedDict()
 
+# TODO: Have some type of inactivity disconnect
+# This goes along side with auto connected to a server as the connected to -
+# list might get a bit too large
+# TODO: Check if in a channel that the bot can speak in before doing anything
 # TODO: Record down server.id been in (simple text list)
 # TODO: If new server show welcome message on first join
 # TODO: Make settings to ignore text channels
-# TODO: @ the server owner in welcome message
 
 
 @client.event
 async def on_message(message):
     global USER_LAST_COMMAND
-    print("{} ({}) | {} ({}) - {}".format(message.server, message.server.id,
-                                          message.author, message.author.id,
-                                          message.content))
     if message.author == client.user:
+        print("{} ({}) | {} ({}) - {}".format(message.server,
+                                              message.server.id,
+                                              message.author,
+                                              message.author.id,
+                                              message.content))
         return
     # print(message.author.id)
     # print(message.server.owner.id)
@@ -63,7 +68,7 @@ To start simply say: "Waifu"!
 For many more commands read: http://ace3df.github.io/AcePictureBot/commands/
 Don't forget to cheak out all the Ace Bots on Twitter:
 https://twitter.com/AcePictureBot
-{0.server.owner} you should read this for a list of mod only commands:
+@{0.server.owner} you should read this for a list of mod only commands:
 https://gist.github.com/ace3df/cd8e233fe9fe796d297d
 If you don't want this bot in your server - simply kick it.
 """.format(message)
@@ -183,6 +188,11 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d
 
     # Find the command they used.
     command = get_command(msg)
+    if not command:
+        return
+    print("{} ({}) | {} ({}) - {}".format(message.server, message.server.id,
+                                          message.author, message.author.id,
+                                          message.content))
     if command in NO_DISCORD_CMDS:
         msg = r"You can only use {0} on Twitter for now! This will be added later." \
             " - http://twitter.com/acepicturebot".format(command)
@@ -251,6 +261,8 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d
     if command in list_cmds:
         msg, discord_image = func.random_list(command, msg, DISCORD=True)
 
+    # Remove hashtags
+    msg = ' '.join(re.sub("(#[A-Za-z0-9]+)", " ", msg).split())
     msg = '{0} {1.author.mention}'.format(msg, message)
     await client.send_message(message.channel, msg)
     if server_settings['allow_imgs'] and discord_image:
