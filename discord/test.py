@@ -20,6 +20,11 @@ NO_DISCORD_CMDS = ["WaifuRegister", "HusbandoRegister",
 RATE_LIMIT_DICT = {}
 USER_LAST_COMMAND = OrderedDict()
 
+# TODO: Record down server.id been in (simple text list)
+# TODO: If new server show welcome message on first join
+# TODO: Make settings to ignore text channels
+# TODO: @ the server owner in welcome message
+
 
 @client.event
 async def on_message(message):
@@ -58,9 +63,10 @@ To start simply say: "Waifu"!
 For many more commands read: http://ace3df.github.io/AcePictureBot/commands/
 Don't forget to cheak out all the Ace Bots on Twitter:
 https://twitter.com/AcePictureBot
-If you're the server owner you should read this for a list of mod only commands:
+{0.server.owner} you should read this for a list of mod only commands:
 https://gist.github.com/ace3df/cd8e233fe9fe796d297d
-"""
+If you don't want this bot in your server - simply kick it.
+""".format(message)
         await client.send_message(message.channel, msg)
 
     if str(message.author.id) in server_settings['mods'].split(", "):
@@ -178,7 +184,7 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d
     # Find the command they used.
     command = get_command(msg)
     if command in NO_DISCORD_CMDS:
-        msg = r"You can only use {0} on Twitter" \
+        msg = r"You can only use {0} on Twitter for now! This will be added later." \
             " - http://twitter.com/acepicturebot".format(command)
         msg = '{0} {1.author.mention}'.format(msg, message)
         await client.send_message(message.channel, msg)
@@ -186,11 +192,11 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d
 
     if command == "Reroll":
         try:
-            command = USER_LAST_COMMAND[message.author]
+            command = USER_LAST_COMMAND[message.author.id]
         except (ValueError, KeyError):
             return
     else:
-        USER_LAST_COMMAND[message.author] = command
+        USER_LAST_COMMAND[message.author.id] = command
         if len(USER_LAST_COMMAND) > 30:
             USER_LAST_COMMAND = (OrderedDict(
                 islice(USER_LAST_COMMAND.items(),
@@ -199,19 +205,19 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d
     # Stop someone limiting the bot on their own.
     rate_time = datetime.datetime.now()
     rate_limit_secs = 120
-    if message.author in RATE_LIMIT_DICT:
+    if message.author.id in RATE_LIMIT_DICT:
         # User is now limited (3 hours).
-        if ((rate_time - RATE_LIMIT_DICT[message.author][0])
+        if ((rate_time - RATE_LIMIT_DICT[message.author.id][0])
                 .total_seconds() < rate_limit_secs)\
-           and (RATE_LIMIT_DICT[message.author][1] >= 5):
-            return False, False
+           and (RATE_LIMIT_DICT[message.author.id][1] >= 5):
+            return
         # User limit is over.
-        elif ((rate_time - RATE_LIMIT_DICT[message.author][0])
+        elif ((rate_time - RATE_LIMIT_DICT[message.author.id][0])
                 .total_seconds() > rate_limit_secs):
-            del RATE_LIMIT_DICT[message.author]
+            del RATE_LIMIT_DICT[message.author.id]
         else:
             # User found, not limited, add one to the trigger count.
-            RATE_LIMIT_DICT[message.author][1] += 1
+            RATE_LIMIT_DICT[message.author.id][1] += 1
     else:
         # User not found, add them to RATE_LIMIT_DICT.
         # Before that quickly go through RATE_LIMIT_DICT
@@ -220,7 +226,7 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d
             if ((rate_time - RATE_LIMIT_DICT[person][0])
                .total_seconds() > rate_limit_secs):
                 del RATE_LIMIT_DICT[person]
-        RATE_LIMIT_DICT[message.author] = [rate_time, 1]
+        RATE_LIMIT_DICT[message.author.id] = [rate_time, 1]
 
     # This shouldn't happen but just in case.
     if not isinstance(command, str):
