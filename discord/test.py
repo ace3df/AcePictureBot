@@ -3,6 +3,7 @@ sys.path.append('..')
 from utils import get_command
 from utils import printf as print
 from config import discord_settings
+from itertools import islice
 from collections import OrderedDict
 import functions as func
 import json
