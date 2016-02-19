@@ -82,8 +82,8 @@ def config_get(section, key, file=0):
         file = settings['count_file']
     with open(file) as fp:
         config = configparser.RawConfigParser(allow_no_value=True)
-        config.read_file(fp)
         try:
+            config.read_file(fp)
             return config.get(section, key)
         except configparser.NoSectionError:
             return False
