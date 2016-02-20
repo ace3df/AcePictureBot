@@ -6,8 +6,10 @@ from config import discord_settings
 from itertools import islice
 from collections import OrderedDict
 import functions as func
+import time
 import json
 import datetime
+import asyncio
 import discord
 import re
 
@@ -22,16 +24,27 @@ LATER_DISCORD_CMDS = ["WaifuRegister", "HusbandoRegister",
                       "WaifuRemove", "HusbandoRemove"]
 RATE_LIMIT_DICT = {}
 USER_LAST_COMMAND = OrderedDict()
+CHANNEL_TIMEOUT = {}
 
-# TODO: Have some type of inactivity disconnect
-# This goes along side with auto connected to a server as the connected to -
-# list might get a bit too large
 # TODO: Check if in a channel that the bot can speak in before doing anything
 # TODO: Record down server.id been in (simple text list)
 # TODO: If new server show welcome message on first join
 # in #general only if possible
 # if it's not possible do it on first message on another channel
 # TODO: Make settings to ignore text channels
+
+async def timeout_channel():
+    # If no bot activity in the server for a whole 3 days it will disconnect.
+    await client.wait_until_ready()
+    while not client.is_closed:
+        current_time = time.time()
+        for chan in client.servers:
+            if chan.id in CHANNEL_TIMEOUT:
+                if current_time - CHANNEL_TIMEOUT[chan.id] > 259200:
+                    client.leave_server(chan)
+            else:
+                CHANNEL_TIMEOUT[chan.id] = time.time()
+        await asyncio.sleep(360)
 
 
 @client.event
@@ -43,13 +56,10 @@ async def on_message(message):
                                               message.author,
                                               message.author.id,
                                               message.content))
-        return
-    # print(message.author.id)
-    # print(message.server.owner.id)
+        await
 
-    server_settings = func.config_get_section_items(
-        message.server.id,
-        discord_settings['server_settings'])
+    server_settings = func.config_get_section_items(message.server.id,
+                                                    discord_settings['server_settings'])
     if not server_settings:
         # Joined a new server!
         # Save default settings and send welcome message.
@@ -80,6 +90,9 @@ If you don't want this bot in your server - simply kick it.
         await client.send_message(message.channel, msg)
 
     if str(message.author.id) in server_settings['mods'].split(", "):
+        if "!apb server id" in message.content:
+            await client.send_message(
+                message.channel, message.server.id)
         if "!apb turn off" in message.content:
             if server_settings['turned_on'] == "True":
                 func.config_save(message.server.id,
@@ -149,7 +162,7 @@ If you don't want this bot in your server - simply kick it.
                 await client.send_message(message.channel, "Mods removed!")
         if "!apb mods add" in message.content:
             current_mod_list = func.config_get(message.server.id, 'mods',
-                                discord_settings['server_settings'])
+                                               discord_settings['server_settings'])
             current_mod_list = current_mod_list.split(", ")
             for user in message.mentions:
                 if user.id == message.server.owner.id:
@@ -198,6 +211,8 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
     print("{} ({}) | {} ({}) - {}".format(message.server, message.server.id,
                                           message.author, message.author.id,
                                           message.content))
+
+    CHANNEL_TIMEOUT[message.server.id] = time.time()
     if command in LATER_DISCORD_CMDS:
         msg = r"""This command will be added when Discord finishes Twitter account linking.
 For now you can only use {0} on Twitter!
@@ -281,4 +296,7 @@ async def on_ready():
     print(client.user.name)
     print('------')
 
-client.run(discord_settings['email'], discord_settings['password'])
+loop = asyncio.get_event_loop()
+loop.create_task(timeout_channel())
+loop.run_until_complete(client.run(discord_settings['email'],
+                                   discord_settings['password']))
