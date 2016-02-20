@@ -14,10 +14,12 @@ import re
 
 client = discord.Client()
 # Commands not allowed through discord.
-NO_DISCORD_CMDS = ["WaifuRegister", "HusbandoRegister",
-                   "MyWaifu", "MyHusbando",
-                   "WaifuRemove", "HusbandoRemove",
-                   "Level"]
+NO_DISCORD_CMDS = ["!Level", "Source", "DelLimits",
+                   "SetBirthday"]
+# Commands that will be added once Discord finishes Twitter link
+LATER_DISCORD_CMDS = ["WaifuRegister", "HusbandoRegister",
+                      "MyWaifu", "MyHusbando",
+                      "WaifuRemove", "HusbandoRemove",]
 RATE_LIMIT_DICT = {}
 USER_LAST_COMMAND = OrderedDict()
 
@@ -191,12 +193,15 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d
     command = get_command(msg)
     if not command:
         return
+    if command in NO_DISCORD_CMDS:
+        return
     print("{} ({}) | {} ({}) - {}".format(message.server, message.server.id,
                                           message.author, message.author.id,
                                           message.content))
-    if command in NO_DISCORD_CMDS:
-        msg = r"You can only use {0} on Twitter for now! This will be added later." \
-            " - http://twitter.com/acepicturebot".format(command)
+    if command in LATER_DISCORD_CMDS:
+        msg = r"This command will be added when Discord finishes Twitter account linking."
+        msg += r"For now you can only use {0} on Twitter!" \
+                " - http://twitter.com/acepicturebot".format(command)
         msg = '{0} {1.author.mention}'.format(msg, message)
         await client.send_message(message.channel, msg)
         return
@@ -244,7 +249,7 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d
         return
 
     msg = msg.lower().replace(command.lower(), " ", 1).strip()
-
+    discord_image = False
     # Main Commands
     if command == "Waifu":
         msg, discord_image = func.waifu(0, msg, DISCORD=True)
