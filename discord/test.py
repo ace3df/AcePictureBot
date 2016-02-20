@@ -19,7 +19,7 @@ NO_DISCORD_CMDS = ["!Level", "Source", "DelLimits",
 # Commands that will be added once Discord finishes Twitter link
 LATER_DISCORD_CMDS = ["WaifuRegister", "HusbandoRegister",
                       "MyWaifu", "MyHusbando",
-                      "WaifuRemove", "HusbandoRemove",]
+                      "WaifuRemove", "HusbandoRemove"]
 RATE_LIMIT_DICT = {}
 USER_LAST_COMMAND = OrderedDict()
 
@@ -29,6 +29,8 @@ USER_LAST_COMMAND = OrderedDict()
 # TODO: Check if in a channel that the bot can speak in before doing anything
 # TODO: Record down server.id been in (simple text list)
 # TODO: If new server show welcome message on first join
+# in #general only if possible
+# if it's not possible do it on first message on another channel
 # TODO: Make settings to ignore text channels
 
 
@@ -117,18 +119,18 @@ If you don't want this bot in your server - simply kick it.
                                  'must_mention', "False",
                                  discord_settings['server_settings'])
                 await client.send_message(message.channel,
-                        "You can use commands without mentioning me!")
+                                          "You can use commands without mentioning me!")
         if "!apb mentions on" in message.content:
             if server_settings['must_mention'] == "False":
                 func.config_save(message.server.id,
                                  'must_mention', "True",
                                  discord_settings['server_settings'])
                 await client.send_message(message.channel,
-                    "You will now have to mention the bot to use a command!")
+                                          "You will now have to mention the bot to use a command!")
 
         if "!apb mods remove" in message.content:
                 current_mod_list = func.config_get(message.server.id, 'mods',
-                                         discord_settings['server_settings'])
+                                                   discord_settings['server_settings'])
                 current_mod_list = current_mod_list.split(", ")
                 for user in message.mentions:
                     if user.id == message.server.owner.id:
@@ -147,7 +149,7 @@ If you don't want this bot in your server - simply kick it.
                 await client.send_message(message.channel, "Mods removed!")
         if "!apb mods add" in message.content:
             current_mod_list = func.config_get(message.server.id, 'mods',
-                                     discord_settings['server_settings'])
+                                discord_settings['server_settings'])
             current_mod_list = current_mod_list.split(", ")
             for user in message.mentions:
                 if user.id == message.server.owner.id:
@@ -168,10 +170,8 @@ If you don't want this bot in your server - simply kick it.
         if "!apb help" in message.content:
             await client.send_message(
                 message.channel,
-                """
-Commands: http://ace3df.github.io/AcePictureBot/commands/
-Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d
-""")
+                """Commands: http://ace3df.github.io/AcePictureBot/commands/
+Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
 
     if server_settings['turned_on'] == "False":
         return
@@ -199,9 +199,9 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d
                                           message.author, message.author.id,
                                           message.content))
     if command in LATER_DISCORD_CMDS:
-        msg = r"This command will be added when Discord finishes Twitter account linking."
-        msg += r"For now you can only use {0} on Twitter!" \
-                " - http://twitter.com/acepicturebot".format(command)
+        msg = r"""This command will be added when Discord finishes Twitter account linking.
+For now you can only use {0} on Twitter!
+http://twitter.com/acepicturebot""".format(command)
         msg = '{0} {1.author.mention}'.format(msg, message)
         await client.send_message(message.channel, msg)
         return
