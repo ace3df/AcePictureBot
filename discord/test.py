@@ -15,7 +15,7 @@ import re
 client = discord.Client()
 # Commands not allowed through discord.
 NO_DISCORD_CMDS = ["!Level", "Source", "DelLimits",
-                   "SetBirthday"]
+                   "SetBirthday", "Spoiler"]
 # Commands that will be added once Discord finishes Twitter link
 LATER_DISCORD_CMDS = ["WaifuRegister", "HusbandoRegister",
                       "MyWaifu", "MyHusbando",
