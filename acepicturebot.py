@@ -364,7 +364,11 @@ class CustomStreamListener(tweepy.StreamListener):
         tweet, command = acceptable_tweet(status)
         if not command:
             return True
-        open(update['is_busy_file'], 'w')
+        try:
+            open(update['is_busy_file'], 'w')
+        except PermissionError:
+            # This wont happen all the time, the file is probably busy
+            pass
         print("[{0}] Reading: {1} ({2}): {3}".format(
             time.strftime("%Y-%m-%d %H:%M"),
             status.user.screen_name, status.user.id, status.text))
@@ -375,7 +379,11 @@ class CustomStreamListener(tweepy.StreamListener):
                                "tweets_read.txt"),
                   'w') as file:
             file.write("\n".join(TWEETS_READ))
-        os.remove(update['is_busy_file'])
+        try:
+            os.remove(update['is_busy_file'])
+        except (PermissionError, FileNotFoundError):
+            # Related to above PermissionError.
+            pass
 
     def on_error(self, status_code):
         global LAST_STATUS_CODE
