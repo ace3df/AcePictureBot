@@ -185,6 +185,7 @@ def count_trigger(command, user_id="failed"):
 
 
 def get_level(user_id):
+    return "Level has been temp disabled for now!"
     cmd_exp = {'default': 1,
                'my{GENDER}': 2,
                '{GENDER}': 2,
