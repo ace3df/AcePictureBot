@@ -140,6 +140,22 @@ def config_add_section(section, file=0):
         config.write(fp)
 
 
+def config_delete_section(section, file=0):
+    if file == 0:
+        file = settings['settings']
+    elif file == 1:
+        file = settings['count_file']
+    with open(file) as fp:
+        config = configparser.RawConfigParser(allow_no_value=True)
+        config.read_file(fp)
+        try:
+            del config[section]
+        except KeyError:
+            return False
+    with open(file, 'w') as fp:
+        config.write(fp)
+
+
 def count_trigger(command, user_id="failed"):
     if not command.strip():
         return
