@@ -157,6 +157,7 @@ def config_delete_section(section, file=0):
 
 
 def count_trigger(command, user_id="failed"):
+    return False
     if not command.strip():
         return
     if "dellimits" in command.lower():
