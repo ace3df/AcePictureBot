@@ -147,7 +147,9 @@ async def on_message(message):
     if not server_settings:
         # Joined and haven't been able to complete say_welcome_message().
         await say_welcome_message(False, message)
-
+        server_settings = func.config_get_section_items(
+                message.server.id,
+                discord_settings['server_settings'])
     if message.author.id in server_settings['mods'].split(", "):
         if message.content.startswith("!apb help"):
             # Send basic help message.

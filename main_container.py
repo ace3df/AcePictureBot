@@ -72,6 +72,8 @@ def update_self():
         for file_ in files:
             src_file = os.path.join(src_dir, file_)
             dst_file = os.path.join(dst_dir, file_)
+            if not os.path.exists(dst_file):
+                open(dst_file, 'w')
             if md5(open(src_file, 'rb').read()).hexdigest() ==\
                md5(open(dst_file, 'rb').read()).hexdigest():
                 # No change in file
