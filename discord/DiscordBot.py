@@ -432,7 +432,13 @@ http://twitter.com/acepicturebot""".format(command)
     msg = '{0} {1.author.mention}'.format(msg, message)
     await client.send_message(message.channel, msg)
     if server_settings['allow_images'] and discord_image:
-        await client.send_file(message.channel, open(discord_image, 'rb'))
+        try:
+            await client.send_file(message.channel, open(discord_image, 'rb'))
+        except:
+            # discord.errors.Forbidden ?
+            # Channel doesn't allow image uploading
+            pass
+
 
 
 @client.event
