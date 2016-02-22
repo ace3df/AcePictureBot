@@ -1114,7 +1114,6 @@ Kirima Sharo||Gochuumon wa Usagi Desu ka?||http://cdn.myanimelist.net/images/cha
 Tedeza Rize||Gochuumon wa Usagi Desu ka?||http://cdn.myanimelist.net/images/characters/15/243377.jpg
 Ujimatsu Chiya||Gochuumon wa Usagi Desu ka?||http://cdn.myanimelist.net/images/characters/7/294262.jpg
 
-Otosaka Ayumi||Charlotte||http://cdn.myanimelist.net/images/characters/4/288021.jpg
 Kurobane Yusa||Charlotte||http://cdn.myanimelist.net/images/characters/7/288018.jpg
 Kurobane Misa||Charlotte||http://cdn.myanimelist.net/images/characters/5/287688.jpg
 Tomori Nao||Charlotte||http://cdn.myanimelist.net/images/characters/10/288020.jpg
