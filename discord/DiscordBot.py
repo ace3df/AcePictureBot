@@ -294,13 +294,13 @@ Per User:
             if channel.id in current_ignore_list:
                 continue
             else:
-                channel_text.append(channel)
+                channel_text.append("#" + channel.name)
                 current_ignore_list.append(channel.id)
         func.config_save(message.server.id,
                          'ignore_channels',
                          ', '.join(current_ignore_list),
                          discord_settings['server_settings'])
-        msg = "The bot will now ignore the channels: {0}".format(
+        msg = "The bot will now ignore the channels: {}".format(
             ' '.join(channel_text))
         await client.send_message(message.channel, msg)
         return
@@ -311,15 +311,16 @@ Per User:
             'ignore_channels',
             discord_settings['server_settings'])
         current_ignore_list = current_ignore_list.split(", ")
+        channel_text = []
         for channel in message.channel_mentions:
             if channel.id in current_ignore_list:
-                channel_text.append(channel)
+                channel_text.append("#" + channel.name)
                 current_ignore_list.remove(channel.id)
         func.config_save(message.server.id,
                          'ignore_channels',
                          ', '.join(current_ignore_list),
                          discord_settings['server_settings'])
-        msg = "The bot will now NOT ignore the channels: {0}".format(
+        msg = "The bot will now NOT ignore the channels: {}".format(
             ' '.join(channel_text))
         await client.send_message(message.channel, msg)
         return
