@@ -300,7 +300,7 @@ Per User:
                          'ignore_channels',
                          ', '.join(current_ignore_list),
                          discord_settings['server_settings'])
-        if not current_ignore_list:
+        if not channel_text:
             msg = "No such channels or already ignoring these channels!"
         else:
             msg = "The bot will now ignore the channels: {}".format(
@@ -323,7 +323,7 @@ Per User:
                          'ignore_channels',
                          ', '.join(current_ignore_list),
                          discord_settings['server_settings'])
-        if not current_ignore_list:
+        if not channel_text:
             msg = "No such channels or already not ignoring these channels!"
         else:
             msg = "The bot will now not ignore the channels: {}".format(
