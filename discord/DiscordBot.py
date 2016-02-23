@@ -115,8 +115,8 @@ async def on_server_join(server):
     :param server: Discord.Server object.
     """
     server_settings = func.config_get_section_items(
-            server.id,
-            discord_settings['server_settings'])
+        server.id,
+        discord_settings['server_settings'])
     if server_settings:
         # Have already been in server and have saved settings.
         return
@@ -142,14 +142,14 @@ async def on_message(message):
 
     # Server settings of where the message was sent from.
     server_settings = func.config_get_section_items(
-            message.server.id,
-            discord_settings['server_settings'])
+        message.server.id,
+        discord_settings['server_settings'])
     if not server_settings:
         # Joined and haven't been able to complete say_welcome_message().
         await say_welcome_message(False, message)
         server_settings = func.config_get_section_items(
-                message.server.id,
-                discord_settings['server_settings'])
+            message.server.id,
+            discord_settings['server_settings'])
     if message.author.id in server_settings['mods'].split(", "):
         if message.content.startswith("!apb help"):
             # Send basic help message.
@@ -174,7 +174,6 @@ Current Channel ID: {0.channel.id}""".format(message)
             msg = "The bot will now respond to commands!"
         elif message.content.startswith("!apb turn off"):
             # Turn off the bot in the server.
-            print(123)
             edit_result = "False"
             edit_section = "active"
             msg = "The bot will now ignore commands!"
@@ -244,8 +243,8 @@ Per User:
             if message.author.id != message.server.owner.id:
                 return
             # Get all mentions in message and add to mod list.
-            current_mod_list = func.config_get(message.server.id, 'mods',
-                                               discord_settings['server_settings'])
+            current_mod_list = func.config_get(
+                message.server.id, 'mods', discord_settings['server_settings'])
             current_mod_list = current_mod_list.split(", ")
             for user in message.mentions:
                 if user.id == message.server.owner.id:
@@ -266,8 +265,9 @@ Per User:
             if message.author.id != message.server.owner.id:
                 return
             # Remove all mods mentioned.
-            current_mod_list = func.config_get(message.server.id, 'mods',
-                                               discord_settings['server_settings'])
+            current_mod_list = func.config_get(
+                message.server.id, 'mods',
+                discord_settings['server_settings'])
             current_mod_list = current_mod_list.split(", ")
             for user in message.mentions:
                 if user.id == message.server.owner.id:
@@ -285,38 +285,43 @@ Per User:
 
     if message.content.startswith("!apb channels add"):
         # Add a channel to the ignore list.
-        current_ignore_list = func.config_get(message.server.id,
-                                              'ignore_channels',
-                                           discord_settings['server_settings'])
+        current_ignore_list = func.config_get(
+            message.server.id, 'ignore_channels',
+            discord_settings['server_settings'])
         current_ignore_list = current_ignore_list.split(", ")
+        channel_text = []
         for channel in message.channel_mentions:
             if channel.id in current_ignore_list:
                 continue
             else:
+                channel_text.append(channel)
                 current_ignore_list.append(channel.id)
         func.config_save(message.server.id,
                          'ignore_channels',
                          ', '.join(current_ignore_list),
                          discord_settings['server_settings'])
-
-        await client.send_message(message.channel, "Channels ignored!")
+        msg = "The bot will now ignore the channels: {0}".format(
+            ' '.join(channel_text))
+        await client.send_message(message.channel, msg)
         return
     elif message.content.startswith("!apb channels remove"):
         # Remove all mods mentioned.
-        current_ignore_list = func.config_get(message.server.id,
-                                              'ignore_channels',
-                                           discord_settings['server_settings'])
+        current_ignore_list = func.config_get(
+            message.server.id,
+            'ignore_channels',
+            discord_settings['server_settings'])
         current_ignore_list = current_ignore_list.split(", ")
         for channel in message.channel_mentions:
             if channel.id in current_ignore_list:
+                channel_text.append(channel)
                 current_ignore_list.remove(channel.id)
         func.config_save(message.server.id,
                          'ignore_channels',
                          ', '.join(current_ignore_list),
                          discord_settings['server_settings'])
-
-        await client.send_message(message.channel,
-                                  "Removed from channel ignore list!")
+        msg = "The bot will now NOT ignore the channels: {0}".format(
+            ' '.join(channel_text))
+        await client.send_message(message.channel, msg)
         return
 
     if server_settings['active'] == "False":
@@ -443,7 +448,6 @@ http://twitter.com/acepicturebot""".format(command)
             # discord.errors.Forbidden ?
             # Channel doesn't allow image uploading
             pass
-
 
 
 @client.event
