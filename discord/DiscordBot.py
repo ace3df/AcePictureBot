@@ -75,6 +75,9 @@ For many more commands read: http://ace3df.github.io/AcePictureBot/commands/
 Don't forget to cheak out all the Ace Bots on Twitter:
 https://twitter.com/AcePictureBot
 
+Feel free to support the Dev:
+http://ace3df.github.io/AcePictureBot/donate/
+
 {0} you should read this for a list of mod only commands:
 https://gist.github.com/ace3df/cd8e233fe9fe796d297d
 If you don't want this bot in your server - simply kick it.
