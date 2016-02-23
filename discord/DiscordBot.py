@@ -300,8 +300,11 @@ Per User:
                          'ignore_channels',
                          ', '.join(current_ignore_list),
                          discord_settings['server_settings'])
-        msg = "The bot will now ignore the channels: {}".format(
-            ' '.join(channel_text))
+        if not current_ignore_list:
+            msg = "No such channels or already ignoring these channels!"
+        else:
+            msg = "The bot will now ignore the channels: {}".format(
+                ' '.join(channel_text))
         await client.send_message(message.channel, msg)
         return
     elif message.content.startswith("!apb channels remove"):
@@ -320,8 +323,11 @@ Per User:
                          'ignore_channels',
                          ', '.join(current_ignore_list),
                          discord_settings['server_settings'])
-        msg = "The bot will now NOT ignore the channels: {}".format(
-            ' '.join(channel_text))
+        if not current_ignore_list:
+            msg = "No such channels or already not ignoring these channels!"
+        else:
+            msg = "The bot will now not ignore the channels: {}".format(
+                ' '.join(channel_text))
         await client.send_message(message.channel, msg)
         return
 
