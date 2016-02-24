@@ -15,6 +15,7 @@ tweepy/
 tools/
 is_busy/
 cronjobs/
+irc/
 
 mal_list.py
 run.bat

@@ -125,6 +125,10 @@ async def on_server_join(server):
         return
     await say_welcome_message(server)
 
+@client.event
+async def on_error(event):
+    print(event)
+    await asyncio.sleep(60)
 
 @client.event
 async def on_message(message):

@@ -100,8 +100,8 @@ Katsura Hinagiku||Hayate no Gotoku!||http://cdn.myanimelist.net/images/character
 Haruno Sakura||Naruto||http://cdn.myanimelist.net/images/characters/15/103640.jpg
 Hyuuga Hinata||Naruto||http://cdn.myanimelist.net/images/characters/6/278736.jpg
 Tsunade||Naruto||http://cdn.myanimelist.net/images/characters/9/282663.jpg
-Uchiha Sarada||Naruo||http://cdn.myanimelist.net/images/characters/3/280030.jpg
-Yamanaka Ino||Naruo||http://cdn.myanimelist.net/images/characters/9/60062.jpg
+Uchiha Sarada||Naruto||http://cdn.myanimelist.net/images/characters/3/280030.jpg
+Yamanaka Ino||Naruto||http://cdn.myanimelist.net/images/characters/9/60062.jpg
 
 Chrome Dokuro||Katekyo Hitman Reborn!||http://cdn.myanimelist.net/images/characters/4/99922.jpg
 Miura Haru||Katekyo Hitman Reborn!||http://cdn.myanimelist.net/images/characters/6/78764.jpg
