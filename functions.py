@@ -111,6 +111,29 @@ def config_save(section, key, result, file=0):
         config.write(fp)
 
 
+def config_save_2(*set_dict, section, file=0):
+    if not set_dict:
+        # Nothing to write
+        return
+    set_dict = set_dict[0]
+    if file == 0:
+        file = settings['settings']
+    elif file == 1:
+        file = settings['count_file']
+    with open(file) as fp:
+        config = configparser.RawConfigParser(allow_no_value=True)
+        config.read_file(fp)
+        try:
+            for key, val in set_dict.items():
+                config.set(section, key, str(val))
+        except configparser.NoSectionError:
+            return False
+        except configparser.NoOptionError:
+            return False
+    with open(file, 'w') as fp:
+        config.write(fp)
+
+
 def config_get_section_items(section, file=0):
     if file == 0:
         file = settings['settings']
@@ -125,6 +148,18 @@ def config_get_section_items(section, file=0):
             return False
         except configparser.NoOptionError:
             return False
+
+
+def config_all_sections(file=0):
+    if file == 0:
+        file = settings['settings']
+    elif file == 1:
+        file = settings['count_file']
+    with open(file) as fp:
+        config = configparser.RawConfigParser(allow_no_value=True)
+        config.read_file(fp)
+        sections = config.sections()
+    return sections
 
 
 def config_add_section(section, file=0):

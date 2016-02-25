@@ -15,10 +15,10 @@ tweepy/
 tools/
 is_busy/
 cronjobs/
-irc/
 
 mal_list.py
 run.bat
+twitch_settings.ini
 server_settings.ini
 config.py
 
