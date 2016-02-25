@@ -110,7 +110,7 @@ class TwitchIRC:
     def leave_channel(self, channel):
         func.config_delete_section(channel, twitch_settings['settings_file'])
         print("$ Left channel: {}".format(channel))
-        self.current_joined_chans.delete("#" + str(channel))
+        self.current_joined_chans.remove("#" + str(channel))
         self.irc_sock.send("PART {}\n".format(str.rstrip(channel)).encode('UTF-8'))
 
     def on_message(self, message):
