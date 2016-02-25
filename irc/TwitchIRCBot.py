@@ -153,6 +153,12 @@ class TwitchIRC:
             if message.startswith("!apb leave"):
                 self.leave_channel(channel)
 
+            if message.startswith("!apb help"):
+                msg = "Commands: http://ace3df.github.io/AcePictureBot/commands/ "\
+                      "Mod Commands: https://gist.github.com/ace3df/bf7a6e7dce4c1168e3cb"
+                self.send_message(channel, msg)
+                return
+                
             if message.startswith("!apb turn on"):
                 # Turn on the bot in the server (DEFAULT).
                 edit_result = "True"
