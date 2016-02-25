@@ -120,6 +120,8 @@ class TwitchIRC:
         if message.find('PING ') != -1:
             self.irc_sock.send(str("PING :pong\n").encode('UTF-8'))
             return
+        if message.find('End of') != -1:
+            return
         if message.find('.tmi.twitch.tv PART') != -1:
             return
         if message.startswith(":tmi.twitch.tv"):
@@ -158,7 +160,7 @@ class TwitchIRC:
                       "Mod Commands: https://gist.github.com/ace3df/bf7a6e7dce4c1168e3cb"
                 self.send_message(channel, msg)
                 return
-                
+
             if message.startswith("!apb turn on"):
                 # Turn on the bot in the server (DEFAULT).
                 edit_result = "True"
@@ -345,7 +347,8 @@ class TwitchIRC:
                 for msg in msgs:
                     msg = msg.decode('utf-8')
                     Thread(target=self.on_message, args=(msg,)).start()
-            except:
+            except Exception as e:
+                print(e)
                 raise
 
 if __name__ == "__main__":
