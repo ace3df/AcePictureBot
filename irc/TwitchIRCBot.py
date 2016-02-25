@@ -189,8 +189,8 @@ class TwitchIRC:
 
             if message.startswith("!apb rate limit"):
                 # Change the level of users rate limits (Per User).
-                # 1 = 10 Commands in 2 Minutes (DEFAULT).
-                # 2 = 5 Commands in 2 Minutes.
+                # 1 = 10 Commands in 5 Minutes (DEFAULT).
+                # 2 = 5 Commands in 5 Minutes.
                 # 3 = 2 Commands in 1 Minute.
                 # Higher than 3 defaults to 3 - Lower defaults to 1.
                 num = [int(s) for s in message.content.split() if s.isdigit()]
@@ -209,9 +209,9 @@ class TwitchIRC:
                 edit_result = num
                 edit_section = "rate_limit_level"
                 if num == 1:
-                    msg = "10 Commands in 2 Minutes (per user)."
+                    msg = "10 Commands in 5 Minutes (per user)."
                 elif num == 2:
-                    msg = "5 Commands in 2 Minutes (per user)."
+                    msg = "5 Commands in 5 Minutes (per user)."
                 elif num == 3:
                     msg = "2 Commands in 1 Minutes (per user)."
                 msg = "Rate Limit changed to:\n" + msg
@@ -265,10 +265,10 @@ class TwitchIRC:
         rate_time = datetime.datetime.now()
         if channel_settings['rate_limit_level'] == "1":
             rate_limit_commands = 10
-            rate_limit_secs = 120
+            rate_limit_secs = 300
         elif channel_settings['rate_limit_level'] == "2":
             rate_limit_commands = 5
-            rate_limit_secs = 120
+            rate_limit_secs = 300
         elif channel_settings['rate_limit_level'] == "3":
             rate_limit_commands = 2
             rate_limit_secs = 60
