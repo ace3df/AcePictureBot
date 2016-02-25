@@ -104,11 +104,13 @@ class TwitchIRC:
 
     def join_channel(self, channel):
         print("$ Joined channel: {}".format(channel))
+        self.current_joined_chans.append("#" + str(channel))
         self.irc_sock.send("JOIN {}\n".format(str.rstrip(channel.lower())).encode('UTF-8'))
 
     def leave_channel(self, channel):
         func.config_delete_section(channel, twitch_settings['settings_file'])
         print("$ Left channel: {}".format(channel))
+        self.current_joined_chans.delete("#" + str(channel))
         self.irc_sock.send("PART {}\n".format(str.rstrip(channel)).encode('UTF-8'))
 
     def on_message(self, message):
@@ -144,13 +146,11 @@ class TwitchIRC:
 
         if message.startswith("!apb join"):
             if "#" + str(user) not in self.current_joined_chans:
-                self.current_joined_chans.append("#" + str(user))
                 self.join_channel("#" + str(user))
 
         if user == channel[1:]:
             edit_result = False
             if message.startswith("!apb leave"):
-                self.current_joined_chans.remove(channel)
                 self.leave_channel(channel)
 
             if message.startswith("!apb turn on"):
@@ -356,8 +356,14 @@ if __name__ == "__main__":
     RATE_LIMIT_DICT = {}
     CHANNEL_TIMEOUT = {}
     USER_LAST_COMMAND = OrderedDict()
-    imgur_client = ImgurClient(extra_api_keys['imgur_client_id'],
-                               extra_api_keys['imgur_client_secret'])
+    try:
+        imgur_client = ImgurClient(extra_api_keys['imgur_client_id'],
+                                   extra_api_keys['imgur_client_secret'])
+    except:
+        # Temp (probs just timeout or what not if it happens)
+        # TODO: Make it cheack if this is vaild every now and then
+        imgur_client = False
+
     if not os.path.exists(twitch_settings['settings_file']):
         open(twitch_settings['settings_file'], "w")
     while True:
