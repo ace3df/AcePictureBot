@@ -14,16 +14,20 @@ from threading import Thread
 import traceback
 
 from config import settings
+from config import extra_api_keys
 from config import twitch_settings
 from utils import printf as print  # To make sure debug printing won't brake
 from utils import get_command
 import functions as func
+
+from imgurpython import ImgurClient
 
 TWITCH_HOST = r"irc.twitch.tv"
 TWITCH_PORT = 6667
 
 __program__ = "AcePictureBot For Twitch Chat"
 __version__ = "1.0.0"
+
 
 def get_twitch_user_id(username):
     # For mywaifu and stuff
@@ -89,16 +93,11 @@ class TwitchIRC:
                 time.sleep(60)
 
     def upload_image(self, image_loc):
-        url = r"http://uploads.im/api"
         try:
-            r = requests.post(url, timeout=3,
-                              files={'img.png': open(image_loc, 'rb')})
+            return imgur_client.upload_from_path(image_loc)['link']
         except Exception as e:
             print(e)
             return False
-        if r.status_code != 200:
-            return False
-        return r.json()['data']['img_url']
 
     def send_message(self, channel, message):
         self.irc_sock.send("PRIVMSG {} :{}\n".format(channel, str.rstrip(message)).encode('UTF-8'))
@@ -357,7 +356,8 @@ if __name__ == "__main__":
     RATE_LIMIT_DICT = {}
     CHANNEL_TIMEOUT = {}
     USER_LAST_COMMAND = OrderedDict()
-
+    imgur_client = ImgurClient(extra_api_keys['imgur_client_id'],
+                               extra_api_keys['imgur_client_secret'])
     if not os.path.exists(twitch_settings['settings_file']):
         open(twitch_settings['settings_file'], "w")
     while True:
