@@ -7,6 +7,8 @@ import requests
 import socket
 import time
 import json
+import select
+
 import re
 import os
 from threading import Thread
@@ -65,7 +67,8 @@ class TwitchIRC:
         to_add = {'active': 'True',
                   'allow_images': 'True',
                   'must_mention': 'False',
-                  'rate_limit_level': '1'}
+                  'rate_limit_level': '1',
+                  'ads': 'True'}
         func.config_save_2(to_add, section=channel,
                            file=twitch_settings['settings_file'])
         msg = "Hello, my name is AcePictureBot! - "\
@@ -81,7 +84,8 @@ class TwitchIRC:
         self.send_message(channel, msg)
 
     def timeout_channel(self):
-        """Check if the bot has talkined in each server in the last 2 days."""
+        """Check if the bot has talked in each server in the last 2 days.
+        If it hasn't it will leave."""
         while True:
             current_time = time.time()
             for channel in func.config_all_sections(twitch_settings['settings_file']):
@@ -91,6 +95,27 @@ class TwitchIRC:
                 else:
                     CHANNEL_TIMEOUT[channel] = time.time()
                 time.sleep(60)
+
+    def advertise_timer(self, channel):
+        # make this thread per channel
+        return
+        """Post a preset message to advertise the bot."""
+        msgs = ["Get me in your own Twitch channel by typing: \"!apb join\"",
+                r"Don't forget to check out AcePictureBot on Twitter: https://twitter.com/AcePictureBot",
+                r"Get AcePictureBot for Discord! Fill in this form: http://goo.gl/forms/ajpYU8iwAI",
+                r"Enjoy Yuri? Follow the Yuri Bot: https://twitter.com/AceYuriBot"]
+        last_sent = ""
+        while True:
+            sleep_for = random.randint(20, 60)
+            time.sleep(sleep_for * 60)
+            temp_settings = func.config_get_section_items(
+                channel,
+                twitch_settings['settings_file'])
+            if temp_settings['ads'] == "True":
+                msg = random.choice(msgs)
+                while msg == last_sent:
+                    msg = random.choice(msgs)
+                self.send_message(channel, msg)
 
     def upload_image(self, image_loc):
         try:
@@ -139,27 +164,28 @@ class TwitchIRC:
             channel_settings = {'active': 'True',
                                 'allow_images': 'True',
                                 'must_mention': 'False',
-                                'rate_limit_level': '1'}
+                                'rate_limit_level': '1',
+                                'ads': 'True'}
         user = message.split("!", 1)[0][1:]
         message = ' '.join(message.split(channel + " :")[1:])
 
-        if "acepicturebot" in user:
+        if user == "AcePictureBot":
             print("{} | {}: {}".format(channel, user, message))
 
         if message.startswith("!apb join"):
             if "#" + str(user) not in self.current_joined_chans:
                 self.join_channel("#" + str(user))
 
-        if user == channel[1:]:
+        if message.startswith("!apb help"):
+            msg = "Commands: http://ace3df.github.io/AcePictureBot/commands/ || "\
+                  "Mod Commands: https://gist.github.com/ace3df/bf7a6e7dce4c1168e3cb"
+            self.send_message(channel, msg)
+            return
+
+        if user == channel[1:] or user == "ace3df":
             edit_result = False
             if message.startswith("!apb leave"):
                 self.leave_channel(channel)
-
-            if message.startswith("!apb help"):
-                msg = "Commands: http://ace3df.github.io/AcePictureBot/commands/ "\
-                      "Mod Commands: https://gist.github.com/ace3df/bf7a6e7dce4c1168e3cb"
-                self.send_message(channel, msg)
-                return
 
             if message.startswith("!apb turn on"):
                 # Turn on the bot in the server (DEFAULT).
@@ -222,6 +248,17 @@ class TwitchIRC:
                 elif num == 3:
                     msg = "2 Commands in 1 Minutes (per user)."
                 msg = "Rate Limit changed to:\n" + msg
+
+            if message.startswith("!apb ads on"):
+                # They will have to mentiont he bot to use a command.
+                edit_result = "True"
+                edit_section = "ads"
+                msg = "The bot will now advertise itself every so often!"
+            elif message.startswith("!apb ads off"):
+                # They do NOT have to mentiont he bot to use a command(DEFAULT)
+                edit_result = "False"
+                edit_section = "ads"
+                msg = "The bot will now not advertise itself! :( )"
 
             if edit_result:
                 channel_settings[edit_section] = str(edit_result)
@@ -341,12 +378,14 @@ class TwitchIRC:
         while True:
             try:
                 self.connected = True
-                socketBuffer += self.irc_sock.recv(1024)
-                msgs = line_sep_exp.split(socketBuffer)
-                socketBuffer = msgs.pop()
-                for msg in msgs:
-                    msg = msg.decode('utf-8')
-                    Thread(target=self.on_message, args=(msg,)).start()
+                r, _, _ = select.select([self.irc_sock], [], [])
+                if r:
+                    socketBuffer += self.irc_sock.recv(1024)
+                    msgs = line_sep_exp.split(socketBuffer)
+                    socketBuffer = msgs.pop()
+                    for msg in msgs:
+                        msg = msg.decode('utf-8')
+                        Thread(target=self.on_message, args=(msg,)).start()
             except Exception as e:
                 print(e)
                 raise
@@ -355,7 +394,8 @@ if __name__ == "__main__":
     DEBUG = False
 
     # Commands not while using through discord.
-    NO_DISCORD_CMDS = ["Source", "DelLimits", "SetBirthday", "Spoiler"]
+    NO_DISCORD_CMDS = ["Source", "DelLimits", "SetBirthday",
+                       "Spoiler", "Airing"]
     # Commands that will be added once Discord finishes Twitter linking
     LATER_DISCORD_CMDS = ["WaifuRegister", "HusbandoRegister",
                           "MyWaifu", "MyHusbando",
