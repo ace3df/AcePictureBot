@@ -5,6 +5,7 @@ from itertools import islice
 import datetime
 import requests
 import socket
+import random
 import time
 import json
 import select
@@ -48,6 +49,7 @@ def get_twitch_user_id(username):
 class TwitchIRC:
     def __init__(self):
         self.irc_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.irc_sock.settimeout(10)
         self.current_channel = ""
 
     def connect(self):
@@ -97,24 +99,32 @@ class TwitchIRC:
                 time.sleep(60)
 
     def advertise_timer(self, channel):
-        # make this thread per channel
-        return
-        """Post a preset message to advertise the bot."""
+        """Post a preset message to advertise the bot.
+        Optional and streamer can turn off forever."""
         msgs = ["Get me in your own Twitch channel by typing: \"!apb join\"",
                 r"Don't forget to check out AcePictureBot on Twitter: https://twitter.com/AcePictureBot",
                 r"Get AcePictureBot for Discord! Fill in this form: http://goo.gl/forms/ajpYU8iwAI",
-                r"Enjoy Yuri? Follow the Yuri Bot: https://twitter.com/AceYuriBot"]
+                r"Enjoy Yuri? Follow the Yuri Picture Bot: https://twitter.com/AceYuriBot",
+                r"I have over 10 commands! Full list here: https://ace3df.github.io/AcePictureBot/commands/"]
         last_sent = ""
         while True:
-            sleep_for = random.randint(20, 60)
+            sleep_for = random.randint(40, 80)
             time.sleep(sleep_for * 60)
+            if channel not in self.current_joined_chans:
+                return
             temp_settings = func.config_get_section_items(
                 channel,
                 twitch_settings['settings_file'])
+            print(temp_settings)
+            try:
+                temp_settings['ads']
+            except KeyError:
+                temp_settings['ads'] = "True"
             if temp_settings['ads'] == "True":
                 msg = random.choice(msgs)
                 while msg == last_sent:
                     msg = random.choice(msgs)
+                last_sent = msg
                 self.send_message(channel, msg)
 
     def upload_image(self, image_loc):
@@ -125,17 +135,19 @@ class TwitchIRC:
             return False
 
     def send_message(self, channel, message):
+        print("{} | {}: {}".format(channel, "AcePictureBot", message))
         self.irc_sock.send("PRIVMSG {} :{}\n".format(channel, str.rstrip(message)).encode('UTF-8'))
 
     def join_channel(self, channel):
         print("$ Joined channel: {}".format(channel))
-        self.current_joined_chans.append("#" + str(channel))
+        self.current_joined_chans.append(str(channel))
         self.irc_sock.send("JOIN {}\n".format(str.rstrip(channel.lower())).encode('UTF-8'))
+        Thread(target=self.advertise_timer, args=(channel,)).start()
 
     def leave_channel(self, channel):
         func.config_delete_section(channel, twitch_settings['settings_file'])
         print("$ Left channel: {}".format(channel))
-        self.current_joined_chans.remove("#" + str(channel))
+        self.current_joined_chans.remove(str(channel))
         self.irc_sock.send("PART {}\n".format(str.rstrip(channel)).encode('UTF-8'))
 
     def on_message(self, message):
@@ -168,9 +180,6 @@ class TwitchIRC:
                                 'ads': 'True'}
         user = message.split("!", 1)[0][1:]
         message = ' '.join(message.split(channel + " :")[1:])
-
-        if user == "AcePictureBot":
-            print("{} | {}: {}".format(channel, user, message))
 
         if message.startswith("!apb join"):
             if "#" + str(user) not in self.current_joined_chans:

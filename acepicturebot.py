@@ -286,7 +286,7 @@ def is_following(user_id):
         return "Limited"
     if user_info.statuses_count < 10:
         return "Not Genuine"
-    elif user_info.followers_count < 3:
+    elif user_info.followers_count < 5:
         return "Not Genuine"
     try:
         ship = API.lookup_friendships(user_ids=(2910211797, user_id))
