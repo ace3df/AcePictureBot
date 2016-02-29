@@ -251,11 +251,15 @@ def acceptable_tweet(status):
     # Stop someone limiting the bot on their own.
     rate_time = datetime.datetime.now()
     rate_limit_secs = 10800
+    rate_limit_user = 20
+    if user.id in PATREON_IDS:
+        # Still a limit just in case
+        rate_limit_user = 50
     if user.id in RATE_LIMIT_DICT:
         # User is now limited (3 hours).
         if ((rate_time - RATE_LIMIT_DICT[user.id][0])
                 .total_seconds() < rate_limit_secs)\
-           and (RATE_LIMIT_DICT[user.id][1] >= 30):
+           and (RATE_LIMIT_DICT[user.id][1] >= rate_limit_user):
             return False, False
         # User limit is over.
         elif ((rate_time - RATE_LIMIT_DICT[user.id][0])
