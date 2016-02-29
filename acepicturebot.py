@@ -67,7 +67,7 @@ def tweet_command(_API, status, tweet, command):
                 their_id, cmd))
         return False, False
     if str(user.id) not in PATREON_IDS:
-        if not is_mod or :
+        if not is_mod:
             user_is_limited = user_spam_check(user.id, user.screen_name, command)
             if isinstance(user_is_limited, str):
                 # User hit limit, tweet warning
