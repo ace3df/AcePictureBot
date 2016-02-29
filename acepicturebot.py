@@ -20,7 +20,7 @@ import re
 
 __program__ = "AcePictureBot"
 __version__ = "2.4.2"
-DEBUG = False
+DEBUG = True
 
 
 def post_tweet(_API, tweet, media="", command=False, rts=False):
@@ -57,9 +57,8 @@ def post_tweet(_API, tweet, media="", command=False, rts=False):
 def tweet_command(_API, status, tweet, command):
     tweet_image = False
     user = status.user
-
     # Mod command
-    is_mod = [True if user.id in MOD_IDS else False][0]
+    is_mod = [True if str(user.id) in MOD_IDS else False][0]
     if command == "DelLimits":
         if is_mod:
             their_id, cmd = tweet.split(' ', 2)
@@ -68,7 +67,7 @@ def tweet_command(_API, status, tweet, command):
                 their_id, cmd))
         return False, False
 
-    if not is_mod or user.id not in PATREON_IDS:
+    if not is_mod or str(user.id) not in PATREON_IDS:
         user_is_limited = user_spam_check(user.id, user.screen_name, command)
         if isinstance(user_is_limited, str):
             # User hit limit, tweet warning
@@ -252,7 +251,7 @@ def acceptable_tweet(status):
     rate_time = datetime.datetime.now()
     rate_limit_secs = 10800
     rate_limit_user = 20
-    if user.id in PATREON_IDS:
+    if str(user.id) in PATREON_IDS:
         # Still a limit just in case
         rate_limit_user = 50
     if user.id in RATE_LIMIT_DICT:
@@ -497,6 +496,7 @@ if __name__ == '__main__':
         os.path.join(settings['ignore_loc'],
                      "tweets_read.txt"))
     # TODO: TEMP (Read above)
+
     open(update['last_crash_file'], 'w')
     API = func.login(rest=True)
     SAPI = func.login(rest=False)
