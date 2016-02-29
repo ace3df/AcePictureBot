@@ -19,8 +19,8 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.4.2"
-DEBUG = True
+__version__ = "2.5.0"
+DEBUG = False
 
 
 def post_tweet(_API, tweet, media="", command=False, rts=False):
