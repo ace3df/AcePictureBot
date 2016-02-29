@@ -68,7 +68,7 @@ def tweet_command(_API, status, tweet, command):
                 their_id, cmd))
         return False, False
 
-    if not is_mod:
+    if not is_mod or user.id not in PATREON_IDS:
         user_is_limited = user_spam_check(user.id, user.screen_name, command)
         if isinstance(user_is_limited, str):
             # User hit limit, tweet warning
@@ -175,6 +175,9 @@ def acceptable_tweet(status):
     BLOCKED_IDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "Blocked Users.txt"))
+    PATREON_IDS = utils.file_to_list(
+        os.path.join(settings['list_loc'],
+                     "patreon_users.txt"))
     IGNORE_WORDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "Blocked Words.txt"))
@@ -468,6 +471,9 @@ if __name__ == '__main__':
     BLOCKED_IDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "Blocked Users.txt"))
+    PATREON_IDS = utils.file_to_list(
+        os.path.join(settings['list_loc'],
+                     "patreon_users.txt"))
     IGNORE_WORDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "Blocked Words.txt"))
