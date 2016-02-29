@@ -19,7 +19,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.5.0"
+__version__ = "2.5.1"
 DEBUG = False
 
 
@@ -66,18 +66,18 @@ def tweet_command(_API, status, tweet, command):
             print("[INFO] Removed limits for {0} - {1}".format(
                 their_id, cmd))
         return False, False
-
-    if not is_mod or str(user.id) not in PATREON_IDS:
-        user_is_limited = user_spam_check(user.id, user.screen_name, command)
-        if isinstance(user_is_limited, str):
-            # User hit limit, tweet warning
-            command = ""
-            tweet = user_is_limited
-        elif not user_is_limited:
-            # User is limited, return
-            print("[{0}] User is limited! Ignoring...".format(
-                time.strftime("%Y-%m-%d %H:%M")))
-            return False
+    if str(user.id) not in PATREON_IDS:
+        if not is_mod or :
+            user_is_limited = user_spam_check(user.id, user.screen_name, command)
+            if isinstance(user_is_limited, str):
+                # User hit limit, tweet warning
+                command = ""
+                tweet = user_is_limited
+            elif not user_is_limited:
+                # User is limited, return
+                print("[{0}] User is limited! Ignoring...".format(
+                    time.strftime("%Y-%m-%d %H:%M")))
+                return False
     if settings['count_on']:
         func.count_trigger(command, user.id)
 
