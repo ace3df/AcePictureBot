@@ -255,7 +255,7 @@ def acceptable_tweet(status):
         # User is now limited (3 hours).
         if ((rate_time - RATE_LIMIT_DICT[user.id][0])
                 .total_seconds() < rate_limit_secs)\
-           and (RATE_LIMIT_DICT[user.id][1] >= 15):
+           and (RATE_LIMIT_DICT[user.id][1] >= 30):
             return False, False
         # User limit is over.
         elif ((rate_time - RATE_LIMIT_DICT[user.id][0])
