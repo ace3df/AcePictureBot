@@ -16,8 +16,9 @@ import functions as func
 
 import discord
 
+# start_private_message(user)
 __program__ = "AcePictureBot For Discord"
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 
 client = discord.Client()
 # Commands not while using through discord.
@@ -51,22 +52,16 @@ async def say_welcome_message(server=False, message=False):
     else:
         server = message.server
         channel = message.channel
-
     func.config_add_section(server.id,
                             discord_settings['server_settings'])
-    func.config_save(server.id, "active",
-                     "True", discord_settings['server_settings'])
-    func.config_save(server.id, "allow_images",
-                     "True", discord_settings['server_settings'])
-    func.config_save(server.id, "must_mention",
-                     "False", discord_settings['server_settings'])
-    func.config_save(server.id, "rate_limit_level",
-                     "1", discord_settings['server_settings'])
-    func.config_save(server.id, "ignore_channels",
-                     "", discord_settings['server_settings'])
-    func.config_save(server.id, "mods",
-                     str(server.owner.id),
-                     discord_settings['server_settings'])
+    to_add = {'active': 'True',
+              'allow_images': 'True',
+              'must_mention': 'False',
+              'rate_limit_level': '1',
+              'ignore_channels': '',
+              'mods': str(server.owner.id)}
+    func.config_save_2(to_add, section=server.id,
+                       file=discord_settings['server_settings'])
     msg = """Hello, my name is AcePictureBot!
 You can use over 10 commands including: Waifu, Shipgirl, OTP and many more!
 To start simply say: "Waifu"!
@@ -86,13 +81,16 @@ If you don't want this bot in your server - simply kick it.
 
 
 async def timeout_channel():
-    """Check if the bot has talkined in each server in the last 2 days."""
+    """Check if the bot has talkined in each server in the last 4 days."""
     await client.wait_until_ready()
     while not client.is_closed:
         current_time = time.time()
         for server in client.servers:
+            if server.id == "81515992412327936":
+                # Don't timeout own channel
+                continue
             if server.id in CHANNEL_TIMEOUT:
-                if current_time - CHANNEL_TIMEOUT[server.id] > 172800:
+                if current_time - CHANNEL_TIMEOUT[server.id] > 345600:
                     client.leave_server(server.id)
             else:
                 CHANNEL_TIMEOUT[server.id] = time.time()
@@ -127,7 +125,7 @@ async def on_server_join(server):
 
 
 @client.event
-async def on_error(event):
+async def on_error(event, *args, **kwargs):
     print(event)
     await asyncio.sleep(60)
 
@@ -140,6 +138,21 @@ async def on_message(message):
     :param message: Discord.Message object.
     """
     global USER_LAST_COMMAND
+    if message.server is None:
+        # Private message
+        # Default settings
+        server_settings = {'active': 'True',
+                           'allow_images': 'True',
+                           'must_mention': 'False',
+                           'rate_limit_level': '1',
+                           'ignore_channels': '',
+                           'mods': ''}
+        try:
+            await client.accept_invite(message)
+        except (discord.HTTPException, discord.InvalidArgument):
+            # Invalid invite or not a invite at all
+            pass
+
     if message.author == client.user:
         # Print own bot messages.
         print("{} ({}) | {} ({}) - {}".format(message.server,
@@ -148,26 +161,27 @@ async def on_message(message):
                                               message.author.id,
                                               message.content))
         return
-
-    # Server settings of where the message was sent from.
-    server_settings = func.config_get_section_items(
-        message.server.id,
-        discord_settings['server_settings'])
-    if not server_settings:
-        # Joined and haven't been able to complete say_welcome_message().
-        await say_welcome_message(False, message)
+    if message.server is not None:
+        # Server settings of where the message was sent from.
         server_settings = func.config_get_section_items(
             message.server.id,
             discord_settings['server_settings'])
-    if message.author.id in server_settings['mods'].split(", "):
-        if message.content.startswith("!apb help"):
-            # Send basic help message.
-            await client.send_message(
-                message.channel,
-                """Commands: http://ace3df.github.io/AcePictureBot/commands/
-Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
-            return
+        if not server_settings:
+            # Joined and haven't been able to complete say_welcome_message().
+            await say_welcome_message(False, message)
+            server_settings = func.config_get_section_items(
+                message.server.id,
+                discord_settings['server_settings'])
 
+    if message.content.startswith("!apb help"):
+        # Send basic help message.
+        await client.send_message(
+            message.channel,
+            """Commands: http://ace3df.github.io/AcePictureBot/commands/
+Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
+        return
+
+    if message.author.id in server_settings['mods'].split(", "):
         edit_result = False
         if message.content.startswith("!apb ids"):
             # Debug IDs.
@@ -292,53 +306,53 @@ Per User:
             await client.send_message(message.channel, "Mods removed!")
             return
 
-    if message.content.startswith("!apb channels add"):
-        # Add a channel to the ignore list.
-        current_ignore_list = func.config_get(
-            message.server.id, 'ignore_channels',
-            discord_settings['server_settings'])
-        current_ignore_list = current_ignore_list.split(", ")
-        channel_text = []
-        for channel in message.channel_mentions:
-            if channel.id in current_ignore_list:
-                continue
+        if message.content.startswith("!apb channels add"):
+            # Add a channel to the ignore list.
+            current_ignore_list = func.config_get(
+                message.server.id, 'ignore_channels',
+                discord_settings['server_settings'])
+            current_ignore_list = current_ignore_list.split(", ")
+            channel_text = []
+            for channel in message.channel_mentions:
+                if channel.id in current_ignore_list:
+                    continue
+                else:
+                    channel_text.append("#" + channel.name)
+                    current_ignore_list.append(channel.id)
+            func.config_save(message.server.id,
+                             'ignore_channels',
+                             ', '.join(current_ignore_list),
+                             discord_settings['server_settings'])
+            if not channel_text:
+                msg = "No such channels or already ignoring these channels!"
             else:
-                channel_text.append("#" + channel.name)
-                current_ignore_list.append(channel.id)
-        func.config_save(message.server.id,
-                         'ignore_channels',
-                         ', '.join(current_ignore_list),
-                         discord_settings['server_settings'])
-        if not channel_text:
-            msg = "No such channels or already ignoring these channels!"
-        else:
-            msg = "The bot will now ignore the channels: {}".format(
-                ' '.join(channel_text))
-        await client.send_message(message.channel, msg)
-        return
-    elif message.content.startswith("!apb channels remove"):
-        # Remove all mods mentioned.
-        current_ignore_list = func.config_get(
-            message.server.id,
-            'ignore_channels',
-            discord_settings['server_settings'])
-        current_ignore_list = current_ignore_list.split(", ")
-        channel_text = []
-        for channel in message.channel_mentions:
-            if channel.id in current_ignore_list:
-                channel_text.append("#" + channel.name)
-                current_ignore_list.remove(channel.id)
-        func.config_save(message.server.id,
-                         'ignore_channels',
-                         ', '.join(current_ignore_list),
-                         discord_settings['server_settings'])
-        if not channel_text:
-            msg = "No such channels or already not ignoring these channels!"
-        else:
-            msg = "The bot will now not ignore the channels: {}".format(
-                ' '.join(channel_text))
-        await client.send_message(message.channel, msg)
-        return
+                msg = "The bot will now ignore the channels: {}".format(
+                    ' '.join(channel_text))
+            await client.send_message(message.channel, msg)
+            return
+        elif message.content.startswith("!apb channels remove"):
+            # Remove all mods mentioned.
+            current_ignore_list = func.config_get(
+                message.server.id,
+                'ignore_channels',
+                discord_settings['server_settings'])
+            current_ignore_list = current_ignore_list.split(", ")
+            channel_text = []
+            for channel in message.channel_mentions:
+                if channel.id in current_ignore_list:
+                    channel_text.append("#" + channel.name)
+                    current_ignore_list.remove(channel.id)
+            func.config_save(message.server.id,
+                             'ignore_channels',
+                             ', '.join(current_ignore_list),
+                             discord_settings['server_settings'])
+            if not channel_text:
+                msg = "No such channels or already not ignoring these channels!"
+            else:
+                msg = "The bot will now not ignore the channels: {}".format(
+                    ' '.join(channel_text))
+            await client.send_message(message.channel, msg)
+            return
 
     if server_settings['active'] == "False":
         return

@@ -91,8 +91,11 @@ class TwitchIRC:
         while True:
             current_time = time.time()
             for channel in func.config_all_sections(twitch_settings['settings_file']):
+                if channel == "#acepicturebot":
+                    # Don't timeout own channel
+                    continue
                 if channel in CHANNEL_TIMEOUT:
-                    if current_time - CHANNEL_TIMEOUT[channel] > 172800:
+                    if current_time - CHANNEL_TIMEOUT[channel] > 432000:
                         self.leave_channel(channel)
                 else:
                     CHANNEL_TIMEOUT[channel] = time.time()
