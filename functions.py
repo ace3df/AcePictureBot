@@ -709,6 +709,7 @@ def random_list(list_name, args="", DISCORD=False):
         tweet_image = utils.get_image_online(tags, 0, 1, "", path)
 
     name = re.sub(r' \([^)]*\)', '', name)
+    hashtag = ""  # TODO: Temp (testing with twitter)
     if show_series:
         m = "Your {0} is {1} ({2}) {3}".format(list_name, name,
                                                show, hashtag)
@@ -805,7 +806,7 @@ def source(api, status):
         url = "http://iqdb.org/?url=%s" % (str(image))
         soup = utils.scrape_site(url)
         if not soup:
-            return False, False, False
+            return "OFFLINE", "OFFLINE", "OFFLINE"
         if soup.find('th', text="No relevant matches"):
             return False, False, False
         site = None
@@ -910,6 +911,8 @@ def source(api, status):
     artist, series, names = info(tweeted_image)
     saucenao = u"http://saucenao.com/search.php?urlify=1&url={0}".format(
         str(tweeted_image))
+    if artist == "OFFLINE":
+        return "Unable to search for source! Try using SauceNAO: " + saucenao
     if not artist and not series and not names:
         return "No relevant source information found!\n" + saucenao
     else:
