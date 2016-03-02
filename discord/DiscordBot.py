@@ -148,18 +148,25 @@ async def on_message(message):
                            'ignore_channels': '',
                            'mods': ''}
         try:
-            await client.accept_invite(message)
-        except (discord.HTTPException, discord.InvalidArgument):
+            await client.accept_invite(message.content)
+            await client.send_message(message.channel, "Joined!")
+            return
+        except:
             # Invalid invite or not a invite at all
             pass
 
     if message.author == client.user:
         # Print own bot messages.
-        print("{} ({}) | {} ({}) - {}".format(message.server,
-                                              message.server.id,
-                                              message.author,
-                                              message.author.id,
-                                              message.content))
+        if message.server is None:
+            print("PM | {} ({}) - {}".format(message.author,
+                                             message.author.id,
+                                             message.content))
+        else:
+            print("{} ({}) | {} ({}) - {}".format(message.server,
+                                                  message.server.id,
+                                                  message.author,
+                                                  message.author.id,
+                                                  message.content))
         return
     if message.server is not None:
         # Server settings of where the message was sent from.
@@ -381,11 +388,19 @@ Per User:
     if command in NO_DISCORD_CMDS:
         # Completely ignore these.
         return
-    print("{} ({}) | {} ({}) - {}".format(message.server, message.server.id,
-                                          message.author, message.author.id,
-                                          message.content))
+    if message.server is None:
+        print("PM | {} ({}) - {}".format(message.author,
+                                         message.author.id,
+                                         message.content))
+    else:
+        print("{} ({}) | {} ({}) - {}".format(message.server,
+                                              message.server.id,
+                                              message.author,
+                                              message.author.id,
+                                              message.content))
     # Refreash the server's timeout.
-    CHANNEL_TIMEOUT[message.server.id] = time.time()
+    if message.server is not None:
+        CHANNEL_TIMEOUT[message.server.id] = time.time()
 
     # Can't do anything about this for now.
     # TODO: Add these when possible.
