@@ -706,7 +706,9 @@ def random_list(list_name, args="", DISCORD=False):
     path = "{0}/{1}".format(gender.lower(), path_name)
     tweet_image = utils.get_image(path)
     if scrape_images and not DISCORD or not tweet_image and not DISCORD:
-        tweet_image = utils.get_image_online(tags, 0, 1, "", path)
+        tweet_image_temp = utils.get_image_online(tags, 0, 1, "", path)
+        if tweet_image_temp is not False:
+            tweet_image = tweet_image_temp
 
     name = re.sub(r' \([^)]*\)', '', name)
     hashtag = ""  # TODO: Temp (testing with twitter)
