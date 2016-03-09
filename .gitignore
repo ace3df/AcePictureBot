@@ -27,7 +27,10 @@ patreon_users.txt
 Blocked Users.txt
 Blocked Words.txt
 Warned Users.txt
-*-*.txt
+*-sankakucomplex.txt
+*-danbooru.txt
+*-safebooru.txt
+*-gelbooru.txt
 users_waifus.json
 users_husbandos.json
 count.ini

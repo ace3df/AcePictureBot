@@ -2,24 +2,21 @@ import sys
 sys.path.append('..')
 from collections import OrderedDict
 from itertools import islice
+from threading import Thread
 import datetime
 import requests
 import socket
 import random
+import select
 import time
 import json
-import select
-
 import re
 import os
-from threading import Thread
 
-import traceback
-
-from config import settings
-from config import extra_api_keys
-from config import twitch_settings
 from utils import printf as print  # To make sure debug printing won't brake
+from config import twitch_settings
+from config import extra_api_keys
+from config import settings
 from utils import get_command
 import functions as func
 
@@ -32,18 +29,17 @@ __program__ = "AcePictureBot For Twitch Chat"
 __version__ = "1.0.0"
 
 
-def get_twitch_user_id(username):
-    # For mywaifu and stuff
-    # This will probs not happen here and will become a website
-    # with twitter and twitch account linking
-    url = r"https://api.twitch.tv/kraken/users/{}".format(username.replace("#",
-                                                                           ""))
+def get_twitter_id(twitch_username):
+    url = r"http://127.0.0.1:5000/get/" + twitch_username.lower()
     try:
-        json_data = requests.get(url).json()
-    except Exception as e:
-        print(e)
+        r = requests.get(url)
+    except:
         return False
-    return json_data['_id']
+    try:
+        return int(r.text)
+    except:
+        # Still not a int?
+        return False
 
 
 class TwitchIRC:
@@ -70,7 +66,8 @@ class TwitchIRC:
                   'allow_images': 'True',
                   'must_mention': 'False',
                   'rate_limit_level': '1',
-                  'ads': 'True'}
+                  'ads': 'True',
+                  'mywaifu': 'True'}
         func.config_save_2(to_add, section=channel,
                            file=twitch_settings['settings_file'])
         msg = "Hello, my name is AcePictureBot! - "\
@@ -118,11 +115,6 @@ class TwitchIRC:
             temp_settings = func.config_get_section_items(
                 channel,
                 twitch_settings['settings_file'])
-            print(temp_settings)
-            try:
-                temp_settings['ads']
-            except KeyError:
-                temp_settings['ads'] = "True"
             if temp_settings['ads'] == "True":
                 msg = random.choice(msgs)
                 while msg == last_sent:
@@ -231,6 +223,17 @@ class TwitchIRC:
                 edit_result = "False"
                 edit_section = "allow_images"
                 msg = "No image will be posted when using commands!"
+
+            if message.startswith("!apb mywaifu on"):
+                # Allow a user to use MyWaifu/Husbando in their chat (DEFAULT).
+                edit_result = "True"
+                edit_section = "mywaifu"
+                msg = "Users can now use MyWaifu and MyHusbando!"
+            elif message.startswith("!apb mywaifu off"):
+                # Don't post images along side commands.
+                edit_result = "False"
+                edit_section = "mywaifu"
+                msg = "Users can't use use MyWaifu and MyHusbando!"
 
             if message.startswith("!apb rate limit"):
                 # Change the level of users rate limits (Per User).
@@ -359,6 +362,45 @@ class TwitchIRC:
         elif command == "Husbando":
             msg, discord_image = func.waifu(1, msg, DISCORD=True)
 
+        if command == "WaifuRegister" or command == "HusbandoRegister":
+            msg = "You can only register on Twitter! http://twitter.com/AcePictureBot and then connect your account here: URL HERE"
+
+        if command == "MyWaifu" or command == "MyHusbando":
+            if command == "MyWaifu":
+                gender = "Waifu"
+            else:
+                gender = "Husbando"
+            twitter_id = get_twitter_id(user)
+            if not twitter_id:
+                # Site failed.
+                return
+            if twitter_id == "Not Found!":
+                msg = "Couldn't find your {gender}! Register your {gender} on Twitter (Follow: http://ace3df.github.io/AcePictureBot/commands/) and then link your account: URL HERE".format(gender=gender)
+            else:
+                # Legit id
+                if command == "MyWaifu":
+                    gender_id = 0
+                else:
+                    gender_id = 1
+                skip_dups = False
+                if "my{gender}+".format(gender=gender.lower()) in message.lower():
+                    skip_dups = True
+                msg, discord_image = func.mywaifu(twitter_id, gender_id, True, skip_dups)
+                if "I don't know" in msg:
+                    msg = "Couldn't find your {gender}! Register your {gender} on Twitter (http://ace3df.github.io/AcePictureBot/commands/) and then link your account: URL HERE".format(gender=gender)
+                elif not discord_image:
+                    msg = "Sorry failed to get a new image! Use the command on Twitter to help the bot store more images! You can also use My{gender}+ to skip checking for an already used image!".format(gender=gender)
+                else:
+                    msg = ' '.join(re.sub("(#[A-Za-z0-9]+)", " ", msg).split())
+                    msg = "@{0}'s {1}".format(user, msg)
+                    if channel_settings['allow_images'] and discord_image:
+                        discord_image = self.upload_image(discord_image)
+                        if discord_image:
+                            msg = msg + " | " + discord_image
+                    self.send_message(channel, msg)
+                    return
+
+
         if command == "OTP":
             msg, discord_image = func.otp(msg)
 
@@ -410,11 +452,11 @@ if __name__ == "__main__":
                        "Spoiler", "Airing"]
     # Commands that will be added once Discord finishes Twitter linking
     LATER_DISCORD_CMDS = ["WaifuRegister", "HusbandoRegister",
-                          "MyWaifu", "MyHusbando",
                           "WaifuRemove", "HusbandoRemove",
                           "!Level"]
 
     RATE_LIMIT_DICT = {}
+    RATE_LIMIT_DICT_MYWAIFU = {}
     CHANNEL_TIMEOUT = {}
     USER_LAST_COMMAND = OrderedDict()
     try:

@@ -324,7 +324,8 @@ def waifu(gender, args="", otp=False, DISCORD=False):
     return m, tweet_image
 
 
-def mywaifu(user_id, gender):
+def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
+    tweet_image = False
     if gender == 0:
         gender = "Waifu"
         filename = "users_waifus.json"
@@ -355,13 +356,24 @@ def mywaifu(user_id, gender):
                         word_boundary=True, separator="_")
     path = os.path.join(settings['image_loc'],
                         gender.lower(), path_name)
-    ignore_list = "user_ignore/{0}".format(user['twitter_id'])
-    tweet_image = utils.get_image_online(tags, user['web_index'],
-                                         max_page, ignore_list)
+    if DISCORD:
+        ignore_list = "user_ignore/discord_{0}".format(user['twitter_id'])
+        tweet_image = utils.get_image(path, ignore_list)
+    else:
+        ignore_list = "user_ignore/{0}".format(user['twitter_id'])
+
+    if not DISCORD:
+        tweet_image = utils.get_image_online(tags, user['web_index'],
+                                             max_page, ignore_list,
+                                             path=path)
     if not tweet_image:
         tweet_image = utils.get_image(path, ignore_list)
+
+    if not tweet_image and SKIP_DUP_CHECK:
+        tweet_image = utils.get_image(path)
+
     if not tweet_image:
-        m = ("Failed to get an image (website could be offline).\n"
+        m = ("Failed to get a new image!\n The main image website could be offline.\n"
              "Help: {0}").format(config_get('Help URLs', 'website_offline'))
         remove_one_limit(user_id, "my" + gender.lower())
         return m, False
@@ -369,6 +381,10 @@ def mywaifu(user_id, gender):
         m = "#{0}Wednesday".format(gender)
     else:
         m = "#{0}AnyDay".format(gender)
+    if DISCORD:
+        # @user's x is x
+        m = " {gender} is {name}!".format(
+            gender=gender, name=user['name'].replace("_", " ").title())
     return m, tweet_image
 
 
