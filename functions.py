@@ -344,10 +344,10 @@ def delete_used_imgs(twitter_id, DISCORD=False):
     if DISCORD:
         path = os.path.join(settings['ignore_loc'],
                             "user_ignore/discord_{0}".format(
-                            user['twitter_id']))
+                            twitter_id))
     else:
         path = os.path.join(settings['ignore_loc'],
-                            "user_ignore/{0}".format(user['twitter_id']))
+                            "user_ignore/{0}".format(twitter_id))
     try:
         os.remove(path)
     except:
