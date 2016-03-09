@@ -47,7 +47,7 @@ def get_twitter_id(discord_id):
 async def create_twitter_token(user):
     ran = ''.join(random.choice(
         string.ascii_lowercase + string.digits) for _ in range(5))
-    file_with_id = os.path.join(discord_settings['token_loc'], ran, '.txt')
+    file_with_id = os.path.join(discord_settings['token_loc'], ran + '.txt')
     if os.path.isfile(file_with_id):
         pass
     else:
@@ -543,6 +543,8 @@ http://twitter.com/acepicturebot""".format(command)
             skip_dups = False
             if "my{gender}+".format(gender=gender.lower()) in message.content.lower():
                 skip_dups = True
+            if "my{gender}-".format(gender=gender.lower()) in message.content.lower():
+                func.delete_used_imgs(twitter_id, True)
             msg, discord_image = func.mywaifu(twitter_id, gender_id,
                                               True, skip_dups)
             if "I don't know" in msg:
@@ -553,10 +555,10 @@ http://twitter.com/acepicturebot""".format(command)
                       "Use the command on Twitter to help the bot store "\
                       "more images! You can also use My{gender}+ to skip "\
                       "checking for an already "\
-                      "used image!".format(gender=gender)
+                      "used image or My{gender}- to start from fresh!".format(gender=gender)
             else:
                 msg = ' '.join(re.sub("(#[A-Za-z0-9]+)", " ", msg).split())
-                msg = "@{0.author.mention}'s {1}".format(message, msg)
+                msg = "{0.author.mention}'s {1}".format(message, msg)
                 try:
                     await client.send_message(message.channel, msg)
                 except:

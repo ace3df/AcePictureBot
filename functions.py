@@ -340,6 +340,20 @@ def waifu(gender, args="", otp=False, DISCORD=False):
     return m, tweet_image
 
 
+def delete_used_imgs(twitter_id, DISCORD=False):
+    if DISCORD:
+        path = os.path.join(settings['ignore_loc'],
+                            "user_ignore/discord_{0}".format(
+                            user['twitter_id']))
+    else:
+        path = os.path.join(settings['ignore_loc'],
+                            "user_ignore/{0}".format(user['twitter_id']))
+    try:
+        os.delete(path)
+    except:
+        pass
+
+
 def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
     tweet_image = False
     if gender == 0:

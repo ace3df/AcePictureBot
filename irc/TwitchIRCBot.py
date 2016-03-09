@@ -387,11 +387,13 @@ class TwitchIRC:
                 skip_dups = False
                 if "my{gender}+".format(gender=gender.lower()) in message.lower():
                     skip_dups = True
+                if "my{gender}-".format(gender=gender.lower()) in message.lower():
+                    func.delete_used_imgs(twitter_id, True)
                 msg, discord_image = func.mywaifu(twitter_id, gender_id, True, skip_dups)
                 if "I don't know" in msg:
                     msg = "Couldn't find your {gender}! Register your {gender} on Twitter (http://ace3df.github.io/AcePictureBot/commands/) and then link your account: {url}".format(gender=gender, url=twitch_settings['url_start'])
                 elif not discord_image or discord_image is None:
-                    msg = "Sorry failed to get a new image! Use the command on Twitter to help the bot store more images! You can also use My{gender}+ to skip checking for an already used image!".format(gender=gender)
+                    msg = "Sorry failed to get a new image! Use the command on Twitter to help the bot store more images! You can also use My{gender}+ to skip checking for an already used image or My{gender}- to start from fresh!".format(gender=gender)
                 else:
                     msg = ' '.join(re.sub("(#[A-Za-z0-9]+)", " ", msg).split())
                     msg = "@{0}'s {1}".format(user, msg)
