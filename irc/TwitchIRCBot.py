@@ -30,7 +30,7 @@ __version__ = "1.0.0"
 
 
 def get_twitter_id(twitch_username):
-    url = r"http://127.0.0.1:5000/get/" + twitch_username.lower()
+    url = twitch_settings['url_start'] + "get/" + twitch_username.lower()
     try:
         r = requests.get(url)
     except:
@@ -363,7 +363,7 @@ class TwitchIRC:
             msg, discord_image = func.waifu(1, msg, DISCORD=True)
 
         if command == "WaifuRegister" or command == "HusbandoRegister":
-            msg = "You can only register on Twitter! http://twitter.com/AcePictureBot and then connect your account here: URL HERE"
+            msg = "You can only register on Twitter! http://twitter.com/AcePictureBot and then connect your account here: {}".format(twitch_settings['url_start'])
 
         if command == "MyWaifu" or command == "MyHusbando":
             if command == "MyWaifu":
@@ -375,7 +375,7 @@ class TwitchIRC:
                 # Site failed.
                 return
             if twitter_id == "Not Found!":
-                msg = "Couldn't find your {gender}! Register your {gender} on Twitter (Follow: http://ace3df.github.io/AcePictureBot/commands/) and then link your account: URL HERE".format(gender=gender)
+                msg = "Couldn't find your {gender}! Register your {gender} on Twitter (Follow: http://ace3df.github.io/AcePictureBot/commands/) and then link your account: {url}".format(gender=gender, url=twitch_settings['url_start'])
             else:
                 # Legit id
                 if command == "MyWaifu":
@@ -387,7 +387,7 @@ class TwitchIRC:
                     skip_dups = True
                 msg, discord_image = func.mywaifu(twitter_id, gender_id, True, skip_dups)
                 if "I don't know" in msg:
-                    msg = "Couldn't find your {gender}! Register your {gender} on Twitter (http://ace3df.github.io/AcePictureBot/commands/) and then link your account: URL HERE".format(gender=gender)
+                    msg = "Couldn't find your {gender}! Register your {gender} on Twitter (http://ace3df.github.io/AcePictureBot/commands/) and then link your account: {url}".format(gender=gender, url=twitch_settings['url_start'])
                 elif not discord_image:
                     msg = "Sorry failed to get a new image! Use the command on Twitter to help the bot store more images! You can also use My{gender}+ to skip checking for an already used image!".format(gender=gender)
                 else:
