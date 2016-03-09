@@ -349,8 +349,9 @@ def delete_used_imgs(twitter_id, DISCORD=False):
         path = os.path.join(settings['ignore_loc'],
                             "user_ignore/{0}".format(user['twitter_id']))
     try:
-        os.delete(path)
+        os.remove(path)
     except:
+        # No list found
         pass
 
 
