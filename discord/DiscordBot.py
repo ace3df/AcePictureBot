@@ -6,6 +6,8 @@ import datetime
 import asyncio
 import time
 import json
+import string
+import random
 import re
 import os
 
@@ -18,20 +20,42 @@ import discord
 
 # start_private_message(user)
 __program__ = "AcePictureBot For Discord"
-__version__ = "1.0.2"
+__version__ = "1.0.5"
 
 client = discord.Client()
 # Commands not while using through discord.
-NO_DISCORD_CMDS = ["Source", "DelLimits", "SetBirthday", "Spoiler"]
+NO_DISCORD_CMDS = ["Source", "DelLimits", "SetBirthday", "Spoiler", "DiscordConnect"]
 # Commands that will be added once Discord finishes Twitter linking
-LATER_DISCORD_CMDS = ["WaifuRegister", "HusbandoRegister",
-                      "MyWaifu", "MyHusbando",
-                      "WaifuRemove", "HusbandoRemove",
+LATER_DISCORD_CMDS = ["WaifuRemove", "HusbandoRemove",
                       "!Level"]
 
 RATE_LIMIT_DICT = {}
 CHANNEL_TIMEOUT = {}
 USER_LAST_COMMAND = OrderedDict()
+
+
+def get_twitter_id(discord_id):
+    acc_list = open(discord_settings['acc_file'], 'r').read().splitlines()
+    for acc in acc_list:
+        # acc[0] Twitter | acc[1] Discord ID
+        acc = acc.split("||")
+        if discord_id.lower() == acc[1].lower():
+            return acc[0]
+    return "Not Found!"
+
+
+async def create_twitter_token(user):
+    ran = ''.join(random.choice(
+        string.ascii_lowercase + string.digits) for _ in range(5))
+    file_with_id = os.path.join(discord_settings['token_loc'], ran, '.txt')
+    if os.path.isfile(file_with_id):
+        pass
+    else:
+        open(file_with_id, 'w').write(user.id)
+    msg = "Link your account by tweeting to http://twitter.com/AcePictureBot"\
+          "\n@AcePictureBot DiscordConnect " + ran
+
+    await client.send_message(user, msg)
 
 
 async def say_welcome_message(server=False, message=False):
@@ -59,6 +83,7 @@ async def say_welcome_message(server=False, message=False):
               'must_mention': 'False',
               'rate_limit_level': '1',
               'ignore_channels': '',
+              'mywaifu': 'True',
               'mods': str(server.owner.id)}
     func.config_save_2(to_add, section=server.id,
                        file=discord_settings['server_settings'])
@@ -146,6 +171,7 @@ async def on_message(message):
                            'must_mention': 'False',
                            'rate_limit_level': '1',
                            'ignore_channels': '',
+                           'mywaifu': 'True',
                            'mods': ''}
         try:
             await client.accept_invite(message.content)
@@ -153,7 +179,13 @@ async def on_message(message):
             return
         except:
             # Invalid invite or not a invite at all
-            pass
+            # Send basic help message.
+            if "help" in message.content[0:10]:
+                await client.send_message(
+                    message.channel,
+                    """Commands: http://ace3df.github.io/AcePictureBot/commands/
+        Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
+                return
 
     if message.author == client.user:
         # Print own bot messages.
@@ -218,6 +250,17 @@ Current Channel ID: {0.channel.id}""".format(message)
             edit_result = "False"
             edit_section = "allow_images"
             msg = "No image will be posted when using commands!"
+
+        if message.content.startswith("!apb mywaifu on"):
+            # Allow a user to use MyWaifu/Husbando in their chat (DEFAULT).
+            edit_result = "True"
+            edit_section = "mywaifu"
+            msg = "Users can now use MyWaifu and MyHusbando!"
+        elif message.content.startswith("!apb mywaifu off"):
+            # Don't post images along side commands.
+            edit_result = "False"
+            edit_section = "mywaifu"
+            msg = "Users can't use use MyWaifu and MyHusbando!"
 
         if message.content.startswith("!apb mention on"):
             # They will have to mentiont he bot to use a command.
@@ -460,11 +503,74 @@ http://twitter.com/acepicturebot""".format(command)
 
     msg = msg.lower().replace(command.lower(), " ", 1).strip()
     discord_image = False
+
     # Main Commands
     if command == "Waifu":
         msg, discord_image = func.waifu(0, msg, DISCORD=True)
     elif command == "Husbando":
         msg, discord_image = func.waifu(1, msg, DISCORD=True)
+
+    if command == "WaifuRegister" or command == "HusbandoRegister":
+        msg = "You can only register on Twitter! "\
+              "http://twitter.com/AcePictureBot and then connect your "\
+              "account here: {}".format(discord_settings['url_start'])
+
+    if command == "MyWaifu" or command == "MyHusbando":
+        if message.server is None:
+            pass
+        if server_settings.get('mywaifu', 'True') == "False":
+            return
+        if command == "MyWaifu":
+            gender = "Waifu"
+        else:
+            gender = "Husbando"
+        twitter_id = get_twitter_id(message.author.id)
+        if twitter_id == "Not Found!":
+            msg = "Couldn't find your {gender}! "\
+                  "Register your {gender} on Twitter "\
+                  "(Follow: http://ace3df.github.io/AcePictureBot/commands/) "\
+                  "and then link your account using the ID that has been PM'd"\
+                  " to you!".format(gender=gender)
+            await client.send_message(message.channel, msg)
+            await create_twitter_token(message.author)
+            return
+        else:
+            # Legit id
+            if command == "MyWaifu":
+                gender_id = 0
+            else:
+                gender_id = 1
+            skip_dups = False
+            if "my{gender}+".format(gender=gender.lower()) in message.content.lower():
+                skip_dups = True
+            msg, discord_image = func.mywaifu(twitter_id, gender_id,
+                                              True, skip_dups)
+            if "I don't know" in msg:
+                msg = "Couldn't find your {gender}! Register your {gender} on "\
+                      " Twitter (http://ace3df.github.io/AcePictureBot/commands/) first!"
+            elif not discord_image or discord_image is None:
+                msg = "Sorry failed to get a new image! "\
+                      "Use the command on Twitter to help the bot store "\
+                      "more images! You can also use My{gender}+ to skip "\
+                      "checking for an already "\
+                      "used image!".format(gender=gender)
+            else:
+                msg = ' '.join(re.sub("(#[A-Za-z0-9]+)", " ", msg).split())
+                msg = "@{0.author.mention}'s {1}".format(message, msg)
+                try:
+                    await client.send_message(message.channel, msg)
+                except:
+                    # discord.errors.Forbidden ?
+                    pass
+                if server_settings['allow_images'] and discord_image:
+                    try:
+                        await client.send_file(message.channel, open(discord_image, 'rb'))
+                    except:
+                        # discord.errors.Forbidden ?
+                        # Channel doesn't allow image uploading
+                        pass
+                return
+
 
     if command == "OTP":
         msg, discord_image = func.otp(msg)

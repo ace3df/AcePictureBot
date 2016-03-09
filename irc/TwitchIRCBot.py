@@ -451,10 +451,9 @@ if __name__ == "__main__":
 
     # Commands not while using through discord.
     NO_DISCORD_CMDS = ["Source", "DelLimits", "SetBirthday",
-                       "Spoiler", "Airing"]
+                       "Spoiler", "Airing", "DiscordConnect"]
     # Commands that will be added once Discord finishes Twitter linking
-    LATER_DISCORD_CMDS = ["WaifuRegister", "HusbandoRegister",
-                          "WaifuRemove", "HusbandoRemove",
+    LATER_DISCORD_CMDS = ["WaifuRemove", "HusbandoRemove",
                           "!Level"]
 
     RATE_LIMIT_DICT = {}

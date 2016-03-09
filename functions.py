@@ -219,6 +219,22 @@ def count_trigger(command, user_id="failed"):
         config_save(user_id, command, user_cur_count, 1)
 
 
+def DiscordConnect(str_id, user_id):
+    from config import discord_settings
+    # Make sure to clean up
+    token_path = os.path.join(discord_settings['token_loc'], str_id + '.txt')
+    if os.path.isfile(token_path):
+        discord_id = open(token_path, 'r').read()
+        acc_list = open(discord_settings['acc_file'], 'r').read().splitlines()
+        acc_list.append("{}||{}".format(user_id, discord_id))
+        open(discord_settings['acc_file'], 'w').write("\n".join(acc_list))
+        os.remove(token_path)
+        return "You can now use MyWaifu / MyHusbando on Discord!"
+    else:
+        # Invalid token
+        return "Your Token ID was invalid!"
+
+
 def get_level(user_id):
     return "Level has been temp disabled for now!"
     cmd_exp = {'default': 1,
@@ -338,9 +354,9 @@ def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
     user_waifus = json.load(user_waifus_file)
     user_waifus_file.close()
     for user in user_waifus['users']:
-        if int(user['twitter_id']) == user_id:
+        if int(user['twitter_id']) == int(user_id):
             break
-    if int(user['twitter_id']) != user_id:
+    if int(user['twitter_id']) != int(user_id):
         count_trigger("mywaifu")
         m = ("I don't know who your {0} is!\n"
              "Use {1}Register!\n"

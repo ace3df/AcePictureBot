@@ -25,3 +25,4 @@ Monstergirl
 Witchgirl
 Tankgirl
 Reroll
+DiscordConnect

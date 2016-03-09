@@ -19,7 +19,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.5.1"
+__version__ = "2.6.0"
 DEBUG = False
 
 
@@ -80,6 +80,9 @@ def tweet_command(_API, status, tweet, command):
                 return False
     if settings['count_on']:
         func.count_trigger(command, user.id)
+
+    if command == "DiscordConnect":
+        tweet = func.DiscordConnect(tweet, user.id)
 
     # Joke Commands
     if command == "spook":
