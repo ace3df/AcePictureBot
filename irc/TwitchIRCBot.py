@@ -39,7 +39,7 @@ def get_twitter_id(twitch_username):
         return int(r.text)
     except:
         # Still not a int?
-        return False
+        return "Not Found!"
 
 
 class TwitchIRC:
@@ -366,6 +366,8 @@ class TwitchIRC:
             msg = "You can only register on Twitter! http://twitter.com/AcePictureBot and then connect your account here: {}".format(twitch_settings['url_start'])
 
         if command == "MyWaifu" or command == "MyHusbando":
+            if channel_settings['mywaifu'] == "False":
+                return
             if command == "MyWaifu":
                 gender = "Waifu"
             else:
@@ -388,7 +390,7 @@ class TwitchIRC:
                 msg, discord_image = func.mywaifu(twitter_id, gender_id, True, skip_dups)
                 if "I don't know" in msg:
                     msg = "Couldn't find your {gender}! Register your {gender} on Twitter (http://ace3df.github.io/AcePictureBot/commands/) and then link your account: {url}".format(gender=gender, url=twitch_settings['url_start'])
-                elif not discord_image:
+                elif not discord_image or discord_image is None:
                     msg = "Sorry failed to get a new image! Use the command on Twitter to help the bot store more images! You can also use My{gender}+ to skip checking for an already used image!".format(gender=gender)
                 else:
                     msg = ' '.join(re.sub("(#[A-Za-z0-9]+)", " ", msg).split())
