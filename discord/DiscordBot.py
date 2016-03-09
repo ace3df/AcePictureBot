@@ -512,8 +512,7 @@ http://twitter.com/acepicturebot""".format(command)
 
     if command == "WaifuRegister" or command == "HusbandoRegister":
         msg = "You can only register on Twitter! "\
-              "http://twitter.com/AcePictureBot and then connect your "\
-              "account here: {}".format(discord_settings['url_start'])
+              "http://twitter.com/AcePictureBot"
 
     if command == "MyWaifu" or command == "MyHusbando":
         if message.server is None:
