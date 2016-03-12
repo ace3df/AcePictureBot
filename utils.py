@@ -429,6 +429,8 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
                     if "/posts/" not in link['href']:
                         continue
                 elif site == 2:
+                    if "forum" in link['href']:
+                        continue
                     if "&id=" not in link['href']:
                         continue
                 elif site == 3:
