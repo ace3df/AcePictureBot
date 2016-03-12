@@ -1027,4 +1027,4 @@ def check_website():
                 # Site is online. Turn it back on.
                 if websites[website] == "False":
                     config_save('Websites', website, 'True', file=0)
-        time.sleep(15 * 60)
+        time.sleep(5 * 60)
