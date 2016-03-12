@@ -424,7 +424,8 @@ def waifuregister(user_id, username, name, gender):
     config.read(settings['settings'])
     help_urls = (dict(config.items('Help URLs')))
     if config_get('Websites', 'sankakucomplex') == "False":
-        m = "Some websites are offline. Try again later!"
+        m = "Some websites are offline to get you images."\
+            "\nTry registering again later!"
         if gender == 0:
             gender = "Waifu"
         elif gender == 1:

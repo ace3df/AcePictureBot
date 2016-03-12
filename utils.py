@@ -114,6 +114,19 @@ def scrape_site(url, cookie_file=""):
                 form[form_password].value = password
                 browser.submit_form(form)
                 s.cookies.save()
+            elif "gelbooru.com" in url:
+                url_login = "http://gelbooru.com/index.php?page=account&s=login&code=00"
+                form_num = 0
+                form_user = "user"
+                form_password = "pass"
+                username = website_logins['gelbooru_username']
+                password = website_logins['gelbooru_password']
+                browser.open(url_login)
+                form = browser.get_form(form_num)
+                form[form_user].value = username
+                form[form_password].value = password
+                browser.submit_form(form)
+                s.cookies.save()
     browser = RoboBrowser(session=s,
                           parser='html5lib',
                           timeout=10)
