@@ -100,7 +100,7 @@ def scrape_site(url, cookie_file=""):
                 os.remove(cookie_file)
             browser = RoboBrowser(session=s,
                                   parser='html5lib',
-                                  timeout=15)
+                                  timeout=10)
             if "sankakucomplex.com" in url:
                 url_login = "https://chan.sankakucomplex.com/user/login/"
                 form_num = 0
@@ -116,7 +116,7 @@ def scrape_site(url, cookie_file=""):
                 s.cookies.save()
     browser = RoboBrowser(session=s,
                           parser='html5lib',
-                          timeout=15)
+                          timeout=10)
     try:
         browser.open(url)
         return browser

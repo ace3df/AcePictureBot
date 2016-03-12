@@ -1022,9 +1022,11 @@ def check_website():
             browser = utils.scrape_site(ping_url)
             if not browser or browser is False:
                 # Website is offline/timed out.
+                print("$ Website {0} has been set to offline!".format(website))
                 config_save('Websites', website, 'False', file=0)
             else:
                 # Site is online. Turn it back on.
                 if websites[website] == "False":
+                    print("$ Website {0} has been set to online!".format(website))
                     config_save('Websites', website, 'True', file=0)
         time.sleep(5 * 60)
