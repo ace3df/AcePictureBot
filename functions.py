@@ -1002,6 +1002,7 @@ def check_website():
     """Check to make sure websites are online.
     If they're not change the settings.ini to say False.
     Use a url that will make the website query and not a cached page."""
+    import time
     config = configparser.RawConfigParser(allow_no_value=True)
     config.read(settings['settings'])
     websites = (dict(config.items('Websites')))
