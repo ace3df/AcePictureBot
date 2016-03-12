@@ -68,7 +68,8 @@ def tweet_command(_API, status, tweet, command):
         return False, False
     if str(user.id) not in PATREON_IDS:
         if not is_mod:
-            user_is_limited = user_spam_check(user.id, user.screen_name, command)
+            user_is_limited = user_spam_check(user.id,
+                                              user.screen_name, command)
             if isinstance(user_is_limited, str):
                 # User hit limit, tweet warning
                 command = ""
@@ -101,16 +102,16 @@ def tweet_command(_API, status, tweet, command):
         tweet, tweet_image = func.waifu(1, tweet)
 
     gender = utils.gender(status.text)
+    if gender == 0:
+        g_str = "waifu"
+    else:
+        g_str = "husbando"
     if "Register" in command:
         follow_result = is_following(user.id)
         if follow_result == "Limited":
             tweet = ("The bot is currently limited on checking stuff.\n"
                      "Try again in 15 minutes!")
-            if gender == 0:
-                gender = "waifu"
-            else:
-                gender = "husbando"
-            func.remove_one_limit(user.id, gender.lower() + "register")
+            func.remove_one_limit(user.id, g_str.lower() + "register")
         elif follow_result == "Not Genuine":
             tweet = ("Your account wasn't found to be genuine.\n"
                      "Help: {url}").format(
@@ -125,7 +126,12 @@ def tweet_command(_API, status, tweet, command):
                                                     tweet, gender)
 
     if "My" in command:
-        tweet, tweet_image = func.mywaifu(user.id, gender)
+        skip_dups = False
+        if "my{g_str}+".format(g_str=g_str) in tweet.lower():
+            skip_dups = True
+        if "my{g_str}-".format(g_str=g_str) in tweet.lower():
+            func.delete_used_imgs(str(user.id), False)
+        tweet, tweet_image = func.mywaifu(user.id, gender, False, skip_dups)
 
     if "Remove" in command:
         tweet = func.waifuremove(user.id, gender)
@@ -170,7 +176,7 @@ def acceptable_tweet(status):
         return False, False
 
     if DEBUG:
-        if user.id not in MOD_IDS:
+        if str(user.id) not in MOD_IDS:
             return False, False
 
     # Reload in case of manual updates.
@@ -208,12 +214,13 @@ def acceptable_tweet(status):
     # Remove @UserNames (usernames could trigger commands alone)
     tweet = tweet.replace("🚢👧", "Shipgirl")
     tweet = ' '.join(
-            re.sub('(^|\n| )(@[A-Za-z0-9_🚢👧.]+)', ' ', tweet).split())
+            re.sub('(^|\n| )(@[A-Za-z0-9_🚢👧.+-]+)', ' ', tweet).split())
     tweet = tweet.replace("#", "")
 
     # Find the command they used.
     command = utils.get_command(tweet)
-    if command == "WaifuRegister" or command == "HusbandoRegister":
+    if command == "WaifuRegister" or command == "HusbandoRegister" \
+            or command == "DiscordConnect":
         # Cut the text off after the command word.
         reg = "({0})(?i)".format(command)
         if len(tweet) > (len(command) +
@@ -236,15 +243,17 @@ def acceptable_tweet(status):
 
     if command == "Reroll":
         try:
-            command = USER_LAST_COMMAND[user.id]
+            command = utils.get_command(USER_LAST_COMMAND[user.id])
             if "Register" in command:
                 return False, False
             elif "My" in command:
                 return False, False
+            elif command is False:
+                return False, False
         except (ValueError, KeyError):
             return False, False
     else:
-        USER_LAST_COMMAND[user.id] = command
+        USER_LAST_COMMAND[user.id] = tweet
         if len(USER_LAST_COMMAND) > 30:
             USER_LAST_COMMAND = (OrderedDict(
                 islice(USER_LAST_COMMAND.items(),
@@ -256,7 +265,7 @@ def acceptable_tweet(status):
     rate_limit_user = 20
     if str(user.id) in PATREON_IDS:
         # Still a limit just in case
-        rate_limit_user = 50
+        rate_limit_user = 35
     if user.id in RATE_LIMIT_DICT:
         # User is now limited (3 hours).
         if ((rate_time - RATE_LIMIT_DICT[user.id][0])
@@ -360,7 +369,7 @@ def status_account(status_api):
                     "get_href": True,
                     "msg_id": "{http://www.w3.org/2005/Atom}content"}
         read_rss(url, name, pre_msg, find_xml)
-        time.sleep(300)
+        time.sleep(3 * 60)
 
 
 class CustomStreamListener(tweepy.StreamListener):
@@ -487,7 +496,7 @@ if __name__ == '__main__':
     HAD_ERROR = False
     LAST_STATUS_CODE = 0
     TWEETS_READ = []
-    MOD_IDS = [2780494890, 121144139]
+    MOD_IDS = ["2780494890", "121144139"]
     RATE_LIMIT_DICT = {}
     USER_LAST_COMMAND = OrderedDict()
     START_TIME = time.time()
@@ -499,11 +508,11 @@ if __name__ == '__main__':
         os.path.join(settings['ignore_loc'],
                      "tweets_read.txt"))
     # TODO: TEMP (Read above)
-
     open(update['last_crash_file'], 'w')
     API = func.login(rest=True)
     SAPI = func.login(rest=False)
     STATUS_API = func.login(status=True)
     read_notifications(API, True, TWEETS_READ)
     Thread(target=status_account, args=(STATUS_API, )).start()
+    Thread(target=func.check_website).start()
     handle_stream(SAPI, STATUS_API)

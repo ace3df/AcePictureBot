@@ -404,7 +404,7 @@ def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
         tweet_image = utils.get_image(path)
 
     if not tweet_image:
-        m = ("Failed to get a new image!\n The main image website could be offline.\n"
+        m = ("Failed to grab a new image!\nThe main image website could be offline.\n"
              "Help: {0}").format(config_get('Help URLs', 'website_offline'))
         remove_one_limit(user_id, "my" + gender.lower())
         return m, False
@@ -884,7 +884,7 @@ def source(api, status):
             return False, False, False
         soup = utils.scrape_site(url)
         if not soup:
-            return False, False, False
+            return "OFFLINE", "OFFLINE", "OFFLINE"
         try:
             if site == 0:
                 # Sankaku
@@ -996,3 +996,34 @@ def spookjoke():
     m = "Oh oh! Looks like your command was stolen by {0}!! #Sp00ky".format(
         name)
     return m, tweet_image
+
+
+def check_website():
+    """Check to make sure websites are online.
+    If they're not change the settings.ini to say False.
+    Use a url that will make the website query and not a cached page."""
+    config = configparser.RawConfigParser(allow_no_value=True)
+    config.read(settings['settings'])
+    websites = (dict(config.items('Websites')))
+    while True:
+        for website in websites:
+            browser = False
+            if website == "sankakucomplex":
+                ping_url = r"https://chan.sankakucomplex.com/?tags=1girl+rating%3Asafe+solo&commit=Search"
+            elif website == "safebooru":
+                ping_url = r"http://safebooru.org/index.php?page=post&s=list&tags=c.c.+1girl"
+            elif website == "danbooru":
+                continue
+            elif website == "yande":
+                continue
+            elif website == "konachan":
+                continue
+            browser = utils.scrape_site(ping_url)
+            if not browser or browser is False:
+                # Website is offline/timed out.
+                config_save('Websites', website, 'False', file=0)
+            else:
+                # Site is online. Turn it back on.
+                if websites[website] == "False":
+                    config_save('Websites', website, 'True', file=0)
+        time.sleep(15 * 60)

@@ -279,8 +279,8 @@ def get_image_online(tags, site=0, high_page=10, ignore_list="", path=""):
     websites = (dict(config.items('Websites')))
     blacklisted_tags = (config.get('Settings', 'blacklisted_tags')).split(', ')
     if websites['sankakucomplex'] == "False" and site == 0:
-        site = 1
-    if websites['danbooru'] == "False" and site == 1:
+        site = 2
+    if websites['safebooru'] == "False" and site == 2:
         site = 0
     if ignore_list:
         try:

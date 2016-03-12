@@ -18,6 +18,7 @@ cronjobs/
 
 mal_list.py
 run.bat
+settings.ini
 twitch_settings.ini
 server_settings.ini
 config.py
