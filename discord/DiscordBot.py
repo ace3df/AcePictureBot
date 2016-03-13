@@ -122,6 +122,28 @@ async def timeout_channel():
         await asyncio.sleep(360)
 
 
+async def rss_twitter():
+    """Check each server to see if they want a bot to post into their server."""
+    await client.wait_until_ready()
+    BOT_ACCS = ["AcePictureBot", "AceEcchiBot", "AceYuriBot",
+                "AceYaoiBot", "AceNSFWBot", "AceAnimatedBot",
+                "AceCatgirlBot"]
+    LAST_POSTED_PIC = {} # server = [[bot, tweet id], [bot, tweet idz]]
+    while not client.is_closed:
+        for server in client.servers:
+            if server.id == "81515992412327936":
+                # Don't timeout own channel
+                continue
+            server_settings = func.config_get_section_items(
+                    server.id,
+                    discord_settings['server_settings'])
+            for sec in server_settings:
+                if sec in BOT_ACCS:
+                    url = r"https://twitrss.me/twitter_user_to_rss/?user=" + sec
+
+        await asyncio.sleep(60)
+
+
 @client.event
 async def on_server_remove(server):
     """Called when kicked or left the server.
@@ -184,7 +206,7 @@ async def on_message(message):
                 await client.send_message(
                     message.channel,
                     """Commands: http://ace3df.github.io/AcePictureBot/commands/
-        Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
+Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
                 return
 
     if message.author == client.user:
@@ -547,8 +569,9 @@ http://twitter.com/acepicturebot""".format(command)
             msg, discord_image = func.mywaifu(twitter_id, gender_id,
                                               True, skip_dups)
             if "I don't know" in msg:
-                msg = "Couldn't find your {gender}! Register your {gender} on "\
-                      " Twitter (http://ace3df.github.io/AcePictureBot/commands/) first!"
+                msg = "Couldn't find your {gender}! "\
+                      "Register your {gender} on Twitter "\
+                      "(Follow: http://ace3df.github.io/AcePictureBot/commands/)".format(gender=gender)
             elif not discord_image or discord_image is None:
                 msg = "Sorry failed to get a new image! "\
                       "Use the command on Twitter to help the bot store "\
