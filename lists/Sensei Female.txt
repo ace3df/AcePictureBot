@@ -31,14 +31,14 @@ Sengoku Chihiro||Sakurasou no Pet na Kanojo
 Matsumoto yoriko||Yuyushiki
 Kiryuu yuuzuki||Kiss x Sis
 Sakurai Izumi||Nichijou
-Sakuragawa kikue||Acchi Kocchi
+Sakuragawa Kikue||Acchi Kocchi
 Myers||Magi
 Yamuraiha||Magi
-Saitou aiko||Hinryaku! Ikamusume
+Saitou Aiko||Hinryaku! Ikamusume
 Sakura Karasuma||Kin-iro Mosaic
-Sako makoto||Devil Survivor 2 The Animation
-Yanagiya otome||Devil Survivor 2 The Animation
-Nagase jun||Kami nomi zo Shiru Sekai
+Sako Makoto||Devil Survivor 2 The Animation
+Yanagiya Otome||Devil Survivor 2 The Animation
+Nagase Jun||Kami nomi zo Shiru Sekai
 Ariel Valtiel Westcott||Genei wo Kakeru Taiyou
 ashigara (kantai Collection)||Kantai Collection
 Kakazu Chieko||Kenzen Robo Daimidaler
@@ -80,3 +80,4 @@ Akatsuki Mimori||Strike the Blood
 Minamiya Natsuki||Strike the Blood
 Oriotorai Makiko||Kyoukaisenjou no Horizon
 Yagami Tsurugi||Sasami-san at Ganbaranai
+Koigakubo Yuri||Toradora!
