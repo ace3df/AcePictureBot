@@ -423,7 +423,8 @@ def waifuregister(user_id, username, name, gender):
     config = configparser.RawConfigParser(allow_no_value=True)
     config.read(settings['settings'])
     help_urls = (dict(config.items('Help URLs')))
-    if config_get('Websites', 'sankakucomplex') == "False":
+    if config_get('Websites', 'sankakucomplex') == "False" \
+            and config_get('Websites', 'safebooru') == "False":
         m = "Some websites are offline to get you images."\
             "\nTry registering again later!"
         if gender == 0:
@@ -447,10 +448,12 @@ def waifuregister(user_id, username, name, gender):
         user_id, username, name, gender)
     if register_object.TEMP_bug:
         remove_one_limit(user_id, gender.lower() + "register")
-        return "Some websites are offline. Try again later!"
+        return "Some websites are offline to get you images."\
+            "\nTry registering again later!"
     if register_object.offline:
         remove_one_limit(user_id, gender.lower() + "register")
-        return "Some websites are offline. Try again later!"
+        return "Some websites are offline to get you images."\
+            "\nTry registering again later!"
     if register_object.disable:
         warn_user(user_id, "Banned Register - {0}".format(name))
         return False, False

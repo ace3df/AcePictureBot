@@ -3,10 +3,29 @@ from utils import file_to_list
 from utils import scrape_site
 from utils import make_paste
 from config import settings
+import configparser
 import datetime
 import json
 import re
 import os
+
+
+def config_get(section, key, file=0):
+    if file == 0:
+        file = settings['settings']
+    elif file == 1:
+        file = settings['count_file']
+    with open(file) as fp:
+        config = configparser.RawConfigParser(allow_no_value=True)
+        try:
+            config.read_file(fp)
+            return config.get(section, key)
+        except configparser.NoSectionError:
+            return False
+        except configparser.NoOptionError:
+            return False
+        except configparser.DuplicateSectionError:
+            return False
 
 
 class WaifuRegisterClass:
@@ -102,20 +121,31 @@ class WaifuRegisterClass:
             a = "http://safebooru.org/"
             url_search = a + "index.php?page=post&s=list&tags="
         tags = self.name + self.end_tags
-        if site == 0 or site >= 2:
+        if site == 0 or site > 2:
             tags += "+rating:safe"
         url = url_search + tags
         return scrape_site(url, cookie_file)
 
     def check_possible_names(self):
         possible_names = []
-        names = self.soup.find_all('li', attrs={'class': 'tag-type-character'})
-        for a in names:
-            name = a.next.text
-            name = name.title()
-            if " " not in name:
-                name += " $"
-            possible_names.append(name)
+        if self.site == 0:
+            names = self.soup.find_all('li',
+                                       attrs={'class': 'tag-type-character'})
+            for a in names:
+                name = a.next.text
+                name = name.title()
+                if " " not in name:
+                    name += " $"
+                    possible_names.append(name)
+        elif self.site == 2:
+            names = self.soup.find_all('li',
+                                       attrs={'class': 'tag-type-character'})
+            for a in names:
+                name = a.findNext('a').findNext('a').findNext('a').text
+                name = name.title()
+                if " " not in name:
+                    name += " $"
+                    possible_names.append(name)
         if not possible_names:
             return False
         if self.name.lower() + " $" in list(map(str.lower, possible_names)):
@@ -153,15 +183,21 @@ Spanish: {2}
         html_tags = self.soup.find_all(
             'li', class_="tag-type-character")
         tags = []
-        for tag in html_tags:
-            tag = str(tag.text).split(" (?)")[0].replace(" ", "_")
-            tags.append(tag)
+        if self.site == 0:
+            for tag in html_tags:
+                tag = str(tag.text).split(" (?)")[0].replace(" ", "_")
+                tags.append(tag)
+        elif self.site == 2:
+            for tag in html_tags:
+                tag = tag.findNext('a').findNext('a').findNext('a').text
+                tags.append(tag.replace(" ", "_"))
+
         if self.name in tags:
             return True
         return False
 
     def has_enough_imgs(self, site, reversed_search=False):
-        if site == 0:
+        if self.site == 0:
             try:
                 post_count = self.soup.find(
                     'span', attrs={'class': 'tag-type-none'}).text
@@ -169,6 +205,9 @@ Spanish: {2}
             except:
                 post_count = int(len(
                     self.soup.find_all('img', attrs={'class': 'preview'})))
+        elif self.site == 2:
+            post_count = int(len(
+                self.soup.find_all('span', attrs={'class': 'thumb'})))
         if post_count >= self.pic_limit:
             return post_count
         else:
@@ -181,7 +220,7 @@ Spanish: {2}
                     "name": self.name,
                     "subscribed": self.subscribe,
                     "tags": self.end_tags_main,
-                    "web_index": 0,
+                    "web_index": self.site,
                     "date": self.date}
         self.user_waifus["users"].append(template)
         user_waifus_file = open(
@@ -191,7 +230,10 @@ Spanish: {2}
         user_waifus_file.close()
 
     def start(self):
-        self.soup = self.get_soup(0)
+        self.site = 0
+        if config_get('Websites', 'sankakucomplex') == "False":
+            self.site = 2
+        self.soup = self.get_soup(self.site)
         if "error" in str(self.soup):
             self.TEMP_bug = True
             return self.TEMP_bug
