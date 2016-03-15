@@ -7,3 +7,8 @@ robobrowser == 0.5.3
 python-slugify
 tweepy == 3.4.0
 html5lib
+
+# IRC
+
+# Discord
+feedparser

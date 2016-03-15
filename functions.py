@@ -191,6 +191,22 @@ def config_delete_section(section, file=0):
         config.write(fp)
 
 
+def config_delete_key(section, key, file=0):
+    if file == 0:
+        file = settings['settings']
+    elif file == 1:
+        file = settings['count_file']
+    with open(file) as fp:
+        config = configparser.RawConfigParser(allow_no_value=True)
+        config.read_file(fp)
+        try:
+            del config[section][key]
+        except KeyError:
+            return False
+    with open(file, 'w') as fp:
+        config.write(fp)
+
+
 def count_trigger(command, user_id="failed"):
     return False
     if not command.strip():
@@ -409,9 +425,9 @@ def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
         remove_one_limit(user_id, "my" + gender.lower())
         return m, False
     if datetime.datetime.now().isoweekday() == 3:
-        m = "#{0}Wednesday".format(gender)
+        m = ""  # m = "#{0}Wednesday".format(gender)
     else:
-        m = "#{0}AnyDay".format(gender)
+        m = ""  # m = "#{0}AnyDay".format(gender)
     if DISCORD:
         # @user's x is x
         m = " {gender} is {name}!".format(

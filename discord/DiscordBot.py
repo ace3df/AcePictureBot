@@ -3,11 +3,12 @@ sys.path.append('..')
 from collections import OrderedDict
 from itertools import islice
 import datetime
+import requests
 import asyncio
-import time
-import json
 import string
 import random
+import time
+import json
 import re
 import os
 
@@ -16,22 +17,31 @@ from utils import printf as print  # To make sure debug printing won't brake
 from utils import get_command
 import functions as func
 
+import feedparser
 import discord
 
-# start_private_message(user)
 __program__ = "AcePictureBot For Discord"
-__version__ = "1.0.5"
+__version__ = "1.1.0"
 
 client = discord.Client()
-# Commands not while using through discord.
-NO_DISCORD_CMDS = ["Source", "DelLimits", "SetBirthday", "Spoiler", "DiscordConnect"]
-# Commands that will be added once Discord finishes Twitter linking
+# Commands not allowed to use while through discord.
+NO_DISCORD_CMDS = ["Source", "DelLimits",
+                   "SetBirthday", "Spoiler",
+                   "DiscordConnect"]
+
+# Commands that will be added later.
 LATER_DISCORD_CMDS = ["WaifuRemove", "HusbandoRemove",
                       "!Level"]
 
 RATE_LIMIT_DICT = {}
 CHANNEL_TIMEOUT = {}
 USER_LAST_COMMAND = OrderedDict()
+# TODO: Add AceAnimatedBot when it works on TwitterRSS
+BOT_ACCS = ["AcePictureBot", "AceEcchiBot", "AceYuriBot",
+            "AceYaoiBot", "AceNSFWBot",
+            "AceCatgirlBot", "AceAsianBot", "AceYuriNSFWBot"]
+BOT_ACCS = [x.lower() for x in BOT_ACCS]
+BOT_ACCS_STR = ["!apb " + x for x in BOT_ACCS]
 
 
 def get_twitter_id(discord_id):
@@ -123,23 +133,55 @@ async def timeout_channel():
 
 
 async def rss_twitter():
-    """Check each server to see if they want a bot to post into their server."""
+    """Check servers to see if they want a bot to post into their server."""
     await client.wait_until_ready()
-    BOT_ACCS = ["AcePictureBot", "AceEcchiBot", "AceYuriBot",
-                "AceYaoiBot", "AceNSFWBot", "AceAnimatedBot",
-                "AceCatgirlBot"]
-    LAST_POSTED_PIC = {} # server = [[bot, tweet id], [bot, tweet idz]]
+    RSS_URL = r"https://twitrss.me/twitter_user_to_rss/?user="
     while not client.is_closed:
+        # TODO: Should really read RSS once here
+        # including downloading the new images once
         for server in client.servers:
-            if server.id == "81515992412327936":
-                # Don't timeout own channel
-                continue
             server_settings = func.config_get_section_items(
-                    server.id,
-                    discord_settings['server_settings'])
+                server.id, discord_settings['server_settings'])
             for sec in server_settings:
                 if sec in BOT_ACCS:
-                    url = r"https://twitrss.me/twitter_user_to_rss/?user=" + sec
+                    chan, last_id = func.config_get(
+                        server.id, sec,
+                        discord_settings['server_settings']).split("||")
+                    chan_obj = client.get_channel(chan)
+                    if chan_obj is None:
+                        # Channel not found
+                        func.config_delete_key(
+                            server.id, sec,
+                            discord_settings['server_settings'])
+                        continue
+                    url = RSS_URL + sec
+                    d = feedparser.parse(url)
+                    if last_id == d.entries[0].guid:
+                        # Already posted latest entry
+                        continue
+                    matches = re.search('src="([^"]+)"',
+                                        d.entries[0].description)
+                    if not matches:
+                        # No image URL found / Custom text only tweet
+                        continue
+                    image_url = matches.group(0)[4:].replace("\"", "")
+                    message = "New Tweet from {0}: {1}"\
+                        .format(d.entries[0].author, d.entries[0].guid)
+                    img_file_name = ''.join(
+                        random.choice('abcdefg0123456') for _ in range(6))\
+                        + '.jpg'
+                    img_file = open(img_file_name, 'wb')
+                    img_file.write(requests.get(image_url).content)
+                    img_file.close()
+                    img_file = open(img_file_name, 'rb')
+                    await client.send_file(chan_obj, img_file,
+                                           content=message)
+                    img_file.close()
+                    to_string = "{0}||{1}".format(chan, d.entries[0].guid)
+                    func.config_save(server.id, sec,
+                                     to_string,
+                                     discord_settings['server_settings'])
+                    os.remove(img_file_name)
 
         await asyncio.sleep(60)
 
@@ -174,7 +216,7 @@ async def on_server_join(server):
 @client.event
 async def on_error(event, *args, **kwargs):
     print(event)
-    await asyncio.sleep(60)
+    await asyncio.sleep(5)
 
 
 @client.event
@@ -273,6 +315,42 @@ Current Channel ID: {0.channel.id}""".format(message)
             edit_section = "allow_images"
             msg = "No image will be posted when using commands!"
 
+        if message.content.lower().startswith(tuple(BOT_ACCS_STR)):
+            # TODO: Clean up the msg stuff here it looks ugly posted.
+            matched_bots = [s for s in BOT_ACCS if s in message.content][0]
+            current_channel = func.config_get(
+                message.server.id, matched_bots,
+                discord_settings['server_settings'])
+            if current_channel:
+                current_channel = current_channel.split("||")[0]
+            if not message.channel_mentions:
+                # Didn't mention any channels
+                msg = "Please metion a single channel for this bot to post in!"
+                msg = '{0.author.mention} {1}'.format(message, msg)
+                await client.send_message(message.channel, msg)
+                return
+            for channel in message.channel_mentions:
+                if channel.id == current_channel:
+                    # Already in this channel, remove
+                    func.config_delete_key(message.server.id,
+                                           matched_bots,
+                                           discord_settings['server_settings'])
+                    msg = "Removed the bot {} from posting in #{}"\
+                        .format(matched_bots.title(), channel.name)
+                    msg = '{0} {1.author.mention}'.format(msg, message)
+                    await client.send_message(message.channel, msg)
+                    return
+                else:
+                    func.config_save(message.server.id,
+                                     matched_bots,
+                                     message.channel.id + "||temp",
+                                     discord_settings['server_settings'])
+                    msg = "I will now post {}'s Tweets into the channel #{}"\
+                        .format(matched_bots.title(), channel.name)
+                    msg = '{0} {1.author.mention}'.format(msg, message)
+                    await client.send_message(message.channel, msg)
+                    return
+
         if message.content.startswith("!apb mywaifu on"):
             # Allow a user to use MyWaifu/Husbando in their chat (DEFAULT).
             edit_result = "True"
@@ -294,6 +372,9 @@ Current Channel ID: {0.channel.id}""".format(message)
             edit_result = "False"
             edit_section = "must_mention"
             msg = "You can use commands without mentioning me!"
+
+
+        # ADD BOTS ADD HERE
 
         if message.content.startswith("!apb rate limit"):
             # Change the level of users rate limits (Per User).
@@ -581,20 +662,28 @@ http://twitter.com/acepicturebot""".format(command)
             else:
                 msg = ' '.join(re.sub("(#[A-Za-z0-9]+)", " ", msg).split())
                 msg = "{0.author.mention}'s {1}".format(message, msg)
-                try:
-                    await client.send_message(message.channel, msg)
-                except:
-                    # discord.errors.Forbidden ?
-                    pass
+                # TODO: Clean this up
                 if server_settings['allow_images'] and discord_image:
                     try:
-                        await client.send_file(message.channel, open(discord_image, 'rb'))
+                        await client.send_file(message.channel,
+                                               open(discord_image, 'rb'),
+                                               content=msg)
                     except:
                         # discord.errors.Forbidden ?
                         # Channel doesn't allow image uploading
+                        try:
+                            await client.send_message(message.channel, msg)
+                        except:
+                            # discord.errors.Forbidden ?
+                            pass
+                        pass
+                else:
+                    try:
+                        await client.send_message(message.channel, msg)
+                    except:
+                        # discord.errors.Forbidden ?
                         pass
                 return
-
 
     if command == "OTP":
         msg, discord_image = func.otp(msg)
@@ -610,18 +699,26 @@ http://twitter.com/acepicturebot""".format(command)
     # Remove hashtags
     msg = ' '.join(re.sub("(#[A-Za-z0-9]+)", " ", msg).split())
     msg = '{0} {1.author.mention}'.format(msg, message)
-    try:
-        await client.send_message(message.channel, msg)
-    except:
-        # discord.errors.Forbidden ?
-        pass
-
+    # TODO: Clean this up
     if server_settings['allow_images'] and discord_image:
         try:
-            await client.send_file(message.channel, open(discord_image, 'rb'))
+            await client.send_file(message.channel,
+                                   open(discord_image, 'rb'),
+                                   content=msg)
         except:
             # discord.errors.Forbidden ?
             # Channel doesn't allow image uploading
+            try:
+                await client.send_message(message.channel, msg)
+            except:
+                # discord.errors.Forbidden ?
+                pass
+            pass
+    else:
+        try:
+            await client.send_message(message.channel, msg)
+        except:
+            # discord.errors.Forbidden ?
             pass
 
 
@@ -635,5 +732,6 @@ async def on_ready():
 
 loop = asyncio.get_event_loop()
 loop.create_task(timeout_channel())
+loop.create_task(rss_twitter())
 loop.run_until_complete(client.run(discord_settings['email'],
                                    discord_settings['password']))
