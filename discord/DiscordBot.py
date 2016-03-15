@@ -122,7 +122,11 @@ async def inv_from_cmd():
         for inv_file in os.listdir(discord_settings['invites_loc']):
             if inv_file.endswith(".txt"):
                 inv_file_clean = inv_file.split(".txt")[0]
-                await client.accept_invite(inv_file_clean)
+                try:
+                    await client.accept_invite(inv_file_clean)
+                except:
+                    # NotFound
+                    pass
                 os.remove(os.path.join(discord_settings['invites_loc'],
                                        inv_file))
         await asyncio.sleep(10)
