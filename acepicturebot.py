@@ -85,6 +85,9 @@ def tweet_command(_API, status, tweet, command):
     if command == "DiscordConnect":
         tweet = func.DiscordConnect(tweet, user.id)
 
+    if command == "DiscordJoin":
+        tweet = func.DiscordJoin(tweet)
+
     # Joke Commands
     if command == "spook":
         tweet, tweet_image = func.spookjoke()

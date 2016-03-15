@@ -251,6 +251,15 @@ def DiscordConnect(str_id, user_id):
         return "Your Token ID was invalid!"
 
 
+def DiscrodJoin(invite):
+    rx = r'(?:https?\:\/\/)?discord\.gg\/(.+)'
+    m = re.match(rx, invite)
+    if m:
+        invite = m.group(1)
+    open(os.path.join(discord_settings['invites_loc'], invite + ".txt"), 'w')
+    return "I will attempt to join this server in the next minute!"
+
+
 def get_level(user_id):
     return "Level has been temp disabled for now!"
     cmd_exp = {'default': 1,

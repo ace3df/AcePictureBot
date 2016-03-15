@@ -115,6 +115,19 @@ If you don't want this bot in your server - simply kick it.
     await client.send_message(channel, msg)
 
 
+async def inv_from_cmd():
+    """Check a folder for new invites."""
+    await client.wait_until_ready()
+    while not client.is_closed:
+        for inv_file in os.listdir(discord_settings['invites_loc']):
+            if inv_file.endswith(".txt"):
+                inv_file_clean = inv_file.split(".txt")[0]
+                await client.accept_invite(inv_file_clean)
+                os.remove(os.path.join(discord_settings['invites_loc'],
+                                       inv_file))
+        await asyncio.sleep(10)
+
+
 async def timeout_channel():
     """Check if the bot has talkined in each server in the last 4 days."""
     await client.wait_until_ready()
@@ -137,7 +150,7 @@ async def rss_twitter():
     await client.wait_until_ready()
     RSS_URL = r"https://twitrss.me/twitter_user_to_rss/?user="
     while not client.is_closed:
-        # TODO: Should really read RSS once here
+        # TODO: Should really read RSS once heresom
         # including downloading the new images once
         for server in client.servers:
             server_settings = func.config_get_section_items(

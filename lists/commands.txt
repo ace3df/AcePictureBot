@@ -26,3 +26,4 @@ Witchgirl
 Tankgirl
 Reroll
 DiscordConnect
+DiscordJoin
