@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from waifu_register import WaifuRegisterClass
-from config import credentials, status_credentials
+from config import credentials, status_credentials, discord_settings
 from spam_checker import remove_one_limit
 from slugify import slugify
 from config import settings
@@ -236,7 +236,6 @@ def count_trigger(command, user_id="failed"):
 
 
 def DiscordConnect(str_id, user_id):
-    from config import discord_settings
     # Make sure to clean up
     token_path = os.path.join(discord_settings['token_loc'], str_id + '.txt')
     if os.path.isfile(token_path):
