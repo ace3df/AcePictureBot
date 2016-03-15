@@ -251,7 +251,7 @@ def DiscordConnect(str_id, user_id):
         return "Your Token ID was invalid!"
 
 
-def DiscrodJoin(invite):
+def DiscordJoin(invite):
     rx = r'(?:https?\:\/\/)?discord\.gg\/(.+)'
     m = re.match(rx, invite)
     if m:
