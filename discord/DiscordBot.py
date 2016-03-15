@@ -142,6 +142,9 @@ async def rss_twitter():
         for server in client.servers:
             server_settings = func.config_get_section_items(
                 server.id, discord_settings['server_settings'])
+            if not server_settings:
+                # Haven't setup server yet
+                continue
             for sec in server_settings:
                 if sec in BOT_ACCS:
                     chan, last_id = func.config_get(

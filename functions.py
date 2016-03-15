@@ -425,9 +425,10 @@ def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
         remove_one_limit(user_id, "my" + gender.lower())
         return m, False
     if datetime.datetime.now().isoweekday() == 3:
-        m = ""  # m = "#{0}Wednesday".format(gender)
+        # TODO: Remember hashtags here
+        m = "{0}Wednesday".format(gender)
     else:
-        m = ""  # m = "#{0}AnyDay".format(gender)
+        m = "{0}AnyDay".format(gender)
     if DISCORD:
         # @user's x is x
         m = " {gender} is {name}!".format(
