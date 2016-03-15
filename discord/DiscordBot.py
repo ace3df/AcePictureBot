@@ -117,6 +117,7 @@ If you don't want this bot in your server - simply kick it.
 
 async def inv_from_cmd():
     """Check a folder for new invites."""
+    # TODO: use better function name
     await client.wait_until_ready()
     while not client.is_closed:
         for inv_file in os.listdir(discord_settings['invites_loc']):
@@ -753,5 +754,6 @@ async def on_ready():
 loop = asyncio.get_event_loop()
 loop.create_task(timeout_channel())
 loop.create_task(rss_twitter())
+loop.create_task(inv_from_cmd())
 loop.run_until_complete(client.run(discord_settings['email'],
                                    discord_settings['password']))

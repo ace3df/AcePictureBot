@@ -86,6 +86,13 @@ def tweet_command(_API, status, tweet, command):
         tweet = func.DiscordConnect(tweet, user.id)
 
     if command == "DiscordJoin":
+        re_url = '(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)'\
+                 '(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))'\
+                 '+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|'\
+                 '[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))'
+        tweet = re.sub(re_url, '', tweet)
+        for url in status.entities['urls']:
+            tweet += " " + url['expanded_url']
         tweet = func.DiscordJoin(tweet)
 
     # Joke Commands
