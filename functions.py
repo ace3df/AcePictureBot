@@ -255,6 +255,13 @@ def DiscordJoin(invite):
     m = re.match(rx, invite)
     if m:
         invite = m.group(1)
+    else:
+        rx = r'(?:https?\:\/\/)?discordapp\.com\/(.+)'
+        m = re.match(rx, invite)
+        if m:
+            invite = m.group(1)
+    if "\\" or "/" in invite:
+        return "Invalid invite code!"
     open(os.path.join(discord_settings['invites_loc'], invite + ".txt"), 'w')
     return "I will attempt to join this server in the next minute!"
 
