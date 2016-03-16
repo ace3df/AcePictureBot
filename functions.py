@@ -251,18 +251,17 @@ def DiscordConnect(str_id, user_id):
 
 
 def DiscordJoin(invite):
-    rx = r'(?:https?\:\/\/)?discord\.gg\/(.+)'
+    rx = r'(?:https?\:\/\/)?discord\.gg/(.+)|(?:https?\:\/\/)?discordapp\.com/invite\/(.+)'
     m = re.match(rx, invite)
     if m:
         invite = m.group(1)
-    else:
-        rx = r'(?:https?\:\/\/)?discordapp\.com\/(.+)'
-        m = re.match(rx, invite)
-        if m:
-            invite = m.group(1)
-    if "\\" or "/" in invite:
-        return "Invalid invite code!"
-    open(os.path.join(discord_settings['invites_loc'], invite + ".txt"), 'w')
+        if not invite:
+            invite = m.group(2)
+    try:
+        open(os.path.join(discord_settings['invites_loc'], invite + ".txt"), 'w')
+    except:
+        return """Invalid Invite code!
+E.g. https://discord.gg/0SEI9hgBjAhuB0hX or 0SEI9hgBjAhuB0hX"""
     return "I will attempt to join this server in the next minute!"
 
 
