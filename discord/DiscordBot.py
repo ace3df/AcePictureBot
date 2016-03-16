@@ -27,7 +27,7 @@ client = discord.Client()
 # Commands not allowed to use while through discord.
 NO_DISCORD_CMDS = ["Source", "DelLimits",
                    "SetBirthday", "Spoiler",
-                   "DiscordConnect"]
+                   "DiscordConnect", "DiscordJoin"]
 
 # Commands that will be added later.
 LATER_DISCORD_CMDS = ["WaifuRemove", "HusbandoRemove",
