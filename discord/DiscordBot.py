@@ -21,13 +21,14 @@ import feedparser
 import discord
 
 __program__ = "AcePictureBot For Discord"
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 client = discord.Client()
 # Commands not allowed to use while through discord.
 NO_DISCORD_CMDS = ["Source", "DelLimits",
                    "SetBirthday", "Spoiler",
-                   "DiscordConnect", "DiscordJoin"]
+                   "DiscordConnect", "DiscordJoin",
+                   "Airing"]
 
 # Commands that will be added later.
 LATER_DISCORD_CMDS = ["WaifuRemove", "HusbandoRemove",
@@ -138,7 +139,8 @@ async def timeout_channel():
     await client.wait_until_ready()
     while not client.is_closed:
         current_time = time.time()
-        for server in client.servers:
+        current_server_list = client.servers
+        for server in current_server_list:
             if server.id == "81515992412327936":
                 # Don't timeout own channel
                 continue
@@ -157,7 +159,8 @@ async def rss_twitter():
     while not client.is_closed:
         # TODO: Should really read RSS once heresom
         # including downloading the new images once
-        for server in client.servers:
+        current_server_list = client.servers
+        for server in current_server_list:
             server_settings = func.config_get_section_items(
                 server.id, discord_settings['server_settings'])
             if not server_settings:
