@@ -26,7 +26,7 @@ TWITCH_HOST = r"irc.twitch.tv"
 TWITCH_PORT = 6667
 
 __program__ = "AcePictureBot For Twitch Chat"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 
 def get_twitter_id(twitch_username):
@@ -51,9 +51,16 @@ class TwitchIRC:
     def connect(self):
         self.irc_sock.connect((TWITCH_HOST, TWITCH_PORT))
         self.current_joined_chans = [twitch_settings['default_channel']]
-        self.irc_sock.send(str("Pass " + twitch_settings['twitch_oauth_token'] + "\r\n").encode('UTF-8'))
-        self.irc_sock.send(str("NICK " + twitch_settings['twitch_username'] + "\r\n").encode('UTF-8'))
-        self.irc_sock.send(str("JOIN " + twitch_settings['default_channel'] + "\r\n").encode('UTF-8'))
+        self.irc_sock.send(
+            str("Pass " +
+                twitch_settings['twitch_oauth_token'] +
+                "\r\n").encode('UTF-8'))
+        self.irc_sock.send(
+            str("NICK " +
+                twitch_settings['twitch_username'] + "\r\n").encode('UTF-8'))
+        self.irc_sock.send(
+            str("JOIN " +
+                twitch_settings['default_channel'] + "\r\n").encode('UTF-8'))
 
     def say_welcome_message(self, channel):
         try:
