@@ -1195,11 +1195,12 @@ Princess Peach||Super Mario Bros.||http://i.imgur.com/MeJOYMN.jpg
 Rosalina (Mario)||Super Mario Bros.||http://i.imgur.com/nmM7grR.jpg
 Princess Zelda||The Legend of Zelda||http://i.imgur.com/nmQUFrk.jpg
 Lucina||Fire Emblem||http://i.imgur.com/o3CPNQ1.jpg
+Roll||Rockman||http://i.imgur.com/F1crcmq.jpg
 Palutena||Kid Icarus||http://i.imgur.com/6z2UCA5.jpg
 Bayonetta (Character)||Bayonetta||http://cdn.myanimelist.net/images/characters/16/264599.jpg
 
-Fubuki (one_punch_man)||One Punch Man||http://cdn.myanimelist.net/images/characters/5/294843.jpg
-Tatsumaki (one-punch_man)||One Punch Man||http://cdn.myanimelist.net/images/characters/16/296299.jpg
+Fubuki (one-punch man)||One Punch Man||http://cdn.myanimelist.net/images/characters/5/294843.jpg
+Tatsumaki (one-punch man)||One Punch Man||http://cdn.myanimelist.net/images/characters/16/296299.jpg
 
 Kurogane Shizuku||Rakudai Kishi no Cavalry||http://cdn.myanimelist.net/images/characters/13/297020.jpg
 Stella Vermillion||Rakudai Kishi no Cavalry||http://cdn.myanimelist.net/images/characters/8/277837.jpg
