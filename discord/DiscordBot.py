@@ -20,6 +20,15 @@ import functions as func
 import feedparser
 import discord
 
+import logging
+
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
+
+
 __program__ = "AcePictureBot For Discord"
 __version__ = "1.1.2"
 
@@ -132,6 +141,23 @@ async def inv_from_cmd():
                 os.remove(os.path.join(discord_settings['invites_loc'],
                                        inv_file))
         await asyncio.sleep(10)
+
+
+async def change_game():
+    """Change the accounts game to text that shows tips."""
+    # TODO: Test around with spacing and think of better ones
+    tips_list = ["Help: !apb help"]
+    list_cmds = ["Shipgirl", "Touhou", "Vocaloid",
+                 "Imouto", "Idol", "Shota",
+                 "Onii", "Onee", "Sensei",
+                 "Monstergirl", "Witchgirl", "Tankgirl",
+                 "Senpai", "Kouhai"]
+    for cmd in list_cmds:
+        tips_list.append("Try: " + cmd)
+    await client.wait_until_ready()
+    while not client.is_closed:
+        client.change_status(random.choice(tips_list))
+        await asyncio.sleep(120)
 
 
 async def timeout_channel():
@@ -755,9 +781,18 @@ async def on_ready():
     print(client.user.name)
     print("------------------")
 
+
 loop = asyncio.get_event_loop()
-loop.create_task(timeout_channel())
-loop.create_task(rss_twitter())
-loop.create_task(inv_from_cmd())
-loop.run_until_complete(client.run(discord_settings['email'],
-                                   discord_settings['password']))
+
+try:
+    loop.create_task(timeout_channel())
+    loop.create_task(rss_twitter())
+    loop.create_task(inv_from_cmd())
+    loop.create_task(change_game())
+    loop.run_until_complete(client.login(discord_settings['email'],
+                                         discord_settings['password']))
+    loop.run_until_complete(client.connect())
+except Exception:
+    loop.run_until_complete(client.close())
+finally:
+    loop.close()
