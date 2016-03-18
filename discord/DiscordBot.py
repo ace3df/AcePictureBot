@@ -21,7 +21,7 @@ import feedparser
 import discord
 
 __program__ = "AcePictureBot For Discord"
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 client = discord.Client()
 # Commands not allowed to use while through discord.
@@ -155,59 +155,60 @@ async def timeout_channel():
 async def rss_twitter():
     """Check servers to see if they want a bot to post into their server."""
     await client.wait_until_ready()
-    RSS_URL = r"https://twitrss.me/twitter_user_to_rss/?user="
+    RSS_URL = r"http://rss.acebot.xyz/"
     while not client.is_closed:
-        # TODO: Should really read RSS once heresom
-        # including downloading the new images once
         current_server_list = client.servers
-        for server in current_server_list:
-            server_settings = func.config_get_section_items(
-                server.id, discord_settings['server_settings'])
-            if not server_settings:
-                # Haven't setup server yet
+        for bot in BOT_ACCS:
+            url = RSS_URL + bot + ".xml"
+            d = feedparser.parse(url)
+            matches = re.search('src="([^"]+)"',
+                                d.entries[0].description)
+            if not matches:
+                # No image URL found / Custom text only tweet
                 continue
-            for sec in server_settings:
-                if sec in BOT_ACCS:
-                    chan, last_id = func.config_get(
-                        server.id, sec,
-                        discord_settings['server_settings']).split("||")
-                    chan_obj = client.get_channel(chan)
-                    if chan_obj is None:
-                        # Channel not found
-                        func.config_delete_key(
-                            server.id, sec,
-                            discord_settings['server_settings'])
-                        continue
-                    url = RSS_URL + sec
-                    d = feedparser.parse(url)
-                    if last_id == d.entries[0].guid:
-                        # Already posted latest entry
-                        continue
-                    matches = re.search('src="([^"]+)"',
-                                        d.entries[0].description)
-                    if not matches:
-                        # No image URL found / Custom text only tweet
-                        continue
-                    image_url = matches.group(0)[4:].replace("\"", "")
-                    message = "New Tweet from {0}: {1}"\
-                        .format(d.entries[0].author, d.entries[0].guid)
-                    img_file_name = ''.join(
-                        random.choice('abcdefg0123456') for _ in range(6))\
-                        + '.jpg'
-                    img_file = open(img_file_name, 'wb')
-                    img_file.write(requests.get(image_url).content)
-                    img_file.close()
-                    img_file = open(img_file_name, 'rb')
-                    await client.send_file(chan_obj, img_file,
-                                           content=message)
-                    img_file.close()
-                    to_string = "{0}||{1}".format(chan, d.entries[0].guid)
-                    func.config_save(server.id, sec,
-                                     to_string,
-                                     discord_settings['server_settings'])
-                    os.remove(img_file_name)
-
-        await asyncio.sleep(60)
+            image_url = matches.group(0)[4:].replace("\"", "")
+            message = "New Tweet from {0}: {1}"\
+                .format(d.entries[0].summary_detail['value'].split(":")[0],
+                        d.entries[0].guid)
+            img_file_name = ''.join(
+                random.choice('abcdefg0123456') for _ in range(6))\
+                + '.jpg'
+            img_file = open(img_file_name, 'wb')
+            img_file.write(requests.get(image_url).content)
+            img_file.close()
+            img_file = open(img_file_name, 'rb')
+            for server in current_server_list:
+                server_settings = func.config_get_section_items(
+                    server.id, discord_settings['server_settings'])
+                if not server_settings:
+                    # Haven't setup server yet
+                    continue
+                chan = func.config_get(
+                    server.id, bot,
+                    discord_settings['server_settings'])
+                if not chan:
+                    # They don't use this bot
+                    continue
+                chan, last_id = chan.split("||")
+                if last_id == d.entries[0].guid:
+                    # Already posted latest entry
+                    continue
+                chan_obj = client.get_channel(chan)
+                if chan_obj is None:
+                    # Channel not found
+                    func.config_delete_key(
+                        server.id, bot,
+                        discord_settings['server_settings'])
+                    continue
+                await client.send_file(chan_obj, img_file,
+                                       content=message)
+                to_string = "{0}||{1}".format(chan, d.entries[0].guid)
+                func.config_save(server.id, bot,
+                                 to_string,
+                                 discord_settings['server_settings'])
+            img_file.close()
+            os.remove(img_file_name)
+        await asyncio.sleep(120)
 
 
 @client.event
