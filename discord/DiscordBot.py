@@ -3,7 +3,7 @@ sys.path.append('..')
 from collections import OrderedDict
 from itertools import islice
 import datetime
-import requests
+import aiohttp
 import asyncio
 import string
 import random
@@ -12,10 +12,13 @@ import json
 import re
 import os
 
+from functions import (config_save, config_get, config_add_section,
+                       config_save_2, config_delete_key, config_delete_section,
+                       config_get_section_items,
+                       random_list, waifu, mywaifu)
 from config import discord_settings
 from utils import printf as print  # To make sure debug printing won't brake
 from utils import get_command
-import functions as func
 
 import feedparser
 import discord
@@ -96,7 +99,7 @@ async def say_welcome_message(server=False, message=False):
     else:
         server = message.server
         channel = message.channel
-    func.config_add_section(server.id,
+    config_add_section(server.id,
                             discord_settings['server_settings'])
     to_add = {'active': 'True',
               'allow_images': 'True',
@@ -105,7 +108,7 @@ async def say_welcome_message(server=False, message=False):
               'ignore_channels': '',
               'mywaifu': 'True',
               'mods': str(server.owner.id)}
-    func.config_save_2(to_add, section=server.id,
+    config_save_2(to_add, section=server.id,
                        file=discord_settings['server_settings'])
     msg = """Hello, my name is AcePictureBot!
 You can use over 10 commands including: Waifu, Shipgirl, OTP and many more!
@@ -186,13 +189,18 @@ async def rss_twitter():
         current_server_list = client.servers
         for bot in BOT_ACCS:
             url = RSS_URL + bot + ".xml"
-            d = feedparser.parse(url)
+            with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    assert response.status == 200
+                    text = await response.read()
+            d = feedparser.parse(text)
             matches = re.search('src="([^"]+)"',
                                 d.entries[0].description)
             if not matches:
                 # No image URL found / Custom text only tweet
                 continue
             image_url = matches.group(0)[4:].replace("\"", "")
+            print(image_url)
             message = "New Tweet from {0}: {1}"\
                 .format(d.entries[0].summary_detail['value'].split(":")[0],
                         d.entries[0].guid)
@@ -200,16 +208,24 @@ async def rss_twitter():
                 random.choice('abcdefg0123456') for _ in range(6))\
                 + '.jpg'
             img_file = open(img_file_name, 'wb')
-            img_file.write(requests.get(image_url).content)
+            with aiohttp.ClientSession() as session:
+                async with session.get(image_url) as response:
+                    assert response.status == 200
+                    with open(img_file_name, 'wb') as fd:
+                        while True:
+                            chunk = await response.content.read(10)
+                            if not chunk:
+                                break
+                            fd.write(chunk)
             img_file.close()
             img_file = open(img_file_name, 'rb')
             for server in current_server_list:
-                server_settings = func.config_get_section_items(
+                server_settings = config_get_section_items(
                     server.id, discord_settings['server_settings'])
                 if not server_settings:
                     # Haven't setup server yet
                     continue
-                chan = func.config_get(
+                chan = config_get(
                     server.id, bot,
                     discord_settings['server_settings'])
                 if not chan:
@@ -222,19 +238,19 @@ async def rss_twitter():
                 chan_obj = client.get_channel(chan)
                 if chan_obj is None:
                     # Channel not found
-                    func.config_delete_key(
+                    config_delete_key(
                         server.id, bot,
                         discord_settings['server_settings'])
                     continue
                 await client.send_file(chan_obj, img_file,
                                        content=message)
                 to_string = "{0}||{1}".format(chan, d.entries[0].guid)
-                func.config_save(server.id, bot,
+                config_save(server.id, bot,
                                  to_string,
                                  discord_settings['server_settings'])
             img_file.close()
             os.remove(img_file_name)
-        await asyncio.sleep(120)
+        await asyncio.sleep(360)
 
 
 @client.event
@@ -244,7 +260,7 @@ async def on_server_remove(server):
     Remove the server from server_settings.ini
     :param server: Discord.Server object.
     """
-    func.config_delete_section(server.id, discord_settings['server_settings'])
+    config_delete_section(server.id, discord_settings['server_settings'])
     print("$ Left server: {} ({})".format(server, server.id))
 
 
@@ -255,7 +271,7 @@ async def on_server_join(server):
     Set up the default settings and say joined message.
     :param server: Discord.Server object.
     """
-    server_settings = func.config_get_section_items(
+    server_settings = config_get_section_items(
         server.id,
         discord_settings['server_settings'])
     if server_settings:
@@ -263,11 +279,11 @@ async def on_server_join(server):
         return
     await say_welcome_message(server)
 
-
+"""
 @client.event
 async def on_error(event, *args, **kwargs):
     print(event)
-    await asyncio.sleep(5)
+    await asyncio.sleep(5)"""
 
 
 @client.event
@@ -317,13 +333,13 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
         return
     if message.server is not None:
         # Server settings of where the message was sent from.
-        server_settings = func.config_get_section_items(
+        server_settings = config_get_section_items(
             message.server.id,
             discord_settings['server_settings'])
         if not server_settings:
             # Joined and haven't been able to complete say_welcome_message().
             await say_welcome_message(False, message)
-            server_settings = func.config_get_section_items(
+            server_settings = config_get_section_items(
                 message.server.id,
                 discord_settings['server_settings'])
 
@@ -369,7 +385,7 @@ Current Channel ID: {0.channel.id}""".format(message)
         if message.content.lower().startswith(tuple(BOT_ACCS_STR)):
             # TODO: Clean up the msg stuff here it looks ugly posted.
             matched_bots = [s for s in BOT_ACCS if s in message.content][0]
-            current_channel = func.config_get(
+            current_channel = config_get(
                 message.server.id, matched_bots,
                 discord_settings['server_settings'])
             if current_channel:
@@ -383,7 +399,7 @@ Current Channel ID: {0.channel.id}""".format(message)
             for channel in message.channel_mentions:
                 if channel.id == current_channel:
                     # Already in this channel, remove
-                    func.config_delete_key(message.server.id,
+                    config_delete_key(message.server.id,
                                            matched_bots,
                                            discord_settings['server_settings'])
                     msg = "Removed the bot {} from posting in #{}"\
@@ -392,7 +408,7 @@ Current Channel ID: {0.channel.id}""".format(message)
                     await client.send_message(message.channel, msg)
                     return
                 else:
-                    func.config_save(message.server.id,
+                    config_save(message.server.id,
                                      matched_bots,
                                      message.channel.id + "||temp",
                                      discord_settings['server_settings'])
@@ -459,7 +475,7 @@ Per User:
             msg = "Rate Limit changed to:\n" + msg
 
         if edit_result:
-            func.config_save(message.server.id,
+            config_save(message.server.id,
                              edit_section, str(edit_result),
                              discord_settings['server_settings'])
             msg = '{0} {1.author.mention}'.format(msg, message)
@@ -470,7 +486,7 @@ Per User:
             if message.author.id != message.server.owner.id:
                 return
             # Get all mentions in message and add to mod list.
-            current_mod_list = func.config_get(
+            current_mod_list = config_get(
                 message.server.id, 'mods', discord_settings['server_settings'])
             current_mod_list = current_mod_list.split(", ")
             for user in message.mentions:
@@ -481,7 +497,7 @@ Per User:
                     continue
                 else:
                     current_mod_list.append(user.id)
-            func.config_save(message.server.id,
+            config_save(message.server.id,
                              'mods',
                              ', '.join(current_mod_list),
                              discord_settings['server_settings'])
@@ -492,7 +508,7 @@ Per User:
             if message.author.id != message.server.owner.id:
                 return
             # Remove all mods mentioned.
-            current_mod_list = func.config_get(
+            current_mod_list = config_get(
                 message.server.id, 'mods',
                 discord_settings['server_settings'])
             current_mod_list = current_mod_list.split(", ")
@@ -502,7 +518,7 @@ Per User:
                     continue
                 if user.id in current_mod_list:
                     current_mod_list.remove(user.id)
-            func.config_save(message.server.id,
+            config_save(message.server.id,
                              'mods',
                              ', '.join(current_mod_list),
                              discord_settings['server_settings'])
@@ -512,7 +528,7 @@ Per User:
 
         if message.content.startswith("!apb channels add"):
             # Add a channel to the ignore list.
-            current_ignore_list = func.config_get(
+            current_ignore_list = config_get(
                 message.server.id, 'ignore_channels',
                 discord_settings['server_settings'])
             current_ignore_list = current_ignore_list.split(", ")
@@ -523,7 +539,7 @@ Per User:
                 else:
                     channel_text.append("#" + channel.name)
                     current_ignore_list.append(channel.id)
-            func.config_save(message.server.id,
+            config_save(message.server.id,
                              'ignore_channels',
                              ', '.join(current_ignore_list),
                              discord_settings['server_settings'])
@@ -536,7 +552,7 @@ Per User:
             return
         elif message.content.startswith("!apb channels remove"):
             # Remove all mods mentioned.
-            current_ignore_list = func.config_get(
+            current_ignore_list = config_get(
                 message.server.id,
                 'ignore_channels',
                 discord_settings['server_settings'])
@@ -546,7 +562,7 @@ Per User:
                 if channel.id in current_ignore_list:
                     channel_text.append("#" + channel.name)
                     current_ignore_list.remove(channel.id)
-            func.config_save(message.server.id,
+            config_save(message.server.id,
                              'ignore_channels',
                              ', '.join(current_ignore_list),
                              discord_settings['server_settings'])
@@ -660,9 +676,9 @@ http://twitter.com/acepicturebot""".format(command)
 
     # Main Commands
     if command == "Waifu":
-        msg, discord_image = func.waifu(0, msg, DISCORD=True)
+        msg, discord_image = waifu(0, msg, DISCORD=True)
     elif command == "Husbando":
-        msg, discord_image = func.waifu(1, msg, DISCORD=True)
+        msg, discord_image = waifu(1, msg, DISCORD=True)
 
     if command == "WaifuRegister" or command == "HusbandoRegister":
         msg = "You can only register on Twitter! "\
@@ -697,8 +713,8 @@ http://twitter.com/acepicturebot""".format(command)
             if "my{gender}+".format(gender=gender.lower()) in message.content.lower():
                 skip_dups = True
             if "my{gender}-".format(gender=gender.lower()) in message.content.lower():
-                func.delete_used_imgs(twitter_id, True)
-            msg, discord_image = func.mywaifu(twitter_id, gender_id,
+                delete_used_imgs(twitter_id, True)
+            msg, discord_image = mywaifu(twitter_id, gender_id,
                                               True, skip_dups)
             if "I don't know" in msg:
                 msg = "Couldn't find your {gender}! "\
@@ -737,7 +753,7 @@ http://twitter.com/acepicturebot""".format(command)
                 return
 
     if command == "OTP":
-        msg, discord_image = func.otp(msg)
+        msg, discord_image = otp(msg)
 
     list_cmds = ["Shipgirl", "Touhou", "Vocaloid",
                  "Imouto", "Idol", "Shota",
@@ -745,7 +761,7 @@ http://twitter.com/acepicturebot""".format(command)
                  "Monstergirl", "Witchgirl", "Tankgirl",
                  "Senpai", "Kouhai"]
     if command in list_cmds:
-        msg, discord_image = func.random_list(command, msg, DISCORD=True)
+        msg, discord_image = random_list(command, msg, DISCORD=True)
 
     # Remove hashtags
     msg = ' '.join(re.sub("(#[A-Za-z0-9]+)", " ", msg).split())
