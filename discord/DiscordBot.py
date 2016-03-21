@@ -154,11 +154,11 @@ async def change_game():
     tips_list = ["Help: !apb help"]
     list_cmds = ["Shipgirl", "Touhou", "Vocaloid",
                  "Imouto", "Idol", "Shota",
-                 "Onii", "Onee", "Sensei",
+                 "Onii-chan", "Onee-chan", "Sensei",
                  "Monstergirl", "Witchgirl", "Tankgirl",
                  "Senpai", "Kouhai"]
     for cmd in list_cmds:
-        tips_list.append("Try: " + cmd)
+        tips_list.append("Try using: " + cmd)
     await client.wait_until_ready()
     while not client.is_closed:
         await client.change_status(game=discord.Game(
@@ -221,7 +221,7 @@ async def rss_twitter():
                     assert response.status == 200
                     with open(img_file_name, 'wb') as fd:
                         while True:
-                            chunk = await response.content.read(10)
+                            chunk = await response.content.read()
                             if not chunk:
                                 break
                             fd.write(chunk)
@@ -231,7 +231,6 @@ async def rss_twitter():
                 # TODO: Find out why this happens
                 os.remove(img_file_name)
                 continue
-            img_file = open(img_file_name, 'rb')
             for server in current_server_list:
                 server_settings = config_get_section_items(
                     server.id, discord_settings['server_settings'])
@@ -255,12 +254,11 @@ async def rss_twitter():
                         server.id, bot,
                         discord_settings['server_settings'])
                     continue
-                await client.send_file(chan_obj, img_file,
+                await client.send_file(chan_obj, open(img_file_name, 'rb'),
                                        content=message)
                 to_string = "{0}||{1}".format(chan, d.entries[0].guid)
                 config_save(server.id, bot,
                             to_string, discord_settings['server_settings'])
-            img_file.close()
             os.remove(img_file_name)
         await asyncio.sleep(360)
 

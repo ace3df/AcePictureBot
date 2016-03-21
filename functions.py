@@ -434,15 +434,15 @@ def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
         tweet_image = utils.get_image(path)
 
     if not tweet_image:
-        m = ("Failed to grab a new image!\nThe main image website could be offline.\n"
+        m = ("Failed to grab a new image!\n"
+             "The main image website could be offline.\n"
              "Help: {0}").format(config_get('Help URLs', 'website_offline'))
         remove_one_limit(user_id, "my" + gender.lower())
         return m, False
     if datetime.datetime.now().isoweekday() == 3:
-        # TODO: Remember hashtags here
         m = "#{0}Wednesday".format(gender)
     else:
-        m = ""  # "{0}AnyDay".format(gender)
+        m = "#{0}AnyDay".format(gender)
     if DISCORD:
         # @user's x is x
         m = " {gender} is {name}!".format(
