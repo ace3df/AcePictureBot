@@ -161,8 +161,9 @@ async def change_game():
         tips_list.append("Try: " + cmd)
     await client.wait_until_ready()
     while not client.is_closed:
-        client.change_status(game=discord.Game(name=random.choice(tips_list)),
-                             idle=False)
+        await client.change_status(game=discord.Game(
+            name=random.choice(tips_list)),
+            idle=False)
         await asyncio.sleep(240)
 
 
@@ -197,8 +198,12 @@ async def rss_twitter():
                     assert response.status == 200
                     text = await response.read()
             d = feedparser.parse(text)
-            matches = re.search('src="([^"]+)"',
-                                d.entries[0].description)
+            try:
+                matches = re.search('src="([^"]+)"',
+                                    d.entries[0].description)
+            except:
+                # TODO: Need to fix this on the RSS site side
+                continue
             if not matches:
                 # No image URL found / Custom text only tweet
                 continue
