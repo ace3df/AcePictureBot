@@ -19,7 +19,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.6.0"
+__version__ = "2.6.1"
 DEBUG = False
 
 
@@ -180,6 +180,8 @@ def acceptable_tweet(status):
     user = status.user
     # Ignore ReTweets.
     if tweet.startswith('RT'):
+        return False, False
+    if tweet.startswith('Retweeted'):
         return False, False
 
     if DEBUG:

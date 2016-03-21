@@ -13,9 +13,9 @@ import re
 import os
 
 from functions import (config_save, config_get, config_add_section,
-                       config_save_2, config_delete_key, config_delete_section,
-                       config_get_section_items,
-                       random_list, waifu, mywaifu)
+                       config_save_2, config_delete_key,
+                       config_delete_section, config_get_section_items,
+                       random_list, waifu, mywaifu, otp)
 from config import discord_settings
 from utils import printf as print  # To make sure debug printing won't brake
 from utils import get_command
@@ -26,14 +26,16 @@ import discord
 import logging
 
 logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler(filename='discord.log',
+                              encoding='utf-8', mode='w')
+handler.setFormatter(
+    logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
 
 __program__ = "AcePictureBot For Discord"
-__version__ = "1.1.2"
+__version__ = "1.2.0"
 
 client = discord.Client()
 # Commands not allowed to use while through discord.
@@ -50,9 +52,9 @@ RATE_LIMIT_DICT = {}
 CHANNEL_TIMEOUT = {}
 USER_LAST_COMMAND = OrderedDict()
 # TODO: Add AceAnimatedBot when it works on TwitterRSS
-BOT_ACCS = ["AcePictureBot", "AceEcchiBot", "AceYuriBot",
-            "AceYaoiBot", "AceNSFWBot",
-            "AceCatgirlBot", "AceAsianBot", "AceYuriNSFWBot"]
+BOT_ACCS = ["AcePictureBot", "AceEcchiBot", "AceYuriBot", "AceYaoiBot",
+            "AceNSFWBot", "AceCatgirlBot", "AceAsianBot", "AceYuriNSFWBot",
+            "AceStatusBot"]
 BOT_ACCS = [x.lower() for x in BOT_ACCS]
 BOT_ACCS_STR = ["!apb " + x for x in BOT_ACCS]
 
@@ -100,7 +102,7 @@ async def say_welcome_message(server=False, message=False):
         server = message.server
         channel = message.channel
     config_add_section(server.id,
-                            discord_settings['server_settings'])
+                       discord_settings['server_settings'])
     to_add = {'active': 'True',
               'allow_images': 'True',
               'must_mention': 'False',
@@ -109,7 +111,7 @@ async def say_welcome_message(server=False, message=False):
               'mywaifu': 'True',
               'mods': str(server.owner.id)}
     config_save_2(to_add, section=server.id,
-                       file=discord_settings['server_settings'])
+                  file=discord_settings['server_settings'])
     msg = """Hello, my name is AcePictureBot!
 You can use over 10 commands including: Waifu, Shipgirl, OTP and many more!
 To start simply say: "Waifu"!
@@ -159,8 +161,9 @@ async def change_game():
         tips_list.append("Try: " + cmd)
     await client.wait_until_ready()
     while not client.is_closed:
-        client.change_status(random.choice(tips_list))
-        await asyncio.sleep(120)
+        client.change_status(game=discord.Game(name=random.choice(tips_list)),
+                             idle=False)
+        await asyncio.sleep(240)
 
 
 async def timeout_channel():
@@ -218,6 +221,11 @@ async def rss_twitter():
                                 break
                             fd.write(chunk)
             img_file.close()
+            if os.stat(img_file_name).st_size == 0:
+                # Image failed to download, delete and continue on
+                # TODO: Find out why this happens
+                os.remove(img_file_name)
+                continue
             img_file = open(img_file_name, 'rb')
             for server in current_server_list:
                 server_settings = config_get_section_items(
@@ -246,8 +254,7 @@ async def rss_twitter():
                                        content=message)
                 to_string = "{0}||{1}".format(chan, d.entries[0].guid)
                 config_save(server.id, bot,
-                                 to_string,
-                                 discord_settings['server_settings'])
+                            to_string, discord_settings['server_settings'])
             img_file.close()
             os.remove(img_file_name)
         await asyncio.sleep(360)
@@ -278,12 +285,6 @@ async def on_server_join(server):
         # Have already been in server and have saved settings.
         return
     await say_welcome_message(server)
-
-"""
-@client.event
-async def on_error(event, *args, **kwargs):
-    print(event)
-    await asyncio.sleep(5)"""
 
 
 @client.event
@@ -316,6 +317,11 @@ async def on_message(message):
                     message.channel,
                     """Commands: http://ace3df.github.io/AcePictureBot/commands/
 Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
+                return
+            elif "!apb" in message.content[0:10]:
+                await client.send_message(
+                    message.channel,
+                    """You can only use the other !apb commands in servers!""")
                 return
 
     if message.author == client.user:
@@ -400,8 +406,8 @@ Current Channel ID: {0.channel.id}""".format(message)
                 if channel.id == current_channel:
                     # Already in this channel, remove
                     config_delete_key(message.server.id,
-                                           matched_bots,
-                                           discord_settings['server_settings'])
+                                      matched_bots,
+                                      discord_settings['server_settings'])
                     msg = "Removed the bot {} from posting in #{}"\
                         .format(matched_bots.title(), channel.name)
                     msg = '{0} {1.author.mention}'.format(msg, message)
@@ -409,9 +415,9 @@ Current Channel ID: {0.channel.id}""".format(message)
                     return
                 else:
                     config_save(message.server.id,
-                                     matched_bots,
-                                     message.channel.id + "||temp",
-                                     discord_settings['server_settings'])
+                                matched_bots,
+                                message.channel.id + "||temp",
+                                discord_settings['server_settings'])
                     msg = "I will now post {}'s Tweets into the channel #{}"\
                         .format(matched_bots.title(), channel.name)
                     msg = '{0} {1.author.mention}'.format(msg, message)

@@ -440,9 +440,9 @@ def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
         return m, False
     if datetime.datetime.now().isoweekday() == 3:
         # TODO: Remember hashtags here
-        m = "{0}Wednesday".format(gender)
+        m = "#{0}Wednesday".format(gender)
     else:
-        m = "{0}AnyDay".format(gender)
+        m = ""  # "{0}AnyDay".format(gender)
     if DISCORD:
         # @user's x is x
         m = " {gender} is {name}!".format(
