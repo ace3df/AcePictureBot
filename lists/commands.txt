@@ -27,3 +27,4 @@ Tankgirl
 Reroll
 DiscordConnect
 DiscordJoin
+AllowAcc

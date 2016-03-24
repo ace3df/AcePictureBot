@@ -19,7 +19,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.6.1"
+__version__ = "2.7.0"
 DEBUG = False
 
 
@@ -66,6 +66,10 @@ def tweet_command(_API, status, tweet, command):
             print("[INFO] Removed limits for {0} - {1}".format(
                 their_id, cmd))
         return False, False
+    if command == "AllowAcc":
+        if is_mod:
+            func.allow_user(tweet)
+            print("[INFO] Allowing User {0} to register!".format(tweet))
     if str(user.id) not in PATREON_IDS:
         if not is_mod:
             user_is_limited = user_spam_check(user.id,
@@ -114,7 +118,8 @@ def tweet_command(_API, status, tweet, command):
     else:
         g_str = "husbando"
     if "Register" in command:
-        follow_result = is_following(user.id)
+        is_allowed = [True if str(user.id) in ALLOWED_IDS else False][0]
+        follow_result = is_following(user.id, is_allowed)
         if follow_result == "Limited":
             tweet = ("The bot is currently limited on checking stuff.\n"
                      "Try again in 15 minutes!")
@@ -166,7 +171,7 @@ def tweet_command(_API, status, tweet, command):
     if command == "Source":
         tweet = func.source(_API, status)
 
-    if tweet:
+    if tweet or tweet_image:
         tweet = "@{0} {1}".format(user.screen_name, tweet)
         post_tweet(_API, tweet, tweet_image, command, status)
 
@@ -192,6 +197,9 @@ def acceptable_tweet(status):
     BLOCKED_IDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "Blocked Users.txt"))
+    ALLOWED_IDS = utils.file_to_list(
+        os.path.join(settings['list_loc'],
+                     "Allowed Users.txt"))
     PATREON_IDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "patreon_users.txt"))
@@ -252,10 +260,11 @@ def acceptable_tweet(status):
 
     if command == "Reroll":
         try:
-            command = utils.get_command(USER_LAST_COMMAND[user.id])
-            if "Register" in command:
+            tweet = USER_LAST_COMMAND[user.id]
+            command = utils.get_command(tweet)
+            if not command:
                 return False, False
-            elif "My" in command:
+            if "Register" in command:
                 return False, False
             elif command is False:
                 return False, False
@@ -271,7 +280,7 @@ def acceptable_tweet(status):
     # Stop someone limiting the bot on their own.
     rate_time = datetime.datetime.now()
     rate_limit_secs = 10800
-    rate_limit_user = 20
+    rate_limit_user = 15
     if str(user.id) in PATREON_IDS:
         # Still a limit just in case
         rate_limit_user = 35
@@ -306,15 +315,16 @@ def acceptable_tweet(status):
     return tweet, command
 
 
-def is_following(user_id):
-    try:
-        user_info = API.get_user(user_id)
-    except tweepy.TweepError:
-        return "Limited"
-    if user_info.statuses_count < 10:
-        return "Not Genuine"
-    elif user_info.followers_count < 5:
-        return "Not Genuine"
+def is_following(user_id, is_allowed=False):
+    if not is_allowed:
+        try:
+            user_info = API.get_user(user_id)
+        except tweepy.TweepError:
+            return "Limited"
+        if user_info.statuses_count < 10:
+            return "Not Genuine"
+        elif user_info.followers_count < 5:
+            return "Not Genuine"
     try:
         ship = API.lookup_friendships(user_ids=(2910211797, user_id))
     except tweepy.TweepError:

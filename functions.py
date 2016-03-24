@@ -75,6 +75,19 @@ def warn_user(user_id, reason=""):
     filename.close()
 
 
+def allow_user(user_id):
+    path = os.path.join(settings['list_loc'], 'Allowed Users.txt')
+    filename = open(path, 'r')
+    allowed_users = filename.read().splitlines()
+    filename.close()
+    line = "{0}".format(user_id.strip())
+    allowed_users.append(line)
+    filename = open(path, 'w')
+    for item in allowed_users:
+        filename.write("%s\n" % item)
+    filename.close()
+
+
 def config_get(section, key, file=0):
     if file == 0:
         file = settings['settings']
@@ -405,6 +418,7 @@ def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
         count_trigger("mywaifu")
         m = ("I don't know who your {0} is!\n"
              "Use {1}Register!\n"
+             "Or just say \"{1}\"!\n"
              "Help: {2}").format(gender, gender,
                                  config_get('Help URLs', 'include_name'))
         return m, False
@@ -442,7 +456,7 @@ def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
     if datetime.datetime.now().isoweekday() == 3:
         m = "#{0}Wednesday".format(gender)
     else:
-        m = "#{0}AnyDay".format(gender)
+        m = ""
     if DISCORD:
         # @user's x is x
         m = " {gender} is {name}!".format(
@@ -1038,16 +1052,18 @@ def check_website():
     If they're not change the settings.ini to say False.
     Use a url that will make the website query and not a cached page."""
     import time
-    config = configparser.RawConfigParser(allow_no_value=True)
-    config.read(settings['settings'])
-    websites = (dict(config.items('Websites')))
     while True:
+        config = configparser.RawConfigParser(allow_no_value=True)
+        config.read(settings['settings'])
+        websites = (dict(config.items('Websites')))
         for website in websites:
             browser = False
             if website == "sankakucomplex":
-                ping_url = r"https://chan.sankakucomplex.com/?tags=1girl+rating%3Asafe+solo&commit=Search"
+                ping_url = (r"https://chan.sankakucomplex.com/"
+                            "?tags=1girl+rating%3Asafe+solo&commit=Search")
             elif website == "safebooru":
-                ping_url = r"http://safebooru.org/index.php?page=post&s=list&tags=c.c.+1girl"
+                ping_url = (r"http://safebooru.org/index.php?"
+                            "page=post&s=list&tags=c.c.+1girl")
             elif website == "danbooru":
                 continue
             elif website == "yande":
@@ -1062,6 +1078,7 @@ def check_website():
             else:
                 # Site is online. Turn it back on.
                 if websites[website] == "False":
-                    print("$ Website {0} has been set to online!".format(website))
-                    config_save('Websites', website, 'True', file=0)
+                    print("$ Website {0} has been set to online!".format(
+                        website))
+                config_save('Websites', website, 'True', file=0)
         time.sleep(5 * 60)
