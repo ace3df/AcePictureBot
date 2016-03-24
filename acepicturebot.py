@@ -505,6 +505,9 @@ if __name__ == '__main__':
     BLOCKED_IDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "Blocked Users.txt"))
+    ALLOWED_IDS = utils.file_to_list(
+        os.path.join(settings['list_loc'],
+                     "Allowed Users.txt"))
     PATREON_IDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "patreon_users.txt"))
