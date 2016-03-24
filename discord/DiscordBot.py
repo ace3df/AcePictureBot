@@ -68,11 +68,6 @@ def get_twitter_id(discord_id):
             return acc[0]
     return "Not Found!"
 
-async def fetch(session, url):
-    with aiohttp.Timeout(10):
-        async with session.get(url) as response:
-            return await response.text()
-
 async def create_twitter_token(user):
     ran = ''.join(random.choice(
         string.ascii_lowercase + string.digits) for _ in range(5))
@@ -197,9 +192,8 @@ async def rss_twitter():
         current_server_list = client.servers
         for bot in BOT_ACCS:
             url = RSS_URL + bot + ".xml"
-            with aiohttp.ClientSession(loop=loop) as session:
-                html = loop.run_until_complete(
-                    fetch(session, url))
+            async with aiohttp.get(url) as r:
+                html = await r.text()
             d = feedparser.parse(html)
             try:
                 matches = re.search('src="([^"]+)"',
@@ -218,11 +212,11 @@ async def rss_twitter():
             img_file_name = ''.join(
                 random.choice('abcdefg0123456') for _ in range(6))\
                 + '.jpg'
-            with aiohttp.ClientSession() as session:
-                async with session.get(image_url) as resp2:
-                    img_obj = await resp2.read()
-                    with open(img_file_name, "wb") as f:
-                        f.write(img_obj)
+
+            async with aiohttp.get(image_url) as r:
+                data = await r.read()
+                with open(img_file_name, "wb") as f:
+                    f.write(data)
 
             if os.stat(img_file_name).st_size == 0:
                 # Image failed to download, delete and continue on
