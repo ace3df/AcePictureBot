@@ -68,6 +68,10 @@ def get_twitter_id(discord_id):
             return acc[0]
     return "Not Found!"
 
+async def fetch(session, url):
+    with aiohttp.Timeout(10):
+        async with session.get(url) as response:
+            return await response.text()
 
 async def create_twitter_token(user):
     ran = ''.join(random.choice(
@@ -151,14 +155,14 @@ async def inv_from_cmd():
 async def change_game():
     """Change the accounts game to text that shows tips."""
     # TODO: Test around with spacing and think of better ones
-    tips_list = ["Help: !apb help"]
+    tips_list = ["For Help: !apb help"]
     list_cmds = ["Shipgirl", "Touhou", "Vocaloid",
                  "Imouto", "Idol", "Shota",
                  "Onii-chan", "Onee-chan", "Sensei",
                  "Monstergirl", "Witchgirl", "Tankgirl",
                  "Senpai", "Kouhai"]
     for cmd in list_cmds:
-        tips_list.append("Try using: " + cmd)
+        tips_list.append("Try saying: " + cmd)
     await client.wait_until_ready()
     while not client.is_closed:
         await client.change_status(game=discord.Game(
@@ -193,11 +197,10 @@ async def rss_twitter():
         current_server_list = client.servers
         for bot in BOT_ACCS:
             url = RSS_URL + bot + ".xml"
-            with aiohttp.ClientSession() as session:
-                async with session.get(url) as response:
-                    assert response.status == 200
-                    text = await response.read()
-            d = feedparser.parse(text)
+            with aiohttp.ClientSession(loop=loop) as session:
+                html = loop.run_until_complete(
+                    fetch(session, url))
+            d = feedparser.parse(html)
             try:
                 matches = re.search('src="([^"]+)"',
                                     d.entries[0].description)
@@ -215,17 +218,12 @@ async def rss_twitter():
             img_file_name = ''.join(
                 random.choice('abcdefg0123456') for _ in range(6))\
                 + '.jpg'
-            img_file = open(img_file_name, 'wb')
             with aiohttp.ClientSession() as session:
-                async with session.get(image_url) as response:
-                    assert response.status == 200
-                    with open(img_file_name, 'wb') as fd:
-                        while True:
-                            chunk = await response.content.read()
-                            if not chunk:
-                                break
-                            fd.write(chunk)
-            img_file.close()
+                async with session.get(image_url) as resp2:
+                    img_obj = await resp2.read()
+                    with open(img_file_name, "wb") as f:
+                        f.write(img_obj)
+
             if os.stat(img_file_name).st_size == 0:
                 # Image failed to download, delete and continue on
                 # TODO: Find out why this happens
