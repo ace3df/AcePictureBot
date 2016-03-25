@@ -55,6 +55,7 @@ def post_tweet(_API, tweet, media="", command=False, rts=False):
 
 
 def tweet_command(_API, status, message, command):
+    tweet = False
     tweet_image = False
     user = status.user
     # Mod command
