@@ -19,6 +19,7 @@ from functions import (config_save, config_get, config_add_section,
 from config import discord_settings
 from utils import printf as print  # To make sure debug printing won't brake
 from utils import get_command
+from utils import file_to_list
 
 import feedparser
 import discord
@@ -51,12 +52,15 @@ LATER_DISCORD_CMDS = ["WaifuRemove", "HusbandoRemove",
 RATE_LIMIT_DICT = {}
 CHANNEL_TIMEOUT = {}
 USER_LAST_COMMAND = OrderedDict()
-# TODO: Add AceAnimatedBot when it works on TwitterRSS
+# TODO: Add AceAnimatedBot when i make it work on my rss site
 BOT_ACCS = ["AcePictureBot", "AceEcchiBot", "AceYuriBot", "AceYaoiBot",
             "AceNSFWBot", "AceCatgirlBot", "AceAsianBot", "AceYuriNSFWBot",
             "AceStatusBot"]
 BOT_ACCS = [x.lower() for x in BOT_ACCS]
 BOT_ACCS_STR = ["!apb " + x for x in BOT_ACCS]
+# List of bot accs
+BLOCKED_IDS = file_to_list(
+    os.path.join(os.path.dirname(os.path.realpath(__file__)), "bot_ids.txt"))
 
 
 def get_twitter_id(discord_id):
@@ -290,6 +294,8 @@ async def on_message(message):
     :param message: Discord.Message object.
     """
     global USER_LAST_COMMAND
+    if message.author.id in BLOCKED_IDS:
+        return
     if message.server is None:
         # Private message
         # Default settings
