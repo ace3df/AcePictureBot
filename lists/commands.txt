@@ -25,6 +25,7 @@ Monstergirl
 Witchgirl
 Tankgirl
 Reroll
+Another One
 DiscordConnect
 DiscordJoin
 AllowAcc

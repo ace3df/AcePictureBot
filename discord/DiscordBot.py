@@ -626,7 +626,7 @@ http://twitter.com/acepicturebot""".format(command)
         await client.send_message(message.channel, msg)
         return
 
-    if command == "Reroll":
+    if command == "Reroll" or command == "Another One":
         try:
             command = USER_LAST_COMMAND[message.author.id]
         except (ValueError, KeyError):

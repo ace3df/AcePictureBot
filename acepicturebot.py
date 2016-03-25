@@ -54,22 +54,22 @@ def post_tweet(_API, tweet, media="", command=False, rts=False):
         pass
 
 
-def tweet_command(_API, status, tweet, command):
+def tweet_command(_API, status, message, command):
     tweet_image = False
     user = status.user
     # Mod command
     is_mod = [True if str(user.id) in MOD_IDS else False][0]
     if command == "DelLimits":
         if is_mod:
-            their_id, cmd = tweet.split(' ', 2)
+            their_id, cmd = message.split(' ', 2)
             remove_all_limit(their_id, cmd)
             print("[INFO] Removed limits for {0} - {1}".format(
                 their_id, cmd))
         return False, False
     if command == "AllowAcc":
         if is_mod:
-            func.allow_user(tweet)
-            print("[INFO] Allowing User {0} to register!".format(tweet))
+            func.allow_user(message)
+            print("[INFO] Allowing User {0} to register!".format(message))
     if str(user.id) not in PATREON_IDS:
         if not is_mod:
             user_is_limited = user_spam_check(user.id,
@@ -87,14 +87,14 @@ def tweet_command(_API, status, tweet, command):
         func.count_trigger(command, user.id)
 
     if command == "DiscordConnect":
-        tweet = func.DiscordConnect(tweet, user.id)
+        tweet = func.DiscordConnect(message, user.id)
 
     if command == "DiscordJoin":
-        tweet = re.sub('http\S+', '', tweet).strip()
+        tweet = re.sub('http\S+', '', message).strip()
         for url in status.entities['urls']:
             tweet += "" + url['expanded_url']
             break
-        tweet = func.DiscordJoin(tweet)
+        tweet = func.DiscordJoin(message)
 
     # Joke Commands
     if command == "spook":
@@ -108,9 +108,9 @@ def tweet_command(_API, status, tweet, command):
 
     # Main Commands
     if command == "Waifu":
-        tweet, tweet_image = func.waifu(0, tweet)
+        tweet, tweet_image = func.waifu(0, message)
     elif command == "Husbando":
-        tweet, tweet_image = func.waifu(1, tweet)
+        tweet, tweet_image = func.waifu(1, message)
 
     gender = utils.gender(status.text)
     if gender == 0:
@@ -135,13 +135,13 @@ def tweet_command(_API, status, tweet, command):
         else:
             tweet, tweet_image = func.waifuregister(user.id,
                                                     user.screen_name,
-                                                    tweet, gender)
+                                                    message, gender)
 
     if "My" in command:
         skip_dups = False
-        if "my{g_str}+".format(g_str=g_str) in tweet.lower():
+        if "my{g_str}+".format(g_str=g_str) in message.lower():
             skip_dups = True
-        if "my{g_str}-".format(g_str=g_str) in tweet.lower():
+        if "my{g_str}-".format(g_str=g_str) in message.lower():
             func.delete_used_imgs(str(user.id), False)
         tweet, tweet_image = func.mywaifu(user.id, gender, False, skip_dups)
 
@@ -149,7 +149,7 @@ def tweet_command(_API, status, tweet, command):
         tweet = func.waifuremove(user.id, gender)
 
     if command == "OTP":
-        tweet, tweet_image = func.otp(tweet)
+        tweet, tweet_image = func.otp(message)
 
     # TODO: Remove this over sometime and change kohai to kouhai on the site
     if command == "Kohai":
@@ -160,10 +160,10 @@ def tweet_command(_API, status, tweet, command):
                  "Monstergirl", "Witchgirl", "Tankgirl",
                  "Senpai", "Kouhai"]
     if command in list_cmds:
-        tweet, tweet_image = func.random_list(command, tweet)
+        tweet, tweet_image = func.random_list(command, message)
 
     if command == "Airing":
-        tweet = func.airing(tweet)
+        tweet = func.airing(message)
         # No results found.
         if not tweet:
             return False
@@ -172,8 +172,8 @@ def tweet_command(_API, status, tweet, command):
         tweet = func.source(_API, status)
 
     if tweet or tweet_image:
-        tweet = "@{0} {1}".format(user.screen_name, tweet)
-        post_tweet(_API, tweet, tweet_image, command, status)
+        tweet = "@{0} {1}".format(user.screen_name, message)
+        post_tweet(_API, message, tweet_image, command, status)
 
 
 def acceptable_tweet(status):
@@ -258,7 +258,7 @@ def acceptable_tweet(status):
         else:
             return False, False
 
-    if command == "Reroll":
+    if command == "Reroll" or command == "Another One":
         try:
             tweet = USER_LAST_COMMAND[user.id]
             command = utils.get_command(tweet)
