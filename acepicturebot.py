@@ -172,8 +172,8 @@ def tweet_command(_API, status, message, command):
         tweet = func.source(_API, status)
 
     if tweet or tweet_image:
-        tweet = "@{0} {1}".format(user.screen_name, message)
-        post_tweet(_API, message, tweet_image, command, status)
+        tweet = "@{0} {1}".format(user.screen_name, tweet)
+        post_tweet(_API, tweet, tweet_image, command, status)
 
 
 def acceptable_tweet(status):
