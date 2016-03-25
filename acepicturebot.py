@@ -90,9 +90,9 @@ def tweet_command(_API, status, message, command):
         tweet = func.DiscordConnect(message, user.id)
 
     if command == "DiscordJoin":
-        tweet = re.sub('http\S+', '', message).strip()
+        message = re.sub('http\S+', '', message).strip()
         for url in status.entities['urls']:
-            tweet += "" + url['expanded_url']
+            message += "" + url['expanded_url']
             break
         tweet = func.DiscordJoin(message)
 
