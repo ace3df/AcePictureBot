@@ -15,7 +15,8 @@ import os
 from functions import (config_save, config_get, config_add_section,
                        config_save_2, config_delete_key,
                        config_delete_section, config_get_section_items,
-                       random_list, waifu, mywaifu, otp, get_level)
+                       random_list, waifu, mywaifu, otp, get_level,
+                       count_command)
 from config import discord_settings
 from utils import printf as print
 from utils import (get_command, file_to_list)
@@ -33,12 +34,8 @@ handler.setFormatter(
     logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-
-config = configparser.ConfigParser()
-config.read('discord_user_count.ini')
-
 __program__ = "AcePictureBot For Discord"
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 client = discord.Client()
 # Commands not allowed to use while through discord.
@@ -674,7 +671,7 @@ http://twitter.com/acepicturebot""".format(command)
     msg = msg.lower().replace(command.lower(), " ", 1).strip()
     discord_image = False
 
-    count_command(message.author.id, command)
+    count_command(message.author.id, command, 'discord_user_count.ini')
 
     # Main Commands
     if command == "Waifu":
