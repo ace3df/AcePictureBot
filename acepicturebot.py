@@ -86,7 +86,7 @@ def tweet_command(_API, status, message, command):
                     time.strftime("%Y-%m-%d %H:%M")))
                 return False
 
-    if settings['count_on']:
+    if settings['count_on'] and comand:
         func.count_command(str(user.id), command, settings['count_file'])
 
     if command == "DiscordConnect":

@@ -39,6 +39,8 @@ def login(rest=True, status=False):
 
 
 def count_command(user_id, command, file_path):
+    if '\n' in command:
+        return
     config = configparser.ConfigParser()
     config.read(file_path)
     try:
