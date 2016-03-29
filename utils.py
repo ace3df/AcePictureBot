@@ -72,7 +72,7 @@ def file_to_list(file):
             keep_e = 3
     for line in lines:
         # Comment line
-        if line[0] == "#":
+        if line[0] == u"\ufeff":
             continue
         if split_by:
             line = line.split(split_by)
@@ -232,8 +232,11 @@ def download_image(url, path="", filename="", ignore_list=""):
 
     if not os.path.isfile(os.path.join(path, filename)):
         tweet_image = os.path.join(path, filename)
-        with open(tweet_image, "wb") as code:
-            code.write(data)
+        try:
+            with open(tweet_image, "wb") as code:
+                code.write(data)
+        except PermissionError:
+            return False
     else:
         tweet_image = os.path.join(path, str(filename))
 

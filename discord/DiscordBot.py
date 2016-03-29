@@ -2,24 +2,23 @@ import sys
 sys.path.append('..')
 from collections import OrderedDict
 from itertools import islice
+import configparser
 import datetime
 import aiohttp
 import asyncio
 import string
 import random
 import time
-import json
 import re
 import os
 
 from functions import (config_save, config_get, config_add_section,
                        config_save_2, config_delete_key,
                        config_delete_section, config_get_section_items,
-                       random_list, waifu, mywaifu, otp)
+                       random_list, waifu, mywaifu, otp, get_level)
 from config import discord_settings
-from utils import printf as print  # To make sure debug printing won't brake
-from utils import get_command
-from utils import file_to_list
+from utils import printf as print
+from utils import (get_command, file_to_list)
 
 import feedparser
 import discord
@@ -35,6 +34,9 @@ handler.setFormatter(
 logger.addHandler(handler)
 
 
+config = configparser.ConfigParser()
+config.read('discord_user_count.ini')
+
 __program__ = "AcePictureBot For Discord"
 __version__ = "1.2.0"
 
@@ -46,8 +48,7 @@ NO_DISCORD_CMDS = ["Source", "DelLimits",
                    "Airing"]
 
 # Commands that will be added later.
-LATER_DISCORD_CMDS = ["WaifuRemove", "HusbandoRemove",
-                      "!Level"]
+LATER_DISCORD_CMDS = ["WaifuRemove", "HusbandoRemove"]
 
 RATE_LIMIT_DICT = {}
 CHANNEL_TIMEOUT = {}
@@ -55,7 +56,7 @@ USER_LAST_COMMAND = OrderedDict()
 # TODO: Add AceAnimatedBot when i make it work on my rss site
 BOT_ACCS = ["AcePictureBot", "AceEcchiBot", "AceYuriBot", "AceYaoiBot",
             "AceNSFWBot", "AceCatgirlBot", "AceAsianBot", "AceYuriNSFWBot",
-            "AceStatusBot"]
+            "AceWallpaperBot", "AceStatusBot"]
 BOT_ACCS = [x.lower() for x in BOT_ACCS]
 BOT_ACCS_STR = ["!apb " + x for x in BOT_ACCS]
 # List of bot accs
@@ -70,7 +71,8 @@ def get_twitter_id(discord_id):
         acc = acc.split("||")
         if discord_id.lower() == acc[1].lower():
             return acc[0]
-    return "Not Found!"
+    return False
+
 
 async def create_twitter_token(user):
     ran = ''.join(random.choice(
@@ -82,7 +84,6 @@ async def create_twitter_token(user):
         open(file_with_id, 'w').write(user.id)
     msg = "Link your account by tweeting to http://twitter.com/AcePictureBot"\
           "\n@AcePictureBot DiscordConnect " + ran
-
     await client.send_message(user, msg)
 
 
@@ -196,7 +197,7 @@ async def rss_twitter():
         current_server_list = client.servers
         for bot in BOT_ACCS:
             url = RSS_URL + bot + ".xml"
-            async with aiohttp.get(url) as r:
+            async with session.get(url) as r:
                 html = await r.text()
             d = feedparser.parse(html)
             try:
@@ -209,7 +210,6 @@ async def rss_twitter():
                 # No image URL found / Custom text only tweet
                 continue
             image_url = matches.group(0)[4:].replace("\"", "")
-            print(image_url)
             message = "New Tweet from {0}: {1}"\
                 .format(d.entries[0].summary_detail['value'].split(":")[0],
                         d.entries[0].guid)
@@ -217,7 +217,7 @@ async def rss_twitter():
                 random.choice('abcdefg0123456') for _ in range(6))\
                 + '.jpg'
 
-            async with aiohttp.get(image_url) as r:
+            async with session.get(image_url) as r:
                 data = await r.read()
                 with open(img_file_name, "wb") as f:
                     f.write(data)
@@ -447,9 +447,6 @@ Current Channel ID: {0.channel.id}""".format(message)
             edit_section = "must_mention"
             msg = "You can use commands without mentioning me!"
 
-
-        # ADD BOTS ADD HERE
-
         if message.content.startswith("!apb rate limit"):
             # Change the level of users rate limits (Per User).
             # 1 = 10 Commands in 2 Minutes (DEFAULT).
@@ -483,8 +480,8 @@ Per User:
 
         if edit_result:
             config_save(message.server.id,
-                             edit_section, str(edit_result),
-                             discord_settings['server_settings'])
+                        edit_section, str(edit_result),
+                        discord_settings['server_settings'])
             msg = '{0} {1.author.mention}'.format(msg, message)
             await client.send_message(message.channel, msg)
             return
@@ -505,9 +502,8 @@ Per User:
                 else:
                     current_mod_list.append(user.id)
             config_save(message.server.id,
-                             'mods',
-                             ', '.join(current_mod_list),
-                             discord_settings['server_settings'])
+                        'mods', ', '.join(current_mod_list),
+                        discord_settings['server_settings'])
 
             await client.send_message(message.channel, "Mods added!")
             return
@@ -526,9 +522,8 @@ Per User:
                 if user.id in current_mod_list:
                     current_mod_list.remove(user.id)
             config_save(message.server.id,
-                             'mods',
-                             ', '.join(current_mod_list),
-                             discord_settings['server_settings'])
+                        'mods', ', '.join(current_mod_list),
+                        discord_settings['server_settings'])
 
             await client.send_message(message.channel, "Mods removed!")
             return
@@ -547,9 +542,8 @@ Per User:
                     channel_text.append("#" + channel.name)
                     current_ignore_list.append(channel.id)
             config_save(message.server.id,
-                             'ignore_channels',
-                             ', '.join(current_ignore_list),
-                             discord_settings['server_settings'])
+                        'ignore_channels', ', '.join(current_ignore_list),
+                        discord_settings['server_settings'])
             if not channel_text:
                 msg = "No such channels or already ignoring these channels!"
             else:
@@ -570,11 +564,10 @@ Per User:
                     channel_text.append("#" + channel.name)
                     current_ignore_list.remove(channel.id)
             config_save(message.server.id,
-                             'ignore_channels',
-                             ', '.join(current_ignore_list),
-                             discord_settings['server_settings'])
+                        'ignore_channels', ', '.join(current_ignore_list),
+                        discord_settings['server_settings'])
             if not channel_text:
-                msg = "No such channels or already not ignoring these channels!"
+                msg = "No such channels or already not ignoring channels!"
             else:
                 msg = "The bot will now not ignore the channels: {}".format(
                     ' '.join(channel_text))
@@ -681,6 +674,8 @@ http://twitter.com/acepicturebot""".format(command)
     msg = msg.lower().replace(command.lower(), " ", 1).strip()
     discord_image = False
 
+    count_command(message.author.id, command)
+
     # Main Commands
     if command == "Waifu":
         msg, discord_image = waifu(0, msg, DISCORD=True)
@@ -701,7 +696,7 @@ http://twitter.com/acepicturebot""".format(command)
         else:
             gender = "Husbando"
         twitter_id = get_twitter_id(message.author.id)
-        if twitter_id == "Not Found!":
+        if not twitter_id:
             msg = "Couldn't find your {gender}! "\
                   "Register your {gender} on Twitter "\
                   "(Follow: http://ace3df.github.io/AcePictureBot/commands/) "\
@@ -717,22 +712,27 @@ http://twitter.com/acepicturebot""".format(command)
             else:
                 gender_id = 1
             skip_dups = False
-            if "my{gender}+".format(gender=gender.lower()) in message.content.lower():
+            if "my{gender}+".format(gender=gender.lower())\
+                    in message.content.lower():
                 skip_dups = True
-            if "my{gender}-".format(gender=gender.lower()) in message.content.lower():
+            if "my{gender}-".format(gender=gender.lower())\
+                    in message.content.lower():
                 delete_used_imgs(twitter_id, True)
             msg, discord_image = mywaifu(twitter_id, gender_id,
-                                              True, skip_dups)
+                                         True, skip_dups)
             if "I don't know" in msg:
                 msg = "Couldn't find your {gender}! "\
                       "Register your {gender} on Twitter "\
-                      "(Follow: http://ace3df.github.io/AcePictureBot/commands/)".format(gender=gender)
+                      "(Follow: "\
+                      "http://ace3df.github.io/AcePictureBot/commands/)"\
+                      .format(gender=gender)
             elif not discord_image or discord_image is None:
                 msg = "Sorry failed to get a new image! "\
                       "Use the command on Twitter to help the bot store "\
                       "more images! You can also use My{gender}+ to skip "\
                       "checking for an already "\
-                      "used image or My{gender}- to start from fresh!".format(gender=gender)
+                      "used image or My{gender}- to start from fresh!"\
+                      .format(gender=gender)
             else:
                 msg = ' '.join(re.sub("(#[A-Za-z0-9]+)", " ", msg).split())
                 msg = "{0.author.mention}'s {1}".format(message, msg)
@@ -761,6 +761,10 @@ http://twitter.com/acepicturebot""".format(command)
 
     if command == "OTP":
         msg, discord_image = otp(msg)
+
+    if command == "!Level":
+        twitter_id = get_twitter_id(message.author.id)
+        msg = get_level(twitter_id=twitter_id, discord_id=message.author.id)
 
     list_cmds = ["Shipgirl", "Touhou", "Vocaloid",
                  "Imouto", "Idol", "Shota",
@@ -805,17 +809,19 @@ async def on_ready():
     print("------------------")
 
 
-loop = asyncio.get_event_loop()
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    session = aiohttp.ClientSession(loop=loop)
 
-try:
-    loop.create_task(timeout_channel())
-    loop.create_task(rss_twitter())
-    loop.create_task(inv_from_cmd())
-    loop.create_task(change_game())
-    loop.run_until_complete(client.login(discord_settings['email'],
-                                         discord_settings['password']))
-    loop.run_until_complete(client.connect())
-except Exception:
-    loop.run_until_complete(client.close())
-finally:
-    loop.close()
+    try:
+        loop.create_task(timeout_channel())
+        loop.create_task(rss_twitter())
+        loop.create_task(inv_from_cmd())
+        loop.create_task(change_game())
+        loop.run_until_complete(client.login(discord_settings['email'],
+                                             discord_settings['password']))
+        loop.run_until_complete(client.connect())
+    except Exception:
+        loop.run_until_complete(client.close())
+    finally:
+        loop.close()

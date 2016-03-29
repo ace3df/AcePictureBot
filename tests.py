@@ -7,6 +7,40 @@ or go more into testing other than simply this.
 """
 
 
+import sys
+print("Running Python Version:", sys.version)
+
+import unittest
+from functions import (login, count_command, get_level)
+from time import gmtime, strftime
+from tweepy import API
+
+test_count = 0
+"""tweet_text = "@Ace3DF Updated {}! Running Tests."\
+    .format(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+twitter_api = login(rest=True, status=True)
+twitter_api.update_status(status=tweet_text)"""
+
+
+class TestFunctions(unittest.TestCase):
+
+    user_id = "123"
+
+    def test_level_no_level(self):
+        self.assertEqual(get_level("4124"),
+                         "\nYou are Level: 1\nCurrent Exp: 0\nNext Level: 25")
+
+    def test_levl_add_cmd(self):
+        self.assertTrue(count_command('222', 'waifu', 'count.ini'))
+
+    def test_level(self):
+        self.assertEqual(get_level(self.user_id),
+                         "\nYou are Level: 1\nCurrent Exp: 10\nNext Level: 15")
+
+
+if __name__ == '__main__':
+    unittest.main()
+
 def run_tests():
     print("Login Test:")
     api = functions.login()
@@ -75,10 +109,3 @@ def run_tests():
     msg = "@AceStatusBot Test Tweet with Video..."
     api.update_with_media(i, status=msg)
     print("\nFinished all Tests!")
-
-
-if __name__ == '__main__':
-    import sys
-    print("Running Python Version:", sys.version)
-    print()
-    run_tests()

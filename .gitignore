@@ -21,6 +21,7 @@ run.bat
 settings.ini
 twitch_settings.ini
 server_settings.ini
+discord_user_count.ini
 config.py
 
 Allowed Users.txt

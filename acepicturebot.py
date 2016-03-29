@@ -19,7 +19,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.7.0"
+__version__ = "2.8.0"
 DEBUG = False
 
 
@@ -71,6 +71,7 @@ def tweet_command(_API, status, message, command):
         if is_mod:
             func.allow_user(message)
             print("[INFO] Allowing User {0} to register!".format(message))
+            ALLOWED_IDS.append(message)
     if str(user.id) not in PATREON_IDS:
         if not is_mod:
             user_is_limited = user_spam_check(user.id,
@@ -152,9 +153,6 @@ def tweet_command(_API, status, message, command):
     if command == "OTP":
         tweet, tweet_image = func.otp(message)
 
-    # TODO: Remove this over sometime and change kohai to kouhai on the site
-    if command == "Kohai":
-        command = "Kouhai"
     list_cmds = ["Shipgirl", "Touhou", "Vocaloid",
                  "Imouto", "Idol", "Shota",
                  "Onii", "Onee", "Sensei",
@@ -407,7 +405,7 @@ class CustomStreamListener(tweepy.StreamListener):
         except PermissionError:
             # This wont happen all the time, the file is probably busy
             pass
-        print("[{0}] Reading: {1} ({2}): {3}".format(
+        print("[{0}] {1} ({2}): {3}".format(
             time.strftime("%Y-%m-%d %H:%M"),
             status.user.screen_name, status.user.id, status.text))
         tweet_command(API, status, tweet, command)
@@ -490,7 +488,7 @@ def read_notifications(_API, reply, tweets_read):
         if not command:
             continue
         if reply:
-            print("[{0}] Reading (Late): {1} ({2}): {3}".format(
+            print("[{0} - Late]: {1} ({2}): {3}".format(
                 time.strftime("%Y-%m-%d %H:%M"),
                 status.user.screen_name, status.user.id,
                 status.text))

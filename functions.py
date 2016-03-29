@@ -38,6 +38,21 @@ def login(rest=True, status=False):
         return auth
 
 
+def count_command(user_id, command, file_path):
+    config = configparser.ConfigParser()
+    config.read(file_path)
+    try:
+        current_count = config.get(user_id, command)
+        current_count = int(current_count) + 1
+        config.set(user_id, command, str(current_count))
+    except configparser.NoSectionError:
+        config.add_section(user_id)
+        config.set(user_id, command, "1")
+    with open(file_path, 'w') as config_file:
+        config.write(config_file)
+    return config
+
+
 def block_user(user_id, reason=""):
     path = os.path.join(settings['list_loc'], 'Blocked Users.txt')
     filename = open(path, 'r')
@@ -260,53 +275,97 @@ def DiscordConnect(str_id, user_id):
         return "You can now use MyWaifu / MyHusbando on Discord!"
     else:
         # Invalid token
-        return "Your Token ID was invalid!"
+        return ("Your Token ID was invalid!\n"
+                "Say MyWaifu in Discord to get a new one!")
 
 
 def DiscordJoin(invite):
-    rx = r'(?:https?\:\/\/)?discord\.gg/(.+)|(?:https?\:\/\/)?discordapp\.com/invite\/(.+)'
+    rx = (r'(?:https?\:\/\/)?discord\.gg/(.+)|'
+          '(?:https?\:\/\/)?discordapp\.com/invite\/(.+)')
     m = re.match(rx, invite)
     if m:
         invite = m.group(1)
         if not invite:
             invite = m.group(2)
     try:
-        open(os.path.join(discord_settings['invites_loc'], invite + ".txt"), 'w')
+        open(os.path.join(discord_settings['invites_loc'],
+                          invite + ".txt"), 'w')
     except:
-        return """Invalid Invite code!
-E.g. https://discord.gg/0SEI9hgBjAhuB0hX or 0SEI9hgBjAhuB0hX"""
+        return ("Invalid Invite code!\n"
+                "Example: https://discord.gg/0SEI9hgBjAhuB0hX \n"
+                "Example: 0SEI9hgBjAhuB0hX")
     return "I will attempt to join this server in the next minute!"
 
 
-def get_level(user_id):
-    return "Level has been temp disabled for now!"
+def get_level(twitter_id=False, discord_id=False):
     cmd_exp = {'default': 1,
-               'my{GENDER}': 2,
-               '{GENDER}': 2,
-               'shipgirl': 2,
-               'otp': 6,
-               'vocaloid': 2,
-               'imouto': 3,
-               'senpai': 5,
+               'my{GENDER}': 3,
                '{GENDER}register': 10,
-               'monstergirl': 3}
-    sec = config_get_section_items(str(user_id), 1)
-    if not sec:
-        return "\nYou are Level: 1 \nCurrent Exp: 0 \nNext Level: 25"
+               'setbirthday': 50,
+               'shipgirl': 3,
+               'touhou': 3,
+               'vocaloid': 3,
+               'imouto': 5,
+               'idol': 3,
+               'shota': 5,
+               'onii': 5,
+               'onee': 5,
+               'sensei': 5,
+               'senpai': 5,
+               'kouhai': 5,
+               '{GENDER}': 3,
+               'otp': 5,
+               'source': 3,
+               '!level': 3,
+               'airing': 0,
+               'monstergirl': 8,
+               'witchgirl': 8,
+               'tankgirl': 8,
+               'discordconnect': 0,
+               'discordjoin': 0}
+
     user_exp = 0
-    total = 0
-    for cmd, count in sec.items():
-        cmd = cmd.replace("waifu", "{GENDER}")
-        cmd = cmd.replace("husbando", "{GENDER}")
-        for i in range(0, int(count)):
-            total += 1
-            try:
-                user_exp += cmd_exp[cmd]
-            except:
-                user_exp += cmd_exp['default']
+    total_used_cmds = 0
+    user_section = False
+    if discord_id:
+        path = r'discord\discord_user_count.ini'
+        config = configparser.ConfigParser()
+        config.read(path)
+        try:
+            user_section = dict(config.items(discord_id))
+        except configparser.NoSectionError:
+            return "\nYou are Level: 1 \nCurrent Exp: 0 \nNext Level: 25"
+        for cmd, count in user_section.items():
+            cmd = cmd.replace("waifu", "{GENDER}")
+            cmd = cmd.replace("husbando", "{GENDER}")
+            for i in range(0, int(count)):
+                total_used_cmds += 1
+                try:
+                    user_exp += cmd_exp[cmd]
+                except:
+                    user_exp += cmd_exp['default']
+
+    if twitter_id:
+        path = settings['count_file']
+        config = configparser.ConfigParser()
+        config.read(path)
+        try:
+            user_section = dict(config.items(twitter_id))
+        except configparser.NoSectionError:
+            return "\nYou are Level: 1\nCurrent Exp: 0\nNext Level: 25"
+        for cmd, count in user_section.items():
+            cmd = cmd.replace("waifu", "{GENDER}")
+            cmd = cmd.replace("husbando", "{GENDER}")
+            for i in range(0, int(count)):
+                total_used_cmds += 1
+                try:
+                    user_exp += cmd_exp[cmd]
+                except:
+                    user_exp += cmd_exp['default']
+
     levels = 100
-    xp_for_first_level = 25
-    xp_for_last_level = 1000000
+    xp_for_first_level = 15
+    xp_for_last_level = 1500000
     B = log(1.0 * xp_for_last_level / xp_for_first_level) / (levels - 1)
     A = 1.0 * xp_for_first_level / (exp(B) - 1.0)
 
@@ -418,7 +477,7 @@ def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
         count_trigger("mywaifu")
         m = ("I don't know who your {0} is!\n"
              "Use {1}Register!\n"
-             "Or just say \"{1}\"!\n"
+             "or just try say \"{1}\"!\n"
              "Help: {2}").format(gender, gender,
                                  config_get('Help URLs', 'include_name'))
         return m, False
