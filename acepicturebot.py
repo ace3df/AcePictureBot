@@ -19,7 +19,7 @@ import os
 import re
 
 __program__ = "AcePictureBot"
-__version__ = "2.8.0"
+__version__ = "2.8.1"
 DEBUG = False
 
 
@@ -375,7 +375,8 @@ def status_account(status_api):
         msg = "{0}{1}\n{2}".format(pre_msg,
                                    utils.short_string(msg_msg, 90),
                                    msg_url)
-        post_tweet(status_api, msg)
+        if not DEBUG:
+            post_tweet(status_api, msg)
 
     while True:
         url = "https://github.com/ace3df/AcePictureBot/commits/master.atom"
@@ -397,6 +398,9 @@ class CustomStreamListener(tweepy.StreamListener):
         global HAD_ERROR
         global HANG_TIME
         global TWEETS_READ
+        if str(status.id) in TWEETS_READ:
+            return True
+        TWEETS_READ.append(str(status.id))
         HANG_TIME = time.time()
         tweet, command = acceptable_tweet(status)
         if not command:
@@ -411,10 +415,8 @@ class CustomStreamListener(tweepy.StreamListener):
             status.user.screen_name, status.user.id, status.text))
         tweet_command(API, status, tweet, command)
         HAD_ERROR = False
-        TWEETS_READ.append(str(status.id))
         with open(os.path.join(settings['ignore_loc'],
-                               "tweets_read.txt"),
-                  'w') as file:
+                               "tweets_read.txt"), 'w') as file:
             file.write("\n".join(TWEETS_READ))
         try:
             os.remove(update['is_busy_file'])
@@ -460,7 +462,8 @@ def handle_stream(sapi, status_api=False):
         if elapsed > 600:
             # TODO: Temp to try and stop crash tweet spam for now
             if os.path.exists(update['last_crash_file']):
-                if time.time() - os.path.getctime(update['last_crash_file']) > 80000:
+                if time.time() - os.path.getctime(
+                        update['last_crash_file']) > 80000:
                     os.remove(update['last_crash_file'])
                     open(update['last_crash_file'], 'w')
                     msg = """[{0}] Restarting!

@@ -332,13 +332,12 @@ def get_level(twitter_id=False, discord_id=False):
     total_used_cmds = 0
     user_section = False
     if discord_id:
-        path = r'discord\discord_user_count.ini'
         config = configparser.ConfigParser()
-        config.read(path)
+        config.read(discord_settings['count_file'])
         try:
             user_section = dict(config.items(discord_id))
         except configparser.NoSectionError:
-            return "\nYou are Level: 1 \nCurrent Exp: 0 \nNext Level: 25"
+            return "\nYou are Level: 1 \nCurrent Total Exp: 0 \nNext Level: 25"
         for cmd, count in user_section.items():
             cmd = cmd.replace("waifu", "{GENDER}")
             cmd = cmd.replace("husbando", "{GENDER}")
@@ -350,13 +349,12 @@ def get_level(twitter_id=False, discord_id=False):
                     user_exp += cmd_exp['default']
 
     if twitter_id:
-        path = settings['count_file']
         config = configparser.ConfigParser()
-        config.read(path)
+        config.read(settings['count_file'])
         try:
             user_section = dict(config.items(twitter_id))
         except configparser.NoSectionError:
-            return "\nYou are Level: 1\nCurrent Exp: 0\nNext Level: 25"
+            return "\nYou are Level: 1\nCurrent Total Exp: 0\nNext Level: 25"
         for cmd, count in user_section.items():
             cmd = cmd.replace("waifu", "{GENDER}")
             cmd = cmd.replace("husbando", "{GENDER}")
@@ -368,8 +366,8 @@ def get_level(twitter_id=False, discord_id=False):
                     user_exp += cmd_exp['default']
 
     levels = 100
-    xp_for_first_level = 15
-    xp_for_last_level = 1500000
+    xp_for_first_level = 25
+    xp_for_last_level = 5000000
     B = log(1.0 * xp_for_last_level / xp_for_first_level) / (levels - 1)
     A = 1.0 * xp_for_first_level / (exp(B) - 1.0)
 
@@ -394,7 +392,7 @@ def get_level(twitter_id=False, discord_id=False):
     if level == 1:
         for_next = for_next - user_exp
     return ("\nYou are Level: {0}\n"
-            "Current Exp: {1}\n"
+            "Current Total Exp: {1}\n"
             "Next Level: {2}").format(level, user_exp, for_next)
 
 
