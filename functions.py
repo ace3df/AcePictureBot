@@ -48,6 +48,8 @@ def count_command(user_id, command, file_path):
     except configparser.NoSectionError:
         config.add_section(user_id)
         config.set(user_id, command, "1")
+    except configparser.NoOptionError:
+        config.set(user_id, command, "1")
     with open(file_path, 'w') as config_file:
         config.write(config_file)
     return config
