@@ -85,8 +85,9 @@ def tweet_command(_API, status, message, command):
                 print("[{0}] User is limited! Ignoring...".format(
                     time.strftime("%Y-%m-%d %H:%M")))
                 return False
+
     if settings['count_on']:
-        func.count_trigger(command, user.id)
+        func.count_command(str(user.id), command, 'user_count.ini')
 
     if command == "DiscordConnect":
         tweet = func.DiscordConnect(message, user.id)
@@ -106,7 +107,7 @@ def tweet_command(_API, status, message, command):
             os.path.join(settings['list_loc'],
                          "spoilers.txt")))
     elif command == "!Level":
-        tweet = func.get_level(user.id)
+        tweet = func.get_level(twitter_id=str(user.id))
 
     # Main Commands
     if command == "Waifu":
