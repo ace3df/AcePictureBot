@@ -87,7 +87,7 @@ def tweet_command(_API, status, message, command):
                 return False
 
     if settings['count_on']:
-        func.count_command(str(user.id), command, 'user_count.ini')
+        func.count_command(str(user.id), command, settings['count_file'])
 
     if command == "DiscordConnect":
         tweet = func.DiscordConnect(message, user.id)
