@@ -41,6 +41,8 @@ def login(rest=True, status=False):
 def count_command(sec, key, file_path):
     if '\n' in key:
         return
+    # Clean Key
+    key = key.replace(":", "")
     config = configparser.ConfigParser()
     config.read(file_path)
     try:
