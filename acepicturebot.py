@@ -1,25 +1,27 @@
-from spam_checker import remove_all_limit
-from spam_checker import user_spam_check
 import xml.etree.ElementTree as etree
 from collections import OrderedDict
-from utils import printf as print
-from threading import Thread
 from itertools import islice
-from config import settings
-from config import update
-import functions as func
+from threading import Thread
 import urllib.request
 import datetime
 import random
-import tweepy
-import utils
 import time
 import sys
 import os
 import re
 
+from spam_checker import (remove_all_limit, user_spam_check)
+from utils import printf as print
+from config import settings
+from config import update
+import functions as func
+import utils
+
+import tweepy
+
+
 __program__ = "AcePictureBot"
-__version__ = "2.8.1"
+__version__ = "2.9.0"
 DEBUG = False
 
 
@@ -87,7 +89,9 @@ def tweet_command(_API, status, message, command):
                 return False
 
     if settings['count_on'] and command:
-        func.count_command(str(user.id), command, settings['count_file'])
+        func.count_command("Global", command, settings['count_file'])
+        func.count_command(str(user.id), command,
+                           os.path.join(settings['user_count_loc'], user_id))
 
     if command == "DiscordConnect":
         tweet = func.DiscordConnect(message, user.id)
@@ -111,9 +115,9 @@ def tweet_command(_API, status, message, command):
 
     # Main Commands
     if command == "Waifu":
-        tweet, tweet_image = func.waifu(0, message)
+        tweet, tweet_image = func.waifu(0, message, user_id=str(user.id))
     elif command == "Husbando":
-        tweet, tweet_image = func.waifu(1, message)
+        tweet, tweet_image = func.waifu(1, message, user_id=str(user.id))
 
     gender = utils.gender(status.text)
     if gender == 0:

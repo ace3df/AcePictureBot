@@ -5,6 +5,7 @@ Gemfile.lock
 Ace.xml
 
 ignore_lists/
+users/
 .idea/vcs.xml
 .idea/
 FFmpeg/
@@ -21,6 +22,7 @@ run.bat
 settings.ini
 twitch_settings.ini
 server_settings.ini
+twitter_user_count.ini
 discord_user_count.ini
 config.py
 

@@ -38,20 +38,20 @@ def login(rest=True, status=False):
         return auth
 
 
-def count_command(user_id, command, file_path):
-    if '\n' in command:
+def count_command(sec, key, file_path):
+    if '\n' in key:
         return
     config = configparser.ConfigParser()
     config.read(file_path)
     try:
-        current_count = config.get(user_id, command)
+        current_count = config.get(sec, key)
         current_count = int(current_count) + 1
-        config.set(user_id, command, str(current_count))
+        config.set(sec, key, str(current_count))
     except configparser.NoSectionError:
-        config.add_section(user_id)
-        config.set(user_id, command, "1")
+        config.add_section(sec)
+        config.set(sec, key, "1")
     except configparser.NoOptionError:
-        config.set(user_id, command, "1")
+        config.set(sec, key, "1")
     with open(file_path, 'w') as config_file:
         config.write(config_file)
     return config
@@ -396,7 +396,7 @@ def get_level(twitter_id=False, discord_id=False):
             "Next Level: {2}").format(level, user_exp, for_next)
 
 
-def waifu(gender, args="", otp=False, DISCORD=False):
+def waifu(gender, args="", otp=False, DISCORD=False, user_id=False):
     if gender == 0:
         list_name = "Waifu"
         end_tag = "1girl+solo"
@@ -440,7 +440,13 @@ def waifu(gender, args="", otp=False, DISCORD=False):
     name = re.sub(r' \([^)]*\)', '', name)
     m = "Your {0} is {1} ({2})".format(list_name.title(),
                                        name, show)
-    count_trigger(name, list_name.lower())
+    if user_id:
+        st = "{}||{} ({})".format(list_name, name, show)
+        count_command(user_id, st,
+                      os.path.join(settings['user_count_loc'], user_id))
+    count_command(list_name, "{} ({})".format(name, show),
+                  settings['count_file'])
+
     return m, tweet_image
 
 
@@ -693,7 +699,7 @@ def otp(args):
     return m, tweet_image
 
 
-def random_list(list_name, args="", DISCORD=False):
+def random_list(list_name, args="", DISCORD=False, user_id=False):
     gender = "waifu"
     hashtag = ""
     search_for = ""
@@ -878,8 +884,17 @@ def random_list(list_name, args="", DISCORD=False):
         name = "{0} x {1}".format(name_one, name_two)
     if not m:
         m = "Your {0} is {1} {2}".format(list_name, name, hashtag)
-        if not list_name.endswith("OTP"):
-            count_trigger(name, gender)
+
+    if not list_name.endswith("OTP"):
+        if user_id:
+            if show_series:
+                st = "{}||{} ({})".format(list_name, name, show)
+            else:
+                st = "{}||{}".format(list_name, name)
+            count_command(user_id, st,
+                          os.path.join(settings['user_count_loc'],
+                                       user_id))
+        count_command(list_name, name, settings['count_file'])
     return m, tweet_image
 
 

@@ -74,6 +74,8 @@ def file_to_list(file):
         # Comment line
         if line[0] == u"\ufeff":
             continue
+        if line[0] == "#":
+            continue
         if split_by:
             line = line.split(split_by)
             if keep_e < 2:
