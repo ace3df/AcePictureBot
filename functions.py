@@ -350,9 +350,9 @@ def get_level(twitter_id=False, discord_id=False):
 
     if twitter_id:
         config = configparser.ConfigParser()
-        config.read(settings['count_file'])
+        config.read(os.path.join(settings['user_count_loc'], twitter_id))
         try:
-            user_section = dict(config.items(twitter_id))
+            user_section = dict(config.items("commands"))
         except configparser.NoSectionError:
             return "\nYou are Level: 1\nCurrent Total Exp: 0\nNext Level: 25"
         for cmd, count in user_section.items():

@@ -16,7 +16,7 @@ from functions import (config_save, config_get, config_add_section,
                        config_save_2, config_delete_key,
                        config_delete_section, config_get_section_items,
                        random_list, waifu, mywaifu, otp, get_level,
-                       count_command)
+                       count_command, delete_used_imgs)
 from config import discord_settings
 from utils import printf as print
 from utils import (get_command, file_to_list)
