@@ -352,9 +352,9 @@ def get_level(twitter_id=False, discord_id=False):
         config = configparser.ConfigParser()
         config.read(os.path.join(settings['user_count_loc'], twitter_id))
         try:
-            user_section = dict(config.items("commands"))
+            user_section = dict(config.items("Commands"))
         except configparser.NoSectionError:
-            return "\nYou are Level: 1\nCurrent Total Exp: 0\nNext Level: 25"
+            return "\nYou are Level: 1\nCurrent Total Exp: 3\nNext Level: 22"
         for cmd, count in user_section.items():
             cmd = cmd.replace("waifu", "{GENDER}")
             cmd = cmd.replace("husbando", "{GENDER}")
@@ -441,8 +441,8 @@ def waifu(gender, args="", otp=False, DISCORD=False, user_id=False):
     m = "Your {0} is {1} ({2})".format(list_name.title(),
                                        name, show)
     if user_id:
-        st = "{}||{} ({})".format(list_name, name, show)
-        count_command(user_id, st,
+        st = "{} ({})".format(name, show)
+        count_command(list_name, st,
                       os.path.join(settings['user_count_loc'], user_id))
     count_command(list_name, "{} ({})".format(name, show),
                   settings['count_file'])
@@ -888,10 +888,10 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
     if not list_name.endswith("OTP"):
         if user_id:
             if show_series:
-                st = "{}||{} ({})".format(list_name, name, show)
+                st = "{} ({})".format(list_name, name, show)
             else:
-                st = "{}||{}".format(list_name, name)
-            count_command(user_id, st,
+                st = "{}".format(name)
+            count_command(list_name, st,
                           os.path.join(settings['user_count_loc'],
                                        user_id))
         count_command(list_name, name, settings['count_file'])
