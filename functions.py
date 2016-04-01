@@ -11,14 +11,15 @@ import configparser
 import datetime
 import random
 import urllib
-import tweepy
 import utils
 import json
 import os
 import re
 
+from twython import Twython
 
-def login(rest=True, status=False):
+
+def login(status=False):
     if status:
         consumer_token = status_credentials['consumer_key']
         consumer_secret = status_credentials['consumer_secret']
@@ -29,13 +30,8 @@ def login(rest=True, status=False):
         consumer_secret = credentials['consumer_secret']
         access_token = credentials['access_token']
         access_token_secret = credentials['access_token_secret']
-    auth = tweepy.OAuthHandler(consumer_token, consumer_secret)
-    auth.set_access_token(access_token, access_token_secret)
-    if rest:
-        api = tweepy.API(auth)
-        return api
-    else:
-        return auth
+    return Twython(consumer_token, consumer_secret,
+                   access_token, access_token_secret)
 
 
 def count_command(sec, key, file_path):
@@ -398,6 +394,29 @@ def get_level(twitter_id=False, discord_id=False):
             "Next Level: {2}").format(level, user_exp, for_next)
 
 
+def pictag(tags="", repeat_for=1):
+    """ Search Safebooru and return random result.
+    For Patreon supporters only.
+    """
+    tags = tags.split(" ")
+    tags = [tag.strip() for tag in tags]
+    if len(tags) > 5:
+        return ("Sorry, can't search more than 5 tags!\n"
+                "Example of using tags correctly: "
+                "http://safebooru.org/index.php?"
+                "page=post&s=list&tags=blake_belladonna+solo+bow")
+    tweet_image_list = []
+    for x in range(0, repeat_for):
+        tweet_image_list.append(
+            utils.get_image_online('+'.join(tags), site=2, high_page=10))
+        if not tweet_image_list:
+            message = "Sorry failed to get an image! Try different tags!"
+            return message, False
+        else:
+            message = "Result for the tags: {}".format(', '.join(tags))
+    return message, tweet_image_list
+
+
 def waifu(gender, args="", otp=False, DISCORD=False, user_id=False):
     if gender == 0:
         list_name = "Waifu"
@@ -467,7 +486,8 @@ def delete_used_imgs(twitter_id, DISCORD=False):
         pass
 
 
-def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
+def mywaifu(user_id, gender, DISCORD=False,
+            SKIP_DUP_CHECK=False, repeat_for=1):
     tweet_image = False
     if gender == 0:
         gender = "Waifu"
@@ -500,28 +520,33 @@ def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
                         word_boundary=True, separator="_")
     path = os.path.join(settings['image_loc'],
                         gender.lower(), path_name)
-    if DISCORD:
-        ignore_list = "user_ignore/discord_{0}".format(user['twitter_id'])
-        tweet_image = utils.get_image(path, ignore_list)
-    else:
-        ignore_list = "user_ignore/{0}".format(user['twitter_id'])
+    tweet_image_list = []
+    for x in range(0, repeat_for):
+        if DISCORD:
+            ignore_list = "user_ignore/discord_{0}".format(user['twitter_id'])
+            tweet_image = utils.get_image(path, ignore_list)
+        else:
+            ignore_list = "user_ignore/{0}".format(user['twitter_id'])
 
-    if not DISCORD:
-        tweet_image = utils.get_image_online(tags, user['web_index'],
-                                             max_page, ignore_list,
-                                             path=path)
-    if not tweet_image:
-        tweet_image = utils.get_image(path, ignore_list)
+        if not DISCORD:
+            tweet_image = utils.get_image_online(tags, user['web_index'],
+                                                 max_page, ignore_list,
+                                                 path=path)
+        if not tweet_image:
+            tweet_image = utils.get_image(path, ignore_list)
 
-    if not tweet_image and SKIP_DUP_CHECK:
-        tweet_image = utils.get_image(path)
+        if not tweet_image and SKIP_DUP_CHECK:
+            tweet_image = utils.get_image(path)
 
-    if not tweet_image:
-        m = ("Failed to grab a new image!\n"
-             "The main image website could be offline.\n"
-             "Help: {0}").format(config_get('Help URLs', 'website_offline'))
-        remove_one_limit(user_id, "my" + gender.lower())
-        return m, False
+        if not tweet_image:
+            m = ("Failed to grab a new image!\n"
+                 "The main image website could be offline.\n"
+                 "Help: {0}").format(config_get('Help URLs',
+                                                'website_offline'))
+            remove_one_limit(user_id, "my" + gender.lower())
+            return m, False
+        tweet_image_list.append(tweet_image)
+
     if datetime.datetime.now().isoweekday() == 3:
         m = "#{0}Wednesday".format(gender)
     else:
@@ -530,6 +555,8 @@ def mywaifu(user_id, gender, DISCORD=False, SKIP_DUP_CHECK=False):
         # @user's x is x
         m = " {gender} is {name}!".format(
             gender=gender, name=user['name'].replace("_", " ").title())
+    if len(tweet_image_list) > 1:
+        return m, tweet_image_list
     return m, tweet_image
 
 
@@ -1067,8 +1094,8 @@ def source(api, status):
     def tweeted_image(api, status):
         """Return the image url from the tweet."""
         try:
-            tweet = api.get_status(status.in_reply_to_status_id)
-            tweet = tweet.entities['media'][0]['media_url_https']
+            tweet = api.lookup_status(id=status['in_reply_to_status_id'])
+            tweet = tweet[0]['entities']['media'][0]['media_url_https']
             if "tweet_video_thumb" in str(tweet):
                 is_gif = True
             else:
@@ -1081,7 +1108,6 @@ def source(api, status):
 
     tweeted_image, is_gif = tweeted_image(api, status)
     if ("Are you sure" in tweeted_image) or ("source is a" in tweeted_image):
-        count_trigger("source")
         return tweeted_image
 
     artist, series, names = info(tweeted_image)
@@ -1098,7 +1124,7 @@ def source(api, status):
             names = "Character(s): {0}\n".format(names)
         if series:
             series = "From: {0}\n".format(utils.short_string(series, 25))
-    handles = status.text.lower()
+    handles = status['text'].lower()
     handles = [word for word in handles.split() if word.startswith('@')]
     handles = list(set(handles))
     handles = ' '.join(handles).replace(

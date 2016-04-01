@@ -11,28 +11,25 @@ import os
 import re
 
 from spam_checker import (remove_all_limit, user_spam_check)
+from config import (credentials, settings, update)
 from utils import printf as print
-from config import settings
-from config import update
 import functions as func
 import utils
 
-import tweepy
+from twython import TwythonStreamer
 
 
 __program__ = "AcePictureBot"
 __version__ = "2.9.0"
-DEBUG = False
+DEBUG = True
 
 
-def post_tweet(_API, tweet, media="", command=False, rts=False):
+def post_tweet(API, tweet, media="", command=False, rts=False):
     try:
-        if media:
-            media = media.replace("\\", "\\\\")
         if rts and command:
             print("[{0}] Tweeting: {1} ({2}): [{3}] {4}".format(
                 time.strftime("%Y-%m-%d %H:%M"),
-                rts.user.screen_name, rts.user.id,
+                rts['user']['screen_name'], rts['user']['id_str'],
                 command, tweet))
         else:
             print("[{0}] Tweeting: {1}".format(
@@ -40,67 +37,102 @@ def post_tweet(_API, tweet, media="", command=False, rts=False):
                 tweet))
         if rts:
             if media:
+                media_ids = []
                 print("(Image: {0})".format(media))
-                _API.update_with_media(media, status=tweet,
-                                       in_reply_to_status_id=rts.id)
+                if isinstance(media, list):
+                    for img in media:
+                        p = open(img, 'rb')
+                        if ".mp4" in img:
+                            media_ids.append(
+                                API.upload_video(
+                                    media=p,
+                                    media_type='video/mp4')['media_id'])
+                        else:
+                            media_ids.append(
+                                API.upload_media(media=p)['media_id'])
+                else:
+                    p = open(media, 'rb')
+                    if ".mp4" in media:
+                        media_ids.append(
+                            API.upload_video(
+                                media=p,
+                                media_type='video/mp4')['media_id'])
+                    else:
+                        media_ids.append(
+                            API.upload_media(media=p)['media_id'])
+
+                API.update_status(status=tweet, media_ids=media_ids,
+                                  in_reply_to_status_id=rts['id'])
             else:
-                _API.update_status(status=tweet,
-                                   in_reply_to_status_id=rts.id)
-        else:
-            if media:
-                print("(Image: {0})".format(media))
-                _API.update_with_media(media, status=tweet)
-            else:
-                _API.update_status(status=tweet)
-    except:
+                API.update_status(status=tweet,
+                                  in_reply_to_status_id=rts['id'])
+    except Exception as e:
+        print(e)
         pass
 
 
-def tweet_command(_API, status, message, command):
+def tweet_command(API, status, message, command):
     tweet = False
     tweet_image = False
-    user = status.user
+    user = status['user']
     # Mod command
-    is_mod = [True if str(user.id) in MOD_IDS else False][0]
+    is_mod = [True if user['id_str'] in MOD_IDS else False][0]
+    is_patreon = [True if user['id_str'] in PATREON_IDS else False][0]
     if command == "DelLimits":
         if is_mod:
             their_id, cmd = message.split(' ', 2)
             remove_all_limit(their_id, cmd)
             print("[INFO] Removed limits for {0} - {1}".format(
                 their_id, cmd))
-        return False, False
+        return "Removed!", False
     if command == "AllowAcc":
         if is_mod:
             func.allow_user(message)
             print("[INFO] Allowing User {0} to register!".format(message))
             ALLOWED_IDS.append(message)
-    if str(user.id) not in PATREON_IDS:
-        if not is_mod:
-            user_is_limited = user_spam_check(user.id,
-                                              user.screen_name, command)
-            if isinstance(user_is_limited, str):
-                # User hit limit, tweet warning
-                command = ""
-                tweet = user_is_limited
-            elif not user_is_limited:
-                # User is limited, return
-                print("[{0}] User is limited! Ignoring...".format(
-                    time.strftime("%Y-%m-%d %H:%M")))
-                return False
+    if (not is_mod) or (not is_mod and not is_patreon):
+        user_is_limited = user_spam_check(user['id_str'],
+                                          user['screen_name'], command)
+        if isinstance(user_is_limited, str):
+            # User hit limit, tweet warning
+            command = ""
+            tweet = user_is_limited
+        elif not user_is_limited:
+            # User is limited, return
+            print("[{0}] User is limited! Ignoring...".format(
+                time.strftime("%Y-%m-%d %H:%M")))
+            return False
 
     if settings['count_on'] and command:
         func.count_command("Global", command, settings['count_file'])
         func.count_command("Commands", command,
                            os.path.join(settings['user_count_loc'],
-                                        str(user.id)))
+                                        user['id_str']))
+
+    if command == "PicTag":
+        if is_mod or is_patreon:
+            get_imgs = 1
+            try:
+                count = int(re.search(r'\d+', message).group())
+            except (AttributeError):
+                count = False
+            if count:
+                if count > 4:
+                    get_imgs = 4
+                elif count < 1:
+                    get_imgs = 1
+                else:
+                    get_imgs = count
+            tweet, tweet_image = func.pictag(message,
+                                             repeat_for=get_imgs)
 
     if command == "DiscordConnect":
-        tweet = func.DiscordConnect(message, user.id)
+        tweet = func.DiscordConnect(message, user['id_str'])
 
     if command == "DiscordJoin":
         message = re.sub('http\S+', '', message).strip()
-        for url in status.entities['urls']:
-            message += "" + url['expanded_url']
+        for url in status['entities']['urls']:
+            message += url['expanded_url']
             break
         tweet = func.DiscordJoin(message)
 
@@ -112,26 +144,28 @@ def tweet_command(_API, status, message, command):
             os.path.join(settings['list_loc'],
                          "spoilers.txt")))
     elif command == "!Level":
-        tweet = func.get_level(twitter_id=str(user.id))
+        tweet = func.get_level(twitter_id=user['id_str'])
 
     # Main Commands
     if command == "Waifu":
-        tweet, tweet_image = func.waifu(0, message, user_id=str(user.id))
+        tweet, tweet_image = func.waifu(0, message, user_id=user['id_str'])
     elif command == "Husbando":
-        tweet, tweet_image = func.waifu(1, message, user_id=str(user.id))
+        tweet, tweet_image = func.waifu(1, message, user_id=user['id_str'])
 
-    gender = utils.gender(status.text)
+    gender = utils.gender(status['text'])
     if gender == 0:
         g_str = "waifu"
     else:
         g_str = "husbando"
     if "Register" in command:
-        is_allowed = [True if str(user.id) in ALLOWED_IDS else False][0]
-        follow_result = is_following(user.id, is_allowed)
+        is_allowed = [True if user['id_str'] in ALLOWED_IDS else False][0]
+        if is_mod:
+            is_allowed = True
+        follow_result = is_following(user['id_str'], is_allowed)
         if follow_result == "Limited":
             tweet = ("The bot is currently limited on checking stuff.\n"
                      "Try again in 15 minutes!")
-            func.remove_one_limit(user.id, g_str.lower() + "register")
+            func.remove_one_limit(user['id_str'], g_str.lower() + "register")
         elif follow_result == "Not Genuine":
             tweet = ("Your account wasn't found to be genuine.\n"
                      "Help: {url}").format(
@@ -141,20 +175,35 @@ def tweet_command(_API, status, message, command):
                      "Help: {url}").format(
                 url=func.config_get('Help URLs', 'must_follow'))
         else:
-            tweet, tweet_image = func.waifuregister(user.id,
-                                                    user.screen_name,
+            tweet, tweet_image = func.waifuregister(user['id_str'],
+                                                    user['screen_name'],
                                                     message, gender)
 
     if "My" in command:
         skip_dups = False
+        get_imgs = 1
         if "my{g_str}+".format(g_str=g_str) in message.lower():
             skip_dups = True
         if "my{g_str}-".format(g_str=g_str) in message.lower():
-            func.delete_used_imgs(str(user.id), False)
-        tweet, tweet_image = func.mywaifu(user.id, gender, False, skip_dups)
+            func.delete_used_imgs(user['id_str'], False)
+        if is_mod or is_patreon:
+            try:
+                count = int(re.search(r'\d+', message).group())
+            except (AttributeError):
+                count = False
+            if count:
+                if count > 4:
+                    get_imgs = 4
+                elif count < 1:
+                    get_imgs = 1
+                else:
+                    get_imgs = count
+
+        tweet, tweet_image = func.mywaifu(user['id_str'], gender,
+                                          False, skip_dups, get_imgs)
 
     if "Remove" in command:
-        tweet = func.waifuremove(user.id, gender)
+        tweet = func.waifuremove(user['id_str'], gender)
 
     if command == "OTP":
         tweet, tweet_image = func.otp(message)
@@ -174,11 +223,11 @@ def tweet_command(_API, status, message, command):
             return False
 
     if command == "Source":
-        tweet = func.source(_API, status)
+        tweet = func.source(API, status)
 
     if tweet or tweet_image:
-        tweet = "@{0} {1}".format(user.screen_name, tweet)
-        post_tweet(_API, tweet, tweet_image, command, status)
+        tweet = "@{0} {1}".format(user['screen_name'], tweet)
+        post_tweet(API, tweet, tweet_image, command, status)
 
 
 def acceptable_tweet(status):
@@ -186,8 +235,8 @@ def acceptable_tweet(status):
     global IGNORE_WORDS
     global BLOCKED_IDS
 
-    tweet = status.text
-    user = status.user
+    tweet = status['text']
+    user = status['user']
     # Ignore ReTweets.
     if tweet.startswith('RT'):
         return False, False
@@ -195,7 +244,7 @@ def acceptable_tweet(status):
         return False, False
 
     if DEBUG:
-        if str(user.id) not in MOD_IDS:
+        if user['id_str'] not in MOD_IDS:
             return False, False
 
     # Reload in case of manual updates.
@@ -213,7 +262,7 @@ def acceptable_tweet(status):
                      "Blocked Words.txt"))
 
     # Ignore bots and bad boys.
-    if str(user.id) in BLOCKED_IDS:
+    if user['id_str'] in BLOCKED_IDS:
         return False, False
 
     # Ignore some messages.
@@ -251,21 +300,21 @@ def acceptable_tweet(status):
 
     # No command is found see if acceptable for a random waifu.
     if not command:
-        # Ignore quote ReTweets.
+        # Ignore quote ReTweets only in this case.
         if tweet.startswith('"@'):
             return False, False
         # Ignore if it doesn't mention the main bot only.
-        if settings['twitter_track'][0] not in status.text:
+        if settings['twitter_track'][0].lower() not in status['text'].lower():
             return False, False
         # Last case, check if they're not replying to a tweet.
-        if status.in_reply_to_status_id is None:
+        if status['in_reply_to_status_id_str'] is None:
             command = "Waifu"
         else:
             return False, False
 
     if command == "Reroll" or command == "Another One":
         try:
-            tweet = USER_LAST_COMMAND[user.id]
+            tweet = USER_LAST_COMMAND[user['id_str']]
             command = utils.get_command(tweet)
             if not command:
                 return False, False
@@ -276,7 +325,7 @@ def acceptable_tweet(status):
         except (ValueError, KeyError):
             return False, False
     else:
-        USER_LAST_COMMAND[user.id] = tweet
+        USER_LAST_COMMAND[user['id_str']] = tweet
         if len(USER_LAST_COMMAND) > 30:
             USER_LAST_COMMAND = (OrderedDict(
                 islice(USER_LAST_COMMAND.items(),
@@ -286,22 +335,22 @@ def acceptable_tweet(status):
     rate_time = datetime.datetime.now()
     rate_limit_secs = 10800
     rate_limit_user = 15
-    if str(user.id) in PATREON_IDS:
+    if user['id_str'] in PATREON_IDS:
         # Still a limit just in case
         rate_limit_user = 35
-    if user.id in RATE_LIMIT_DICT:
+    if user['id_str'] in RATE_LIMIT_DICT:
         # User is now limited (3 hours).
-        if ((rate_time - RATE_LIMIT_DICT[user.id][0])
+        if ((rate_time - RATE_LIMIT_DICT[user['id_str']][0])
                 .total_seconds() < rate_limit_secs)\
-           and (RATE_LIMIT_DICT[user.id][1] >= rate_limit_user):
+           and (RATE_LIMIT_DICT[user['id_str']][1] >= rate_limit_user):
             return False, False
         # User limit is over.
-        elif ((rate_time - RATE_LIMIT_DICT[user.id][0])
+        elif ((rate_time - RATE_LIMIT_DICT[user['id_str']][0])
                 .total_seconds() > rate_limit_secs):
-            del RATE_LIMIT_DICT[user.id]
+            del RATE_LIMIT_DICT[user['id_str']]
         else:
             # User found, not limited, add one to the trigger count.
-            RATE_LIMIT_DICT[user.id][1] += 1
+            RATE_LIMIT_DICT[user['id_str']][1] += 1
     else:
         # User not found, add them to RATE_LIMIT_DICT.
         # Before that quickly go through RATE_LIMIT_DICT
@@ -310,7 +359,7 @@ def acceptable_tweet(status):
             if ((rate_time - RATE_LIMIT_DICT[person][0])
                .total_seconds() > rate_limit_secs):
                 del RATE_LIMIT_DICT[person]
-        RATE_LIMIT_DICT[user.id] = [rate_time, 1]
+        RATE_LIMIT_DICT[user['id_str']] = [rate_time, 1]
 
     # This shouldn't happen but just in case.
     if not isinstance(command, str):
@@ -323,21 +372,22 @@ def acceptable_tweet(status):
 def is_following(user_id, is_allowed=False):
     if not is_allowed:
         try:
-            user_info = API.get_user(user_id)
-        except tweepy.TweepError:
+            user_info = API.lookup_user(user_id=user_id)
+        except twython.exceptions.TwythonAuthError:
             return "Limited"
-        if user_info.statuses_count < 10:
+        if user_info[0]['statuses_count'] < 10:
             return "Not Genuine"
-        elif user_info.followers_count < 5:
+        elif user_info[0]['followers_count'] < 5:
             return "Not Genuine"
     try:
-        ship = API.lookup_friendships(user_ids=(2910211797, user_id))
-    except tweepy.TweepError:
+        ship = API.lookup_friendships(user_id='2910211797,{}'.format(user_id))
+    except twython.exceptions.TwythonAuthError:
         return "Limited"
     try:
-        return ship[1].is_followed_by
-    except TypeError:
+        return 'following' in ship[1]['connections']
+    except (TypeError, IndexError):
         # Account doesn't exist anymore.
+        # Not Following.
         return False
 
 
@@ -397,17 +447,16 @@ def status_account(status_api):
         time.sleep(3 * 60)
 
 
-class CustomStreamListener(tweepy.StreamListener):
-
-    def on_status(self, status):
+class TwitterStream(TwythonStreamer):
+    def on_success(self, data):
         global HAD_ERROR
         global HANG_TIME
         global TWEETS_READ
-        if str(status.id) in TWEETS_READ:
+        if data['id_str'] in TWEETS_READ:
             return True
-        TWEETS_READ.append(str(status.id))
+        TWEETS_READ.append(data['id_str'])
         HANG_TIME = time.time()
-        tweet, command = acceptable_tweet(status)
+        tweet, command = acceptable_tweet(data)
         if not command:
             return True
         try:
@@ -417,8 +466,8 @@ class CustomStreamListener(tweepy.StreamListener):
             pass
         print("[{0}] {1} ({2}): {3}".format(
             time.strftime("%Y-%m-%d %H:%M"),
-            status.user.screen_name, status.user.id, status.text))
-        tweet_command(API, status, tweet, command)
+            data['user']['screen_name'], data['user']['id_str'], data['text']))
+        tweet_command(API, data, tweet, command)
         HAD_ERROR = False
         with open(os.path.join(settings['ignore_loc'],
                                "tweets_read.txt"), 'w') as file:
@@ -429,7 +478,8 @@ class CustomStreamListener(tweepy.StreamListener):
             # Related to above PermissionError.
             pass
 
-    def on_error(self, status_code):
+    def on_error(self, status_code, data):
+        """
         global LAST_STATUS_CODE
         global HANG_TIME
         HANG_TIME = time.time()
@@ -442,56 +492,65 @@ class CustomStreamListener(tweepy.StreamListener):
             print(msg)
             post_tweet(func.login(status=True), msg)
         return True
+        """
+        print(status_code)
 
 
-def start_stream(sapi=None):
-    if sapi is None:
-        sapi = func.login(rest=False)
+def start_stream():
     try:
-        stream_sapi = tweepy.Stream(sapi, CustomStreamListener())
+        stream = TwitterStream(credentials['consumer_key'],
+                               credentials['consumer_secret'],
+                               credentials['access_token'],
+                               credentials['access_token_secret'])
         print("[INFO] Reading Twitter Stream!")
-        stream_sapi.filter(
-            track=[x.lower() for x in settings['twitter_track']], async=True)
-    except (KeyboardInterrupt, SystemExit):
-        stream_sapi.disconnect()
+        # TODO: Start Thread here
+        stream_thread = Thread(
+            target=stream.statuses.filter,
+            kwargs={'track': ', '.join(
+                [x.lower() for x in settings['twitter_track']])})
+        stream_thread.daemon = True
+        stream_thread.start()
+    except (KeyboardInterrupt, SystemExit, RuntimeError):
+        stream.disconnect()
         sys.exit(0)
-    return stream_sapi
+    return stream
 
 
-def handle_stream(sapi, status_api=False):
-    stream_sapi = start_stream(sapi)
+def handle_stream(status_api=False):
+    stream = start_stream()
     global HANG_TIME
-    while True:
-        time.sleep(5)
-        elapsed = (time.time() - HANG_TIME)
-        if elapsed > 600:
-            # TODO: Temp to try and stop crash tweet spam for now
-            if os.path.exists(update['last_crash_file']):
-                if time.time() - os.path.getctime(
-                        update['last_crash_file']) > 80000:
-                    os.remove(update['last_crash_file'])
-                    open(update['last_crash_file'], 'w')
-                    msg = """[{0}] Restarting!
-The bot will catch up on missed messages now!""".format(
-                        time.strftime("%Y-%m-%d %H:%M"))
-                    if status_api:
-                        post_tweet(status_api, msg)
-                    else:
-                        print(msg)
-            stream_sapi.disconnect()
-            time.sleep(3)
-            if not stream_sapi.running:
-                stream_sapi = start_stream(sapi)
-            Thread(target=read_notifications,
-                   args=(API, True, TWEETS_READ)).start()
-            HANG_TIME = time.time()
+    try:
+        while True:
+            time.sleep(5)
+            elapsed = (time.time() - HANG_TIME)
+            if elapsed > 600:
+                # TODO: Temp to try and stop crash tweet spam for now
+                if os.path.exists(update['last_crash_file']):
+                    if time.time() - os.path.getctime(
+                            update['last_crash_file']) > 80000:
+                        os.remove(update['last_crash_file'])
+                        open(update['last_crash_file'], 'w')
+                        msg = """[{0}] Restarting!
+    The bot will catch up on missed messages now!""".format(
+                            time.strftime("%Y-%m-%d %H:%M"))
+                        if status_api:
+                            post_tweet(status_api, msg)
+                        else:
+                            print(msg)
+                stream.disconnect()
+                Thread(target=read_notifications,
+                       args=(API, True, TWEETS_READ)).start()
+                time.sleep(5)
+                stream = start_stream()
+                HANG_TIME = time.time()
+    except (KeyboardInterrupt, SystemExit):
+        sys.exit(0)
 
-
-def read_notifications(_API, reply, tweets_read):
-    statuses = _API.mentions_timeline()
+def read_notifications(API, reply, tweets_read):
+    statuses = API.get_mentions_timeline()
     print("[INFO] Reading late tweets!")
     for status in reversed(statuses):
-        if str(status.id) in TWEETS_READ:
+        if status['id_str'] in TWEETS_READ:
             continue
         tweet, command = acceptable_tweet(status)
         if not command:
@@ -499,10 +558,10 @@ def read_notifications(_API, reply, tweets_read):
         if reply:
             print("[{0} - Late]: {1} ({2}): {3}".format(
                 time.strftime("%Y-%m-%d %H:%M"),
-                status.user.screen_name, status.user.id,
-                status.text))
-            tweet_command(_API, status, tweet, command)
-        TWEETS_READ.append(str(status.id))
+                status['user']['screen_name'], status['user']['id_str'],
+                status['text']))
+            tweet_command(API, status, tweet, command)
+        TWEETS_READ.append(status['id_str'])
         with open(os.path.join(settings['ignore_loc'],
                                "tweets_read.txt"),
                   'w') as file:
@@ -539,10 +598,9 @@ if __name__ == '__main__':
                      "tweets_read.txt"))
     # TODO: TEMP (Read above)
     open(update['last_crash_file'], 'w')
-    API = func.login(rest=True)
-    SAPI = func.login(rest=False)
+    API = func.login()
     STATUS_API = func.login(status=True)
     read_notifications(API, True, TWEETS_READ)
     Thread(target=status_account, args=(STATUS_API, )).start()
     Thread(target=func.check_website).start()
-    handle_stream(SAPI, STATUS_API)
+    handle_stream(STATUS_API)

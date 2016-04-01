@@ -16,8 +16,8 @@ from functions import (config_save, config_get, config_add_section,
                        config_save_2, config_delete_key,
                        config_delete_section, config_get_section_items,
                        random_list, waifu, mywaifu, otp, get_level,
-                       count_command, delete_used_imgs)
-from config import discord_settings
+                       count_command, delete_used_imgs, pictag)
+from config import (settings, discord_settings)
 from utils import printf as print
 from utils import (get_command, file_to_list)
 
@@ -59,6 +59,12 @@ BOT_ACCS_STR = ["!apb " + x for x in BOT_ACCS]
 # List of bot accs
 BLOCKED_IDS = file_to_list(
     os.path.join(os.path.dirname(os.path.realpath(__file__)), "bot_ids.txt"))
+
+MOD_IDS = ["81515803085639680"]
+
+PATREON_IDS = file_to_list(
+    os.path.join(settings['list_loc'],
+                 "patreon_users.txt"))
 
 
 def get_twitter_id(discord_id):
@@ -360,7 +366,8 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
         if message.content.startswith("!apb ids"):
             # Debug IDs.
             msg = """Server ID: {0.server.id}
-Current Channel ID: {0.channel.id}""".format(message)
+Current Channel ID: {0.channel.id}
+Your ID: {0.author.id}""".format(message)
             await client.send_message(message.channel, msg)
             return
 

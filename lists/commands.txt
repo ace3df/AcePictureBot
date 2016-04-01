@@ -1,10 +1,13 @@
 # List of commands. Type=None
+# Mod only
 DelLimits
+AllowAcc
+# Register Related Commands
 My{GENDER}
 {GENDER}Register
 {GENDER}Remove
 SetBirthday
-Spoiler
+# Normal Commands
 Shipgirl
 Touhou
 Vocaloid
@@ -24,8 +27,15 @@ Source
 Monstergirl
 Witchgirl
 Tankgirl
+# User Related
+!Level
+# Reroll Type ones
 Reroll
 Another One
+# Discord Related
 DiscordConnect
 DiscordJoin
-AllowAcc
+# Joke
+Spoiler
+# Patreon only
+PicTag

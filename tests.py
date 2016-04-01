@@ -1,11 +1,13 @@
 from utils import get_image_online
+from utils import printf as print
 import functions
 import time
 """ Simply Tests.
 These will be done while I look at it so I don't have to worry
 or go more into testing other than simply this.
 """
-
+from config import credentials
+from twython import TwythonStreamer
 
 import sys
 print("Running Python Version:", sys.version)

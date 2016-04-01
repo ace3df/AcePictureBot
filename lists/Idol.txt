@@ -63,12 +63,10 @@ Jacqueline (Show By Rock!!)||Show By Rock!!
 Jougasaki Mika||Idolmaster
 Jougasaki Mika||Idolmaster Cinderella Girls
 Jougasaki Rika||Idolmaster
-Jougasaki Rika||Idolmaster
 Jougasaki Rika||Idolmaster Cinderella Girls
 Julia||Idolmaster
 Kamijou Haruna||Idolmaster Cinderella Girls
 Kamiya Nao||Idolmaster Cinderella Girls
-Kanzaki Mizuki||Aikatsu!
 Kanzaki Mizuki||Aikatsu!
 Kanzaki Ranko||Idolmaster
 Kanzaki Ranko||Idolmaster Cinderella Girls
@@ -84,7 +82,6 @@ Kazanari Tsubasa||Senki Zesshou Symphogear
 Kenzaki Makoto||Dokidoki! Pretty Cure
 Kikuchi Makoto||Idolmaster
 Kikuko||Miss Monochrome
-Kikuko||Miss Monochrome
 Kikuma Kaya||Wake Up Girls!
 Kinoshita Hinata||Idolmaster
 Kinoshita Ringo||No-Rin
@@ -92,7 +89,6 @@ Kiriya Aoi||Aikatsu!
 Kisaragi Chihaya||Idolmaster
 Kisaragi Momo||Mekaku City Actors
 Kishida Mimori||AKB0048
-Kitaouji Sakura||Aikatsu!
 Kitaouji Sakura||Aikatsu!
 Kobayakawa Sae||Idolmaster Cinderella Girls
 Kogami Akira||Lucky Star
@@ -135,8 +131,6 @@ Ninomiya Asuka||Idolmaster
 Nishikino Maki||Love Live!
 Nitta Minami||Idolmaster
 Nitta Minami||Idolmaster Cinderella Girls
-Nitta Minami||Idolmaster Cinderella Girls
-Ogata Chieri||Idolmaster
 Ogata Chieri||Idolmaster
 Ogata Chieri||Idolmaster Cinderella Girls
 Ogata Rina||White Album
@@ -157,7 +151,6 @@ Sakuma Mayu||Idolmaster Cinderella Girls
 Saraswati||Kore Wa Zombie Desu Ka?
 Sasaki Chie||Idolmaster Cinderella Girls
 Shibuki Ran||Aikatsu!
-Shibuki Ran||Aikatsu!
 Shibuya Rin||Idolmaster
 Shibuya Rin||Idolmaster Cinderella Girls
 Shiina Noriko||Idolmaster Cinderella Girls
@@ -175,9 +168,7 @@ Sonokoe Utae||R-15
 Summer Ai||Captain Earth
 Tachiishi Aki||Aikatsu!
 Tada Riina||Idolmaster
-Tada Riina||Idolmaster
 Tada Riina||Idolmaster Cinderella Girls
-Takagaki Kaede||Idolmaster
 Takagaki Kaede||Idolmaster
 Takagaki Kaede||Idolmaster Cinderella Girls
 Takahashi Minami||AKB0048
@@ -187,7 +178,6 @@ Takayama Sayoko||Idolmaster
 Tokugawa Ieyasu||Sengoku Collection
 Totoki Airi||Idolmaster
 Totoki Airi||Idolmaster Cinderella Girls
-Toudou Yurika||Aikatsu!
 Toudou Yurika||Aikatsu!
 Toujou Nozomi||Love Live!
 Tsukino (Show By Rock!!)||Show By Rock!!
@@ -205,3 +195,12 @@ Hotaru (Splatoon)||Splatoon
 Aori (Splatoon)||Splatoon
 Amane Misa||Death Note
 Aino Minako||Sailor Moon
+Takami Chika||Love Live! Sunshine!!
+Sakurauchi Riko||Love Live! Sunshine!!
+Matsuura Kanan||Love Live! Sunshine!!
+Kurosawa Dia||Love Live! Sunshine!!
+Watanabe You||Love Live! Sunshine!!
+Tsushima Yoshiko||Love Live! Sunshine!!
+Kunikida Hanamaru||Love Live! Sunshine!!
+Ohara Mari||Love Live! Sunshine!!
+Kurosawa Ruby||Love Live! Sunshine!!
