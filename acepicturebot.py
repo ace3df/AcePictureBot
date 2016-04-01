@@ -20,7 +20,7 @@ from twython import TwythonStreamer
 
 
 __program__ = "AcePictureBot"
-__version__ = "2.9.1"
+__version__ = "2.9.2"
 DEBUG = False
 
 
@@ -384,7 +384,7 @@ def is_following(user_id, is_allowed=False):
     except twython.exceptions.TwythonAuthError:
         return "Limited"
     try:
-        return 'following' in ship[1]['connections']
+        return 'followed_by' in ship[1]['connections']
     except (TypeError, IndexError):
         # Account doesn't exist anymore.
         # Not Following.
@@ -431,7 +431,8 @@ def status_account(status_api):
                                    utils.short_string(msg_msg, 90),
                                    msg_url)
         if not DEBUG:
-            post_tweet(status_api, msg)
+            print(msg)
+            status_api.update_status(status=msg)
 
     while True:
         url = "https://github.com/ace3df/AcePictureBot/commits/master.atom"
@@ -550,7 +551,7 @@ def handle_stream(status_api=False):
     The bot will catch up on missed messages now!""".format(
                             time.strftime("%Y-%m-%d %H:%M"))
                         if status_api:
-                            post_tweet(status_api, msg)
+                            status_api.update_status(status=msg)
                         else:
                             print(msg)
                 stream.disconnect()
