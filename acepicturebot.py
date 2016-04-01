@@ -20,7 +20,7 @@ from twython import TwythonStreamer
 
 
 __program__ = "AcePictureBot"
-__version__ = "2.9.0"
+__version__ = "2.9.1"
 DEBUG = False
 
 
@@ -500,8 +500,8 @@ class StoppableThread(threading.Thread):
     """Thread class with a stop() method. The thread itself has to check
     regularly for the stopped() condition."""
 
-    def __init__(self):
-        super(StoppableThread, self).__init__()
+    def __init__(self, target, kwargs):
+        super(StoppableThread, self).__init__(target=target, kwargs=kwargs)
         self._stop = threading.Event()
 
     def stop(self):
@@ -509,6 +509,7 @@ class StoppableThread(threading.Thread):
 
     def stopped(self):
         return self._stop.isSet()
+
 
 def start_stream():
     try:
