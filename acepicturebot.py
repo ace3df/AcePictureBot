@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as etree
 from collections import OrderedDict
 from itertools import islice
-from threading import Thread
 import urllib.request
+import threading
 import datetime
 import random
 import time
@@ -21,7 +21,7 @@ from twython import TwythonStreamer
 
 __program__ = "AcePictureBot"
 __version__ = "2.9.0"
-DEBUG = True
+DEBUG = False
 
 
 def post_tweet(API, tweet, media="", command=False, rts=False):
@@ -123,7 +123,7 @@ def tweet_command(API, status, message, command):
                     get_imgs = 1
                 else:
                     get_imgs = count
-            tweet, tweet_image = func.pictag(message,
+            tweet, tweet_image = func.pictag(message.replace(count, ""),
                                              repeat_for=get_imgs)
 
     if command == "DiscordConnect":
@@ -496,6 +496,20 @@ class TwitterStream(TwythonStreamer):
         print(status_code)
 
 
+class StoppableThread(threading.Thread):
+    """Thread class with a stop() method. The thread itself has to check
+    regularly for the stopped() condition."""
+
+    def __init__(self):
+        super(StoppableThread, self).__init__()
+        self._stop = threading.Event()
+
+    def stop(self):
+        self._stop.set()
+
+    def stopped(self):
+        return self._stop.isSet()
+
 def start_stream():
     try:
         stream = TwitterStream(credentials['consumer_key'],
@@ -504,13 +518,14 @@ def start_stream():
                                credentials['access_token_secret'])
         print("[INFO] Reading Twitter Stream!")
         # TODO: Start Thread here
-        stream_thread = Thread(
+        stream_thread = StoppableThread(
             target=stream.statuses.filter,
             kwargs={'track': ', '.join(
                 [x.lower() for x in settings['twitter_track']])})
         stream_thread.daemon = True
         stream_thread.start()
     except (KeyboardInterrupt, SystemExit, RuntimeError):
+        stream_thread.stop()
         stream.disconnect()
         sys.exit(0)
     return stream
@@ -538,8 +553,8 @@ def handle_stream(status_api=False):
                         else:
                             print(msg)
                 stream.disconnect()
-                Thread(target=read_notifications,
-                       args=(API, True, TWEETS_READ)).start()
+                threading.Thread(target=read_notifications,
+                                 args=(API, True, TWEETS_READ)).start()
                 time.sleep(5)
                 stream = start_stream()
                 HANG_TIME = time.time()
@@ -601,6 +616,6 @@ if __name__ == '__main__':
     API = func.login()
     STATUS_API = func.login(status=True)
     read_notifications(API, True, TWEETS_READ)
-    Thread(target=status_account, args=(STATUS_API, )).start()
-    Thread(target=func.check_website).start()
+    threading.Thread(target=status_account, args=(STATUS_API, )).start()
+    threading.Thread(target=func.check_website).start()
     handle_stream(STATUS_API)
