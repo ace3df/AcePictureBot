@@ -409,7 +409,7 @@ def pictag(tags="", repeat_for=1):
     for x in range(0, repeat_for):
         tweet_image_list.append(
             utils.get_image_online('+'.join(tags), site=2, high_page=10))
-        if not tweet_image_list:
+        if not tweet_image_list[0]:
             message = "Sorry failed to get an image! Try different tags!"
             return message, False
         else:

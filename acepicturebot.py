@@ -123,7 +123,7 @@ def tweet_command(API, status, message, command):
                     get_imgs = 1
                 else:
                     get_imgs = count
-            tweet, tweet_image = func.pictag(message.replace(count, ""),
+            tweet, tweet_image = func.pictag(message.replace(str(count), ""),
                                              repeat_for=get_imgs)
 
     if command == "DiscordConnect":
