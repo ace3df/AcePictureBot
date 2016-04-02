@@ -256,7 +256,7 @@ def acceptable_tweet(status):
                      "Allowed Users.txt"))
     PATREON_IDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
-                     "patreon_users.txt"))
+                     "Patreon Users.txt"))
     IGNORE_WORDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "Blocked Words.txt"))
@@ -594,7 +594,7 @@ if __name__ == '__main__':
                      "Allowed Users.txt"))
     PATREON_IDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
-                     "patreon_users.txt"))
+                     "Patreon Users.txt"))
     IGNORE_WORDS = utils.file_to_list(
         os.path.join(settings['list_loc'],
                      "Blocked Words.txt"))
