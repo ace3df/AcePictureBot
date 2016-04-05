@@ -90,7 +90,7 @@ def tweet_command(API, status, message, command):
             func.allow_user(message)
             print("[INFO] Allowing User {0} to register!".format(message))
             ALLOWED_IDS.append(message)
-    if (not is_mod) or (not is_mod and not is_patreon):
+    if not is_patreon and not is_mod:
         user_is_limited = user_spam_check(user['id_str'],
                                           user['screen_name'], command)
         if isinstance(user_is_limited, str):
@@ -548,7 +548,7 @@ def handle_stream(status_api=False):
                         os.remove(update['last_crash_file'])
                         open(update['last_crash_file'], 'w')
                         msg = """[{0}] Restarting!
-    The bot will catch up on missed messages now!""".format(
+The bot will catch up on missed messages now!""".format(
                             time.strftime("%Y-%m-%d %H:%M"))
                         if status_api:
                             status_api.update_status(status=msg)
@@ -562,6 +562,7 @@ def handle_stream(status_api=False):
                 HANG_TIME = time.time()
     except (KeyboardInterrupt, SystemExit):
         sys.exit(0)
+
 
 def read_notifications(API, reply, tweets_read):
     statuses = API.get_mentions_timeline()
