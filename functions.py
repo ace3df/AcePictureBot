@@ -829,8 +829,11 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
             gender = "husbando"
             lines = utils.file_to_list('Sensei Male.txt')
         else:
-            lines = utils.file_to_list('Sensei Male.txt')
-            lines += utils.file_to_list('Sensei Female.txt')
+            if random.randint(0, 10) < 3:
+                gender = "husbando"
+                lines = utils.file_to_list('Sensei Male.txt')
+            else:
+                lines = utils.file_to_list('Sensei Female.txt')
     elif list_name == "Senpai":
         show_series = True
         if "female" in args:
@@ -839,8 +842,11 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
             gender = "husbando"
             lines = utils.file_to_list('Senpai Male.txt')
         else:
-            lines = utils.file_to_list('Senpai Male.txt')
-            lines += utils.file_to_list('Senpai Female.txt')
+            if random.randint(0, 10) < 3:
+                gender = "husbando"
+                lines = utils.file_to_list('Senpai Male.txt')
+            else:
+                lines = utils.file_to_list('Senpai Female.txt')
     elif list_name == "Kouhai":
         show_series = True
         if "female" in args:
@@ -849,8 +855,11 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
             gender = "husbando"
             lines = utils.file_to_list('Kouhai Male.txt')
         else:
-            lines = utils.file_to_list('Kouhai Male.txt')
-            lines += utils.file_to_list('Kouhai Female.txt')
+            if random.randint(0, 10) < 3:
+                gender = "husbando"
+                lines = utils.file_to_list('Kouhai Male.txt')
+            else:
+                lines = utils.file_to_list('Kouhai Female.txt')
     elif list_name == "Monstergirl":
         show_series = True
         scrape_images = True
@@ -892,7 +901,7 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
         else:
             name = entry
         if scrape_images:
-            tags = "{0}+solo".format(name.replace(" ", "_"))
+            tags = "{0}+solo+-genderswap".format(name.replace(" ", "_"))
     path_name = slugify(name,
                         word_boundary=True, separator="_")
     path = "{0}/{1}".format(gender.lower(), path_name)

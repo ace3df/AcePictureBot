@@ -189,9 +189,8 @@ Spanish: {2}
                 tags.append(tag)
         elif self.site == 2:
             for tag in html_tags:
-                tag = tag.findNext('a').findNext('a').findNext('a').text
+                tag = tag.findNext('a').text
                 tags.append(tag.replace(" ", "_"))
-
         if self.name in tags:
             return True
         return False
