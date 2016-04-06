@@ -64,7 +64,7 @@ MOD_IDS = ["81515803085639680"]
 
 PATREON_IDS = file_to_list(
     os.path.join(settings['list_loc'],
-                 "patreon_users.txt"))
+                 "Patreon Users.txt"))
 
 
 def get_twitter_id(discord_id):
