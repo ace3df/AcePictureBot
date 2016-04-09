@@ -587,10 +587,6 @@ def waifuregister(user_id, username, name, gender):
 
     register_object = WaifuRegisterClass(
         user_id, username, name, gender)
-    if register_object.TEMP_bug:
-        remove_one_limit(user_id, gender.lower() + "register")
-        return "Some websites are offline to get you images."\
-            "\nTry registering again later!"
     if register_object.offline:
         remove_one_limit(user_id, gender.lower() + "register")
         return "Some websites are offline to get you images."\
@@ -611,6 +607,10 @@ def waifuregister(user_id, username, name, gender):
             return "Not enough images found for \"{0}\"! Help: {1}".format(
                 capwords(register_object.org_name),
                 help_urls['not_enough_imgs']), False
+        if register_object.offline:
+            remove_one_limit(user_id, gender.lower() + "register")
+            return "Some websites are offline to get you images."\
+                "\nTry registering again later!"
     m, tweet_image = mywaifu(user_id, gender)
     return m, tweet_image
 

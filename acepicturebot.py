@@ -20,7 +20,7 @@ from twython import TwythonStreamer
 
 
 __program__ = "AcePictureBot"
-__version__ = "2.9.4"
+__version__ = "2.9.5"
 DEBUG = False
 
 

@@ -39,7 +39,6 @@ class WaifuRegisterClass:
         self.override = False
         self.multinames = False
         self.noimages = False
-        self.TEMP_bug = False
         self.notenough = False
         self.offline = False
         self.soup = False
@@ -178,8 +177,9 @@ Spanish: {2}
     def is_name(self):
         # Make sure they're not registering a show
         # Check if they are trying to register a show name
-        if self.soup.find('div', text="No matching posts"):
-            return False
+        if self.site == 0:
+            if self.soup.find('div', text="No matching posts"):
+                return False
         html_tags = self.soup.find_all(
             'li', class_="tag-type-character")
         tags = []
@@ -189,7 +189,7 @@ Spanish: {2}
                 tags.append(tag)
         elif self.site == 2:
             for tag in html_tags:
-                tag = tag.findNext('a').text
+                tag = tag.findNext('a').findNext('a').findNext('a').text
                 tags.append(tag.replace(" ", "_"))
         if self.name in tags:
             return True
@@ -233,9 +233,6 @@ Spanish: {2}
         if config_get('Websites', 'sankakucomplex') == "False":
             self.site = 2
         self.soup = self.get_soup(self.site)
-        if "error" in str(self.soup):
-            self.TEMP_bug = True
-            return self.TEMP_bug
         if not self.soup:
             self.offline = True
             return self.offline
@@ -249,13 +246,13 @@ Spanish: {2}
                 self.noimages = True
                 return self.noimages
             self.name = self.reverse_name(self.name)
-            self.soup = self.get_soup(0)
+            self.soup = self.get_soup(self.site)
             if not self.soup:
                 self.offline = True
                 return self.offline
             if not self.is_name():
                 self.noimages = True
                 return self.noimages
-        if not self.has_enough_imgs(0):
+        if not self.has_enough_imgs(self.site):
             return self.notenough
         self.save_to_file()

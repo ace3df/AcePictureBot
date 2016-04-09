@@ -1,5 +1,4 @@
 import sys
-sys.path.append('..')
 from collections import OrderedDict
 from itertools import islice
 import configparser
@@ -11,6 +10,7 @@ import random
 import time
 import re
 import os
+sys.path.append('..')
 
 from functions import (config_save, config_get, config_add_section,
                        config_save_2, config_delete_key,
@@ -141,6 +141,7 @@ async def inv_from_cmd():
     """Check a folder for new invites."""
     # TODO: use better function name
     await client.wait_until_ready()
+    await asyncio.sleep(20)
     while not client.is_closed:
         for inv_file in os.listdir(discord_settings['invites_loc']):
             if inv_file.endswith(".txt"):
@@ -158,15 +159,16 @@ async def inv_from_cmd():
 async def change_game():
     """Change the accounts game to text that shows tips."""
     # TODO: Test around with spacing and think of better ones
-    tips_list = ["For Help: !apb help"]
+    tips_list = ["Help: !apb help", "Status: @AceStatusBot"]
     list_cmds = ["Shipgirl", "Touhou", "Vocaloid",
                  "Imouto", "Idol", "Shota",
                  "Onii-chan", "Onee-chan", "Sensei",
                  "Monstergirl", "Witchgirl", "Tankgirl",
                  "Senpai", "Kouhai"]
     for cmd in list_cmds:
-        tips_list.append("Try saying: " + cmd)
+        tips_list.append("Try: " + cmd)
     await client.wait_until_ready()
+    await asyncio.sleep(20)
     while not client.is_closed:
         await client.change_status(game=discord.Game(
             name=random.choice(tips_list)),
@@ -177,6 +179,7 @@ async def change_game():
 async def timeout_channel():
     """Check if the bot has talkined in each server in the last 4 days."""
     await client.wait_until_ready()
+    await asyncio.sleep(20)
     while not client.is_closed:
         current_time = time.time()
         current_server_list = client.servers
@@ -200,7 +203,7 @@ async def rss_twitter():
         current_server_list = client.servers
         for bot in BOT_ACCS:
             url = RSS_URL + bot + ".xml"
-            async with session.get(url) as r:
+            async with aiohttp.get(url) as r:
                 html = await r.text()
             d = feedparser.parse(html)
             try:
@@ -220,10 +223,10 @@ async def rss_twitter():
                 random.choice('abcdefg0123456') for _ in range(6))\
                 + '.jpg'
 
-            async with session.get(image_url) as r:
+            async with aiohttp.get(image_url) as r:
                 data = await r.read()
-                with open(img_file_name, "wb") as f:
-                    f.write(data)
+            with open(img_file_name, "wb") as f:
+                f.write(data)
 
             if os.stat(img_file_name).st_size == 0:
                 # Image failed to download, delete and continue on
@@ -363,11 +366,12 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
 
     if message.author.id in server_settings['mods'].split(", "):
         edit_result = False
-        if message.content.startswith("!apb ids"):
+        if message.content.startswith("!apb debug"):
             # Debug IDs.
-            msg = """Server ID: {0.server.id}
+            msg = """Current Server ID: {0.server.id}
 Current Channel ID: {0.channel.id}
-Your ID: {0.author.id}""".format(message)
+Your ID: {0.author.id}
+Currently in {1} total servers!""".format(message, len(client.servers))
             await client.send_message(message.channel, msg)
             return
 
@@ -815,8 +819,6 @@ async def on_ready():
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    session = aiohttp.ClientSession(loop=loop)
-
     try:
         loop.create_task(timeout_channel())
         loop.create_task(rss_twitter())
