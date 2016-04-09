@@ -23,6 +23,7 @@ from utils import (get_command, file_to_list)
 
 import feedparser
 import discord
+import aiofiles
 
 import logging
 
@@ -141,7 +142,7 @@ async def inv_from_cmd():
     """Check a folder for new invites."""
     # TODO: use better function name
     await client.wait_until_ready()
-    await asyncio.sleep(20)
+    await asyncio.sleep(60)
     while not client.is_closed:
         for inv_file in os.listdir(discord_settings['invites_loc']):
             if inv_file.endswith(".txt"):
@@ -168,7 +169,7 @@ async def change_game():
     for cmd in list_cmds:
         tips_list.append("Try: " + cmd)
     await client.wait_until_ready()
-    await asyncio.sleep(20)
+    await asyncio.sleep(60)
     while not client.is_closed:
         await client.change_status(game=discord.Game(
             name=random.choice(tips_list)),
@@ -179,7 +180,7 @@ async def change_game():
 async def timeout_channel():
     """Check if the bot has talkined in each server in the last 4 days."""
     await client.wait_until_ready()
-    await asyncio.sleep(20)
+    await asyncio.sleep(60)
     while not client.is_closed:
         current_time = time.time()
         current_server_list = client.servers
@@ -199,6 +200,7 @@ async def rss_twitter():
     """Check servers to see if they want a bot to post into their server."""
     await client.wait_until_ready()
     RSS_URL = r"http://rss.acebot.xyz/"
+    await asyncio.sleep(60)
     while not client.is_closed:
         current_server_list = client.servers
         for bot in BOT_ACCS:
@@ -225,8 +227,9 @@ async def rss_twitter():
 
             async with aiohttp.get(image_url) as r:
                 data = await r.read()
-            with open(img_file_name, "wb") as f:
-                f.write(data)
+
+            async with aiofiles.open(img_file_name, mode='wb') as f:
+                await f.write(data)
 
             if os.stat(img_file_name).st_size == 0:
                 # Image failed to download, delete and continue on
