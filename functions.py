@@ -590,7 +590,7 @@ def waifuregister(user_id, username, name, gender):
     if register_object.offline:
         remove_one_limit(user_id, str_gender.lower() + "register")
         return "Some websites are offline to get you images."\
-            "\nTry registering again later!"
+            "\nTry registering again later!", False
     if register_object.disable:
         warn_user(user_id, "Banned Register - {0}".format(name))
         return False, False
@@ -610,7 +610,7 @@ def waifuregister(user_id, username, name, gender):
         if register_object.offline:
             remove_one_limit(user_id, str_gender.lower() + "register")
             return "Some websites are offline to get you images."\
-                "\nTry registering again later!"
+                "\nTry registering again later!", False
     m, tweet_image = mywaifu(user_id, gender)
     return m, tweet_image
 
