@@ -564,15 +564,15 @@ def waifuregister(user_id, username, name, gender):
     config = configparser.RawConfigParser(allow_no_value=True)
     config.read(settings['settings'])
     help_urls = (dict(config.items('Help URLs')))
+    if gender == 0:
+        str_gender = "Waifu"
+    elif gender == 1:
+        str_gender = "Husbando"
     if config_get('Websites', 'sankakucomplex') == "False" \
             and config_get('Websites', 'safebooru') == "False":
         m = "Some websites are offline to get you images."\
             "\nTry registering again later!"
-        if gender == 0:
-            gender = "Waifu"
-        elif gender == 1:
-            gender = "Husbando"
-        remove_one_limit(user_id, gender.lower() + "register", username)
+        remove_one_limit(user_id, str_gender.lower() + "register", username)
         return m, False
     if name == "":
         m = "You forgot to include a name! Help: {0}".format(
@@ -588,7 +588,7 @@ def waifuregister(user_id, username, name, gender):
     register_object = WaifuRegisterClass(
         user_id, username, name, gender)
     if register_object.offline:
-        remove_one_limit(user_id, gender.lower() + "register")
+        remove_one_limit(user_id, str_gender.lower() + "register")
         return "Some websites are offline to get you images."\
             "\nTry registering again later!"
     if register_object.disable:
@@ -608,7 +608,7 @@ def waifuregister(user_id, username, name, gender):
                 capwords(register_object.org_name),
                 help_urls['not_enough_imgs']), False
         if register_object.offline:
-            remove_one_limit(user_id, gender.lower() + "register")
+            remove_one_limit(user_id, str_gender.lower() + "register")
             return "Some websites are offline to get you images."\
                 "\nTry registering again later!"
     m, tweet_image = mywaifu(user_id, gender)
