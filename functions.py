@@ -875,11 +875,11 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
         show_series = False
         scrape_images = True
         lines = utils.file_to_list('Tankgirl.txt')
-    elif list_name == "Granblue":
+    elif list_name == "Grangirl":
         hashtag = ""
         show_series = False
         scrape_images = True
-        lines = utils.file_to_list('Granblue.txt')
+        lines = utils.file_to_list('Grangirl.txt')
         end_tags = "+granblue_fantasy"
 
     # Under heavy stuff random.choice can be very weak
