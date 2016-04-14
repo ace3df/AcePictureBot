@@ -4,6 +4,8 @@ _site/
 Gemfile.lock
 Ace.xml
 
+rewrite/
+
 ignore_lists/
 users/
 .idea/vcs.xml

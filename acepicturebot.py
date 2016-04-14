@@ -212,8 +212,10 @@ def tweet_command(API, status, message, command):
                  "Imouto", "Idol", "Shota",
                  "Onii", "Onee", "Sensei",
                  "Monstergirl", "Witchgirl", "Tankgirl",
-                 "Senpai", "Kouhai"]
+                 "Senpai", "Kouhai", "Granblue"]
     if command in list_cmds:
+        if command == "Granblue" and not is_patreon:
+            return False
         tweet, tweet_image = func.random_list(command, message)
 
     if command == "Airing":

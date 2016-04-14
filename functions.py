@@ -442,7 +442,7 @@ def waifu(gender, args="", otp=False, DISCORD=False, user_id=False):
                slugify(entry[1], word_boundary=True):
                 matched.append(entry)
         # It's not really that random if there isn't that many people matched.
-        if len(matched) > 5:
+        if len(matched) > 4:
             result = random.choice(matched)
     if not result:
         result = random.choice(lines)
@@ -734,6 +734,7 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
     search_for = ""
     m = False
     lines = False
+    end_tags = False
     show_series = False
     scrape_images = True
     if list_name == "Shipgirl":
@@ -874,6 +875,12 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
         show_series = False
         scrape_images = True
         lines = utils.file_to_list('Tankgirl.txt')
+    elif list_name == "Granblue":
+        hashtag = ""
+        show_series = False
+        scrape_images = True
+        lines = utils.file_to_list('Granblue.txt')
+        end_tags = "+granblue_fantasy"
 
     # Under heavy stuff random.choice can be very weak
     # so just a quick way to make sure it's 'random random'
@@ -906,6 +913,8 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
                         word_boundary=True, separator="_")
     path = "{0}/{1}".format(gender.lower(), path_name)
     tweet_image = utils.get_image(path)
+    if end_tags:
+        tags = tags + end_tags
     if scrape_images and not DISCORD or not tweet_image and not DISCORD:
         tweet_image_temp = utils.get_image_online(tags, 0, 1, "", path)
         if tweet_image_temp is not False:

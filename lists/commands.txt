@@ -39,3 +39,4 @@ DiscordJoin
 Spoiler
 # Patreon only
 PicTag
+Granblue

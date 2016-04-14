@@ -641,3 +641,13 @@ def gender(string):
     elif "husbando" in string:
         return 1
     return False
+
+
+def has_imgs(url):
+    print(url)
+    soup = scrape_site(url)
+    print(soup)
+    if len(soup.find_all('img')) > 1:
+        return True
+    else:
+        return False
