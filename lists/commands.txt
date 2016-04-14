@@ -19,6 +19,7 @@ Onee
 Sensei
 Senpai
 Kouhai
+Granblue
 {GENDER}
 OTP
 Airing
@@ -39,4 +40,3 @@ DiscordJoin
 Spoiler
 # Patreon only
 PicTag
-Grangirl

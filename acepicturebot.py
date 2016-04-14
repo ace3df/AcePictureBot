@@ -212,7 +212,7 @@ def tweet_command(API, status, message, command):
                  "Imouto", "Idol", "Shota",
                  "Onii", "Onee", "Sensei",
                  "Monstergirl", "Witchgirl", "Tankgirl",
-                 "Senpai", "Kouhai", "Grangirl"]
+                 "Senpai", "Kouhai", "Granblue"]
     if command in list_cmds:
         tweet, tweet_image = func.random_list(command, message)
 

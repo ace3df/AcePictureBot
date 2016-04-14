@@ -168,6 +168,8 @@ async def change_game():
                  "Senpai", "Kouhai"]
     for cmd in list_cmds:
         tips_list.append("Try: " + cmd)
+        # Add this a lot for now xd
+        tips_list.append("Try: Granblue")
     await client.wait_until_ready()
     await asyncio.sleep(60)
     while not client.is_closed:
@@ -781,7 +783,7 @@ http://twitter.com/acepicturebot""".format(command)
                  "Imouto", "Idol", "Shota",
                  "Onii", "Onee", "Sensei",
                  "Monstergirl", "Witchgirl", "Tankgirl",
-                 "Senpai", "Kouhai"]
+                 "Senpai", "Kouhai", "Granblue"]
     if command in list_cmds:
         msg, discord_image = random_list(command, msg, DISCORD=True)
 
@@ -824,7 +826,7 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     try:
         loop.create_task(timeout_channel())
-        loop.create_task(rss_twitter())
+        # loop.create_task(rss_twitter())
         loop.create_task(inv_from_cmd())
         loop.create_task(change_game())
         loop.run_until_complete(client.login(discord_settings['email'],
