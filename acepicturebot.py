@@ -130,8 +130,8 @@ def tweet_command(API, status, message, command):
         tweet = func.DiscordConnect(message, user['id_str'])
 
     if command == "DiscordJoin":
-        tweet = ("Invite the bot by using this: ",
-                 "https://discordapp.com/oauth2/authorize?",
+        tweet = ("Invite the bot by using this: "
+                 "https://discordapp.com/oauth2/authorize?"
                  "&client_id=170367887393947648&scope=bot")
     # Joke Commands
     if command == "spook":
