@@ -829,9 +829,7 @@ if __name__ == '__main__':
         # loop.create_task(rss_twitter())
         loop.create_task(inv_from_cmd())
         loop.create_task(change_game())
-        loop.run_until_complete(client.login(discord_settings['email'],
-                                             discord_settings['password']))
-        loop.run_until_complete(client.connect())
+        loop.run_until_complete(client.run(discord_settings['token']))
     except Exception:
         loop.run_until_complete(client.close())
     finally:
