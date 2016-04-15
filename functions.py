@@ -737,6 +737,7 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
     end_tags = False
     show_series = False
     scrape_images = True
+    message_layout = False
     if list_name == "Shipgirl":
         if "aoki" in args:
             lines = utils.file_to_list('Shipgirl Aoki.txt')
@@ -880,6 +881,7 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
         show_series = False
         scrape_images = True
         lines = utils.file_to_list('Granblue.txt')
+        message_layout = "{name} has joined your party!"
         end_tags = "+granblue_fantasy"
 
     # Under heavy stuff random.choice can be very weak
@@ -930,7 +932,10 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
         name_two = re.sub(r' \([^)]*\)', '', names[1])
         name = "{0} x {1}".format(name_one, name_two)
     if not m:
-        m = "Your {0} is {1} {2}".format(list_name, name, hashtag)
+        if message_layout:
+            m = message_layout.format(name)
+        else:
+            m = "Your {0} is {1} {2}".format(list_name, name, hashtag)
 
     if not list_name.endswith("OTP"):
         if user_id:
