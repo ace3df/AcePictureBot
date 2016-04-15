@@ -20,7 +20,7 @@ from twython import TwythonStreamer
 
 
 __program__ = "AcePictureBot"
-__version__ = "2.9.5"
+__version__ = "2.9.6"
 DEBUG = False
 
 
@@ -450,6 +450,12 @@ class TwitterStream(TwythonStreamer):
         global HAD_ERROR
         global HANG_TIME
         global TWEETS_READ
+        tweet_datetime = datetime.datetime.strptime(
+                data['created_at'], '%a %b %d %H:%M:%S %z %Y')
+        days_past = datetime.datetime.now(datetime.timezone.utc) - tweet_datetime
+        if days_past.days > 1:
+            return False
+        # Fri Apr 15 16:59:09 +0000 2016
         if data['id_str'] in TWEETS_READ:
             return True
         TWEETS_READ.append(data['id_str'])
@@ -615,7 +621,7 @@ if __name__ == '__main__':
     open(update['last_crash_file'], 'w')
     API = func.login()
     STATUS_API = func.login(status=True)
-    read_notifications(API, True, TWEETS_READ)
+    read_notifications(API, False, TWEETS_READ)
     threading.Thread(target=status_account, args=(STATUS_API, )).start()
     threading.Thread(target=func.check_website).start()
     handle_stream(STATUS_API)
