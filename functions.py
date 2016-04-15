@@ -933,7 +933,7 @@ def random_list(list_name, args="", DISCORD=False, user_id=False):
         name = "{0} x {1}".format(name_one, name_two)
     if not m:
         if message_layout:
-            m = message_layout.format(name)
+            m = message_layout.format(name=name)
         else:
             m = "Your {0} is {1} {2}".format(list_name, name, hashtag)
 
