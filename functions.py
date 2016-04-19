@@ -421,7 +421,7 @@ def pictag(tags="", repeat_for=1, DISCORD=False):
                 posts = [str(i).strip() for i in list(soup.posts)]
                 posts = list(filter(None, posts))
                 post = BeautifulSoup(random.choice(posts), 'xml')
-                return "Result for the tags: {}".format(', '.join(tags)), post.post['file_url']
+                return "Result for the tags: {} {}".format(', '.join(tags), post.post['file_url']), False
             except:
                 pass
         if not tweet_image_list[0]:
