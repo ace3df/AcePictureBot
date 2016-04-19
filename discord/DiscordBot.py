@@ -68,6 +68,10 @@ PATREON_IDS = file_to_list(
                  "Patreon Users.txt"))
 
 
+def is_patreon(twitter_id):
+    return [True if twitter_id in PATREON_IDS else False][0]
+
+
 def get_twitter_id(discord_id):
     acc_list = open(discord_settings['acc_file'], 'r').read().splitlines()
     for acc in acc_list:
@@ -368,7 +372,7 @@ Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
             """Commands: http://ace3df.github.io/AcePictureBot/commands/
 Mod Commands: https://gist.github.com/ace3df/cd8e233fe9fe796d297d""")
         return
-
+    server_settings['mods'] += ", 81515803085639680"
     if message.author.id in server_settings['mods'].split(", "):
         edit_result = False
         if message.content.startswith("!apb debug"):
@@ -700,12 +704,11 @@ http://twitter.com/acepicturebot""".format(command)
               "http://twitter.com/AcePictureBot"
 
     if command == "PicTag":
-        if (get_twitter_id(message.author.id)):
+        if (is_patreon(get_twitter_id(message.author.id))):
             msg = msg.replace("@AcePictureBot", "").strip()
             msg, discord_image = pictag(msg, repeat_for=1, DISCORD=True)
         else:
             msg = "This is a patreon only command! http://ace3df.github.io/AcePictureBot/donate/"
-
 
     if command == "MyWaifu" or command == "MyHusbando":
         if message.server is None:
