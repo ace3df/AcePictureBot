@@ -394,7 +394,7 @@ def get_level(twitter_id=False, discord_id=False):
             "Next Level: {2}").format(level, user_exp, for_next)
 
 
-def pictag(tags="", repeat_for=1):
+def pictag(tags="", repeat_for=1, DISCORD=False):
     """ Search Safebooru and return random result.
     For Patreon supporters only.
     """
@@ -404,11 +404,26 @@ def pictag(tags="", repeat_for=1):
         return ("Sorry, can't search more than 5 tags!\n"
                 "Example of using tags correctly: "
                 "http://safebooru.org/index.php?"
-                "page=post&s=list&tags=blake_belladonna+solo+bow")
+                "page=post&s=list&tags=blake_belladonna+solo+bow", False)
     tweet_image_list = []
     for x in range(0, repeat_for):
-        tweet_image_list.append(
-            utils.get_image_online('+'.join(tags), site=2, high_page=10))
+        if not DISCORD:
+            tweet_image_list.append(
+                utils.get_image_online('+'.join(tags), site=2, high_page=10))
+        else:
+            # Discord
+            try:
+                url = r"http://safebooru.org/index.php?page=dapi&s=post&q=index&tags=" + '+'.join(tags)
+                import urllib.request
+                from bs4 import BeautifulSoup
+                xml_data = urllib.request.urlopen(url).read()
+                soup = BeautifulSoup(xml_data, 'xml')
+                posts = [str(i).strip() for i in list(soup.posts)]
+                posts = list(filter(None, posts))
+                post = BeautifulSoup(random.choice(posts), 'xml')
+                return "Result for the tags: {}".format(', '.join(tags)), post.post['file_url']
+            except:
+                pass
         if not tweet_image_list[0]:
             message = "Sorry failed to get an image! Try different tags!"
             return message, False

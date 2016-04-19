@@ -699,6 +699,14 @@ http://twitter.com/acepicturebot""".format(command)
         msg = "You can only register on Twitter! "\
               "http://twitter.com/AcePictureBot"
 
+    if command == "PicTag":
+        if (get_twitter_id(message.author.id)):
+            msg = msg.replace("@AcePictureBot", "").strip()
+            msg, discord_image = pictag(msg, repeat_for=1, DISCORD=True)
+        else:
+            msg = "This is a patreon only command! http://ace3df.github.io/AcePictureBot/donate/"
+
+
     if command == "MyWaifu" or command == "MyHusbando":
         if message.server is None:
             pass
