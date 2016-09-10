@@ -1,0 +1,19 @@
+*.pyc
+__pycache__
+
+# Baiscs
+.idea/
+tools/
+images/
+_backup/
+Configs/
+Users/
+scripts/
+main.py
+bot_settings.json
+config.py
+*.cookies
+ffmpeg.exe
+*.dll
+
+# Twitter (Tython)

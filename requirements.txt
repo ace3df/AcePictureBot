@@ -1,0 +1,12 @@
+# General
+Pillow
+requests
+bs4
+html5lib
+
+# Twitter
+twython
+
+# Discord
+discord.py[voice]
+
