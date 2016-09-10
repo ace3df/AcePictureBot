@@ -1,19 +1,23 @@
 *.pyc
 __pycache__
 
+# Config files to ignore
+*.txt
+*.json
+Configs/Logs/
+
 # Baiscs
 .idea/
 tools/
 images/
 _backup/
-Configs/
 Users/
 scripts/
-main.py
 bot_settings.json
 config.py
 *.cookies
 ffmpeg.exe
 *.dll
+main.py
 
 # Twitter (Tython)
