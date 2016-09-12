@@ -19,5 +19,6 @@ config.py
 ffmpeg.exe
 *.dll
 main.py
+config_example.py
 
 # Twitter (Tython)
