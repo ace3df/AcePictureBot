@@ -45,17 +45,14 @@ def post_tweet(ctx, reply_text, reply_media=None):
     try:
         if reply_media:
             if isinstance(reply_media, list):
-                should_be_single = False
                 for media in reply_media:
                     # You can only have mp4/gif once per tweet
                     # Make sure it wont try to mix and match
-                    if should_be_single:
-                        break
-                    if media.endswith(".mp4") or media.endswith(".gif"):
-                        should_be_single = True
                     uploaded = upload_media(media)
                     if uploaded:
                         media_ids.append(uploaded)
+                    if media.endswith(".mp4") or media.endswith(".gif"):
+                        break
             else:
                 uploaded = upload_media(reply_media)
                 if uploaded:
@@ -70,7 +67,8 @@ def post_tweet(ctx, reply_text, reply_media=None):
         else:
             bot.api.update_status(status=reply_text,
                                   in_reply_to_status_id=ctx.raw_data['id'])
-    except twython.exceptions.TwythonError:
+    except twython.exceptions.TwythonError as e:
+        bot.log.warning(e)
         # Bad request, silent return
         # TODO: Datadog +1 error
         return
@@ -134,7 +132,6 @@ def process_tweet(data):
     # Ignore tweets from accounts tracking.
     if any(a.lower() in data['user']['screen_name'].lower() for a in bot.settings['twitter_track']):
         return
-
     # Ignore bots and bad boys.
     if data['user']['id_str'] in bot.settings.get('blocked_ids', []):
         return
@@ -148,10 +145,8 @@ def process_tweet(data):
             command = "waifu"
         else:
             return
-
     if bot.settings.get('datadog', False) and bot.settings['datadog'].get('statsd_commands', False):
         bot.datadog.statsd.increment(bot.settings['datadog']['statsd_commands'] + "." + command)
-
     attrs = {'bot': bot,
              'screen_name': data['user']['screen_name'],
              'twitter_id': data['user']['id_str'],
@@ -174,7 +169,7 @@ def process_tweet(data):
             return
         if isinstance(is_limit, str):  # User is now limited, pass warning.
             reply_text = is_limit
-    if command == "waifuregister" or command == "husbandoregister":
+    if command in ["waifuregister", "husbandoregister"]:
         following = is_following(ctx)
         if isinstance(following, str):
             reply_text = following

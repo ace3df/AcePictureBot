@@ -1,6 +1,7 @@
 from collections import Counter, OrderedDict
 from operator import itemgetter
 from datetime import datetime
+import traceback
 import random
 import copy
 import time
@@ -11,10 +12,11 @@ import re
 
 from config import settings, discord_settings
 from functions import (BotProcess, Source, UserContext,
-                       datadog_online_check, create_token)
+                       datadog_online_check, create_token, slugify)
 
-from discord.ext import commands
 from bs4 import BeautifulSoup
+from tabulate import tabulate
+from discord.ext import commands
 import discord
 import asyncio
 import aiohttp
@@ -139,7 +141,7 @@ async def send_reply(reply_text, reply_media, ctx, server_settings):
         return
     message = ctx.raw_data
     command = ctx.command
-    if command == "mywaifu" or command == "myhusbando":
+    if command in ["mywaifu", "myhusbando"]:
         reply_text = reply_text.format(user_mention=message.author.mention)
     else:
         reply_text = "{0} {1.author.mention} ".format(reply_text, message)
@@ -219,9 +221,9 @@ async def on_command_error(error, ctx):
     elif isinstance(error, commands.DisabledCommand):
         await discord_bot.send_message(ctx.message.author, 'Sorry. This command is disabled and cannot be used.')
     elif isinstance(error, commands.CommandInvokeError):
-        bot.log.info('In {0.command.qualified_name}:'.format(ctx), file=sys.stderr)
+        bot.log.info('In {0.command.qualified_name}:'.format(ctx))
         traceback.print_tb(error.original.__traceback__)
-        bot.log.info('{0.__class__.__name__}: {0}'.format(error.original), file=sys.stderr)
+        bot.log.info('{0.__class__.__name__}: {0}'.format(error.original))
 
 
 @discord_bot.event
@@ -298,7 +300,7 @@ async def on_message(message):
     ctx = UserContext(**attrs)
     if not bot.check_rate_limit(ctx.user_id, or_seconds=120, or_per_user=10):
         return
-    if command == "mywaifu" or command == "myhusbando":
+    if command in ["mywaifu", "myhusbando"]:
         if not ctx.user_ids.get('twitter', False):
             # Don't have a Twitter account linked
             reply_text = create_token(
@@ -346,7 +348,6 @@ class Music:
         except FileNotFoundError:
             current_leaderboard = {}
         server_id = ctx.message.server.id
-
         if not current_leaderboard.get(server_id, False):
             current_leaderboard[server_id] = {}
         for player in leaderboard:
@@ -368,8 +369,18 @@ class Music:
         while not discord_bot.is_closed:
             if self.queued_games:
                 if self.player is None:
-                    self.current_game = self.queued_games.popitem(last=False)
-                    await self.game_ready(self.current_game[1])
+                    try:
+                        self.current_game = self.queued_games.popitem(last=False)
+                        await self.game_ready(self.current_game[1])
+                    except:
+                        # TEMP, need to find the cause of this
+                        print("-------")
+                        print(traceback.print_exc())
+                        print("-------------")
+                        exc_type, exc_obj, exc_tb = sys.exc_info()
+                        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                        print(exc_type, fname, exc_tb.tb_lineno)
+                        bot.log.warning("MUSIC GAME CLOSED {}".format(self.current_game))
                     if self.player is not None:
                         await self.player.disconnect()
                     self.current_game = None
@@ -434,6 +445,7 @@ class Music:
                 except discord.errors.Forbidden:
                     return
                 return
+        game_channel = new_msg.channel
         game_settings = {}
         msg_args = {}
         msg_args = new_msg.content.lower().replace("game start", "").replace("=", " ").split()
@@ -571,7 +583,9 @@ class Music:
                 a = ''.join([i for i in op_ed_text if not i.isdigit()])
                 text_guess = entry['series'] + " " + a
             elif game_settings['difficulty'] == 4:
-                text_guess = entry['series'] + " " + op_ed_text
+                a = ''.join([i for i in op_ed_text if not i.isdigit()])
+                b = ''.join([i for i in op_ed_text if i.isdigit()])
+                text_guess = entry['series'] + " "+ a + " " + b
             elif game_settings['difficulty'] == 5:
                 text_guess = entry['song_title']
                 full_string = entry['song_title']
@@ -592,16 +606,8 @@ class Music:
             except discord.errors.Forbidden:
                 return
 
-            def check(msg):
-                msg = re.sub(r'\([^)]*\)', '', msg.content.lower())
-                msg = re.sub(
-                    r'[^\w]', ' ', msg).strip()
-                msg = re.sub(' +', ' ', msg).strip()
-                entry_clean = re.sub(r'\([^)]*\)', '', text_guess.lower())
-                entry_clean = re.sub(
-                    r'[^\w]', ' ', entry_clean)
-                entry_clean = re.sub(' +', ' ', entry_clean).strip()
-                return entry_clean in msg
+            def guess_check(msg):
+                return slugify(text_guess) in slugify(msg)
 
             # Incase of glitch
             safe_timer = time.time()
@@ -619,12 +625,9 @@ class Music:
                     return
                 if safe_timer - time.time() > 250:
                     break
-                try:
-                    guess = await discord_bot.wait_for_message(channel=new_msg.channel, timeout=0)
-                except discord.errors.Forbidden:
-                    return
+                guess = await discord_bot.wait_for_message(channel=new_msg.channel, timeout=0)
                 if guess is not None:
-                    if check(guess):
+                    if guess_check(guess.content):
                         # Correct!
                         if guess.author not in players_corrent_round:
                             if not players_corrent_round:
@@ -649,7 +652,7 @@ class Music:
                         end_string = "{}:exclamation: **Hint {}: {}**".format(
                             clock, current_help_count, ''.join(hint_str).replace("_", " \_ "))
                         try:
-                            await discord_bot.send_message(new_msg.channel, end_string)
+                            await discord_bot.send_message(game_channel, end_string)
                         except discord.errors.Forbidden:
                             return
                         current_help_count += 1
@@ -658,7 +661,6 @@ class Music:
                             current_help_count = max_help_count
                         hint_cooldown = 20
                         timer = time.time()
-                await asyncio.sleep(0.2)  # Without this it lags a bit more w/e
             # Round finished
             if first_correct is None:
                 round_end_msg = "**No one got the answer right!**"
@@ -770,7 +772,7 @@ class Music:
     @commands.command(pass_context=True)
     async def leaderboard(self, ctx, *, get_server_lb : str=None):
         this_server_only = False
-        if get_server_lb == "server":
+        if get_server_lb and get_server_lb.lower() == "server":
             this_server_only = True
         try:
             with open(os.path.join(bot.config_path, 'Global Music Game Leaderboard.json'), 'r') as f:
@@ -793,28 +795,33 @@ class Music:
                     display_leaderboard[user[0]] = user[1]
                 else:
                     display_leaderboard[user[0]] += user[1]
-        ordered_leaderboard = list(reversed(sorted(display_leaderboard.items(), key=itemgetter(1))))[:10]
+        ordered_leaderboard = list(reversed(sorted(display_leaderboard.items(), key=itemgetter(1))))
         user_in_ranks = (ctx.message.author.id, user_rank)
         append_later = False
-        if user_in_ranks not in ordered_leaderboard:
+        if user_in_ranks not in ordered_leaderboard[:10]:
+            # User not in top 10
             append_later = True
-        all_members = discord_bot.get_all_members()
-        temp_leaderboard = ordered_leaderboard
-        change = 0
-        for i in range(len(temp_leaderboard)):
-            member = discord.utils.find(lambda m: m.id == ordered_leaderboard[i][0], all_members)
-            if member is None:
-                ordered_leaderboard.pop(i)
-                change -= 1
-                continue
-            ordered_leaderboard[i - change] = "{rank}. {name} | {is_global}Score: {score}".format(
-                rank=i + 1, name=member.name,
-                is_global="Global " if not this_server_only else "", 
-                score=ordered_leaderboard[i - change][1])
-        if append_later:
-            ordered_leaderboard.append("Your Stats: {name} | Score: {score}")
-        first_msg = "**Top 10 Global**\n" if not this_server_only else "**Top 10 This Server**\n"
-        await discord_bot.say(first_msg + "```\n" + '\n'.join(ordered_leaderboard) + "```")
+        end_string = []
+        rank = 1
+        # Get top 10 only
+        for user in ordered_leaderboard[:10]:
+            member = discord.utils.get(discord_bot.get_all_members(), id=user[0])
+            name = user[0] + " [USER ID]"
+            if member:
+                name = member.name
+            end_string.append([rank, name, user[1]])
+            rank += 1
+        if not end_string:
+            reply_text = "No games have been played yet!"
+        else:
+            reply_text = tabulate(end_string,
+                                  ["Rank", "Name",
+                                   "{is_global}Score".format(is_global="Global " if not this_server_only else "")])
+            if append_later:
+                reply_text += "\nYou: {} | Score: {}".format(ctx.message.author.name, user_rank)
+            first_msg = "**Top 10 Global**\n" if not this_server_only else "**Top 10 This Server**\n"
+            reply_text = first_msg + "```\n" + reply_text + "```"
+        await discord_bot.say(reply_text)
 
 
 @discord_bot.command()

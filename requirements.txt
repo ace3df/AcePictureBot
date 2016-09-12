@@ -9,4 +9,4 @@ twython
 
 # Discord
 discord.py[voice]
-
+tabulate

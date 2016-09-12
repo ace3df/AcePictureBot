@@ -18,7 +18,7 @@ from functions import (yaml_to_list, slugify, get_media, get_media_online,
                        return_page_info, create_otp_image, make_paste,
                        write_user_ignore_list, handle_reply, append_json,
                        filter_per_series, connect_token, scrape_website,
-                       append_warnings)
+                       append_warnings, patreon_reapeat_for)
 
 from bs4 import BeautifulSoup
 import requests
@@ -131,18 +131,19 @@ def random_list(ctx):
         result = random.choice(char_list)
     series = result[1].get('series', None)
     otp_image = result[1].get('otp image', None)
+    start_path = settings.get('image_location', os.path.join(os.path.realpath(__file__), 'images'))
     if list_name == "otp":
         name_one, name_two = result[0].split("(x)")
         end_tag = ["2girls", "yuri", name_one.replace(" ", "_"), name_two.replace(" ", "_")]
         list_title = ctx.command.title() + " OTP"
         name = "{} x {}".format(re.sub("[\(\[].*?[\)\]]", "", name_one).strip(),
                                 re.sub("[\(\[].*?[\)\]]", "", name_two).strip())
+        path_name = os.path.join(start_path, list_name, slugify(name))
     else:
         list_title = ctx.command.title()
         name = re.sub("[\(\[].*?[\)\]]", "", result[0]).strip()  # Remove () and []
         end_tag.append(result[0].replace(" ", "_"))
-    start_path = settings.get('image_location', os.path.join(os.path.realpath(__file__), 'images'))
-    path_name = os.path.join(start_path, list_name, slugify(name).lower())
+        path_name = os.path.join(start_path, list_name, slugify(result[0]))
     if ctx.command == "granblue":
         reply_text = "{} has joined your party!".format(name)
     else:    
@@ -237,14 +238,11 @@ def pictag(ctx):
     """ Search Safebooru or Gelbooru and return random results.
     Patreon supporter only command.
     """
-    try:
-        repeat_for = int(re.search(r'\d +', ctx.args[0:3]).group())
-        if repeat_for > 4:
-            repeat_for = 4
-        ctx.args = ctx.args.replace(str(repeat_for), "", 1).strip()
-    except AttributeError:
-        repeat_for = 1
+    repeat_for = patreon_reapeat_for(ctx)
     args = ctx.args.replace("nsfw", "")
+    if repeat_for > 1:
+        to_replace = re.search(r'\d +', args[0:3]).group()
+        args = args.replace(to_replace, "", 1)
     tags = [tag.strip() for tag in args.split(" ")]
     if len(tags) > 5:
         return (("Sorry, websites don't allow more than 5 tags to be searched!\n"
@@ -252,7 +250,7 @@ def pictag(ctx):
     reply_media = []
     for x in range(0, repeat_for):
         media_args = {'tags': tags, 'random_page': True, 'return_url': ctx.bot.source.support_embedded}
-        image = get_media(path=None, ctx=False, media_args=media_args)
+        image = get_media_online(path=None, ctx=False, media_args=media_args)
         if not image:
             return ("Sorry, no images could be found! Try different tags!")
         reply_media.append(image)
@@ -363,24 +361,26 @@ def source(ctx):
                 break
     if bm_a is None:
         return "No relevant source information found!\n" + sauce_nao_url
-    url = bm_a['href'].replace("//chan.", "https://chan.").replace("//danbooru", "https://danbooru")
+    url = bm_a['href']
+    if not url.startswith("http"):
+        url = "https:" + url
     soup = scrape_website(url)
     if not soup:
         return "Unable to search for source! Try using SauceNAO: " + sauce_nao_url
     artist = None
     series = None
     characters = None
-    if "sankaku" in bm_a['href']:
+    if "sankakucomplex" in url:
         artist_html = soup.find_all('li', attrs={'class': 'tag-type-artist'})
         if artist_html:
-            artist = ', '.join([tag.text.title() for tag in artist_html.find_all('a')])
-        series_html = soup.find('li', attrs={'class': 'tag-type-copyright'})
+            artist = ', '.join([tag.find_all('a', attrs={'itemprop': 'keywords'})[0].text.title() for tag in artist_html])
+        series_html = soup.find_all('li', attrs={'class': 'tag-type-copyright'})
         if series_html:
-            series = ', '.join([tag.text.title() for tag in series_html.find_all('a')])
-        characters_html = soup.find('li', attrs={'class': 'tag-type-character'})
+            series = ', '.join([tag.find_all('a', attrs={'itemprop': 'keywords'})[0].text.title() for tag in series_html])
+        characters_html = soup.find_all('li', attrs={'class': 'tag-type-character'})
         if characters_html:
-            characters = ', '.join([tag.text.title() for tag in characters_html.find_all('a')])
-    elif "danbooru" in bm_a['href']:
+            characters = ', '.join([tag.find_all('a', attrs={'itemprop': 'keywords'})[0].text.title() for tag in characters_html])
+    elif "danbooru" in url:
         artist_html = soup.find('li', attrs={'class': 'category-1'})
         if artist_html:
             artist = ', '.join([tag.text.title() for tag in artist_html.find_all('a', attrs={'class': 'search-tag'})])
@@ -390,6 +390,10 @@ def source(ctx):
         characters_html = soup.find('li', attrs={'class': 'category-4'})
         if characters_html:
             characters = ', '.join([tag.text.title() for tag in characters_html.find_all('a', attrs={'class': 'search-tag'})])
+    else:
+        return "Unable to search for source! Try using SauceNAO: " + sauce_nao_url
+    if artist is None and series is None and characters is None:
+        return "No relevant source information found!\n" + sauce_nao_url
     reply_list = []
     if artist:
         reply_list.append("By: {}".format(artist))
@@ -463,15 +467,7 @@ def mywaifu(ctx):
                       "Try again later!{}".format(list_name,
             "\nHelp: " + url_help if url_help else ""))
         return reply_text
-    repeat_for = 1
-    if ctx.is_patreon or ctx.is_mod:
-        try:
-            repeat_for = int(re.search(r'\d +', ctx.args[0:3]).group())
-            if repeat_for > 4:
-                repeat_for = 4
-            ctx.args = ctx.args.replace(str(repeat_for), "", 1).strip()
-        except AttributeError:
-            repeat_for = 1
+    repeat_for = patreon_reapeat_for(ctx)
     user_file = os.path.join(ctx.bot.config_path, "Users {}Register.json".format(list_name))
     if not os.path.isfile(user_file):
         reply_text = ("I don't know who your {gender} is!\n"
@@ -494,7 +490,7 @@ def mywaifu(ctx):
         write_user_ignore_list(ctx.user_id, ctx.bot.source.name, clear=True)
     start_path = settings.get('image_location', os.path.join(os.path.realpath(__file__), 'images'))
     path_name = os.path.join(start_path, list_name, slugify(user_entry['name'].replace("_", " ")))
-    tags = [user_entry['name']] + list(filter(None, user_entry['tags'].split("+")))
+    tags = [user_entry['name']] + user_entry['tags'].split("+")
     clean_name = re.sub("[\(\[].*?[\)\]]", "", user_entry['name'].replace("_", " ").title()).strip()
     reply_text = ""
     if ctx.bot.source.name == "twitter":
@@ -513,7 +509,7 @@ def mywaifu(ctx):
             reply_media.append(image)
         if not reply_media:
             if ctx.bot.source.allow_new_mywaifu:
-                if ctx and ctx.bot.source.name == "twitter":
+                if ctx and  ctx.bot.source.name == "twitter":
                     ctx.bot.check_rate_limit_per_cmd(ctx, remove=1)
                 url_help = help_urls.get('mywaifu_no_image', False)
                 reply_text = ("Failed to grab a new image!\n"

@@ -7,6 +7,7 @@ import subprocess
 import mimetypes
 import difflib
 import pathlib
+import hashlib
 import random
 import json
 import time
@@ -57,12 +58,12 @@ class BotProcess(CommandGroup):
         self.commands = OrderedDict()
         self.config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
         try:
-            with open(os.path.join(self.config_path, 'Global Settings.json'), 'r') as f:
+            with open(os.path.join(self.config_path, 'Global Settings.json'), 'r', encoding="utf-8") as f:
                 global_settings = json.load(f)
         except FileNotFoundError:
             raise FileNotFoundError("Global Settings.json was not found in /configs/")
         try:
-            with open(os.path.join(self.config_path, '{} Settings.json'.format(source.name.title())), 'r') as f:
+            with open(os.path.join(self.config_path, '{} Settings.json'.format(source.name.title())), 'r', encoding="utf-8") as f:
                 source_settings = json.load(f)
         except FileNotFoundError:
             source_settings = {}
@@ -221,7 +222,7 @@ class BotProcess(CommandGroup):
         while True:
             # Wait until file is not busy
             try:
-                with open(path, 'r') as f:
+                with open(path, 'r', encoding="utf-8") as f:
                     current_user_limits = f.read().splitlines()
                 break
             except (IOError):
@@ -308,7 +309,7 @@ class BotProcess(CommandGroup):
             # save to file
             while True:
                 try:
-                    with open(path, 'w') as f:
+                    with open(path, 'w', encoding="utf-8") as f:
                         f.write('\n'.join(current_user_limits))
                     break
                 except (IOError):
@@ -348,18 +349,18 @@ class BotProcess(CommandGroup):
 
 class UserContext:
     def __init__(self, **attrs):
-        self.bot = attrs.pop('bot', None)
-        self.screen_name = attrs.pop('screen_name', None)
+        self.bot = attrs.pop('bot')
+        self.screen_name = attrs.pop('screen_name')
         self.user_ids = {'twitter': attrs.pop('twitter_id', False),
                          'discord': attrs.pop('discord_id', False),
                          'twitch': attrs.pop('twitch_id', False),
                          'reddit': attrs.pop('reddit_id', False),
                          'facebook': attrs.pop('facebook_id', False)}
         self.user_id = list(filter(None, self.user_ids.values()))[0]
-        self.command = attrs.pop('command', None)
-        self.message = attrs.pop('message', None)
+        self.command = attrs.pop('command')
+        self.message = attrs.pop('message')
         self.args = self.clean_message(self.message)
-        self.raw_data = attrs.pop('raw_data', None)
+        self.raw_data = attrs.pop('raw_data')
         self.is_mod = self.get_is_mod()
         self.is_patreon = self.get_is_patreon()
         self.get_other_ids()
@@ -444,7 +445,7 @@ def create_token(screen_name, user_id, from_source, to_source):
     if is_in_accounts:
         # TODO: Suggest disconnect discord, etc
         return "You already have an account linked!"
-    accounts.append({from_source: user_id})
+    #accounts.append({from_source: user_id})
     try:
         with open(os.path.join(config_path, 'Connect Tokens.json'), 'r') as f:
             tokens = json.load(f)
@@ -462,8 +463,8 @@ def create_token(screen_name, user_id, from_source, to_source):
         tokens[new_token] = user_id
     with open(os.path.join(config_path, "Connect Tokens.json"), 'w') as f:
         json.dump(tokens, f, sort_keys=True, indent=4)
-    with open(os.path.join(config_path, 'Connected Accounts.json'), 'w') as f:
-        json.dump(accounts, f, sort_keys=True, indent=4)
+    """with open(os.path.join(config_path, 'Connected Accounts.json'), 'w') as f:
+                    json.dump(accounts, f, sort_keys=True, indent=4)"""
     msg = ("Link your account by tweeting to {twitter_account_url}"
            "\n@{twitter_account_handle} connect {source_name} {token}".format(
             twitter_account_url=settings.get('twitter_account_url', 'https://twitter.com/AcePictureBot'),
@@ -592,7 +593,7 @@ def append_warnings(user_id, source, reason=""):
     if not os.path.isfile(path):
         with open(path, 'w') as f:
             f.write('')
-    with open(path, 'r') as f:
+    with open(path, 'r', encoding="utf-8") as f:
         warned_users = f.read().splitlines()
     count = 0
     warning_count = 0
@@ -615,7 +616,7 @@ def append_warnings(user_id, source, reason=""):
     if not blocked:
         line = "{0}:{1}".format(user_id, reason)
         warned_users.append(line)
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding="utf-8") as f:
         f.write('\n'.join(warned_users))
     return
 
@@ -628,7 +629,7 @@ def download_file(url, path=None, filename=None):
     local_filename = os.path.join(path, filename)
     try:
         r =  requests.get(url, stream=True, timeout=5)
-    except requests.exceptions.ReadTimeout:
+    except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
         return False
     if r.status_code != 200:
         return False
@@ -669,14 +670,14 @@ def login_website(website, sess=None):
 
 def scrape_website(url, sess=False, content_only=False):
     headers = {
-        'User-Agent': 'Mozilla/5.0'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'
     }
     try:
         if sess:
             r = sess.get(url, timeout=5, headers=headers)
         else:
             r = requests.get(url, timeout=5,  headers=headers)
-    except requests.exceptions.ReadTimeout:
+    except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
         return False
     if r.status_code != 200:
         # bad status_code
@@ -701,7 +702,7 @@ def get_media_online(path=None, ctx=None, media_args={}, ignore_used=False):
         # Too many tags. Safe way to not get rejected from websites.
         media_args['tags'] = media_args.get('tags', [])[0:6]
     if media_args.get('tags', []):
-        tags = '%20'.join([tag.replace(" ", "_") for tag in media_args.get('tags', [])])
+        tags = '%20'.join([tag.replace(" ", "_") for tag in media_args.get('tags', []) if tag is not ""])
     tags += r"%20rating:safe"
     username = ""
     password = ""
@@ -761,9 +762,9 @@ def get_media_online(path=None, ctx=None, media_args={}, ignore_used=False):
             safe_break = 0
             for post in entries:
                 safe_break += 1
-                if safe_break == 6:
+                if safe_break == 10:
                     # Don't want to go through too many entries
-                    return False
+                    break
                 post_media = post.attrib.get('file_url', False)
                 media_hash = post_media.split('/')[-1].split('.')[0]
                 post_id = post.attrib.get('id', False)
@@ -782,7 +783,15 @@ def get_media_online(path=None, ctx=None, media_args={}, ignore_used=False):
                         # This will make sure only 1 charater is in the image-
                         # when the tag "solo"/"1girl"/"1boy" is used.
                         url = page_id_url.format(post_id)
-                        soup = scrape_website(url, sess)
+                        a_break = 0
+                        while True:
+                            a_break += 1
+                            if a_break == 3:
+                                return False
+                            soup = scrape_website(url, sess)
+                            if not soup:
+                                continue
+                            break
                         if len(soup.find_all('li', attrs={'class': 'tag-type-character'})) > 2:
                             # Ignore images with more than 2 chars in it.
                             # I would like this to be 1 but there are a lot of
@@ -806,6 +815,9 @@ def get_media_online(path=None, ctx=None, media_args={}, ignore_used=False):
     if post_media is not None and ignore_used is False:
         if post_media not in ignore_list and ctx:
             ignore_list.append(media_hash)
+            if os.path.isfile(media):
+                md5_hash = md5_file(media)
+                ignore_list.append(md5_hash)
             write_user_ignore_list(ctx.user_id, ctx.bot.source.name, ignore_list)
     return media
 
@@ -822,13 +834,15 @@ def get_media_local(path, ctx=None, media_args={}):
     random.shuffle(files)
     media = None
     for file in files:
-        media_hash = file.split('/')[-1].split('.')[0]
-        if media_hash not in ignore_list:
+        md5_hash = md5_file(file)
+        if md5_hash not in ignore_list:
             media = file
             break
     if media is not None and ignore_used is False:
         if media not in ignore_list and ctx:
-            ignore_list.append(media_hash)
+            if os.path.isfile(media):
+                md5_hash = md5_file(media)
+                ignore_list.append(md5_hash)
             write_user_ignore_list(ctx.user_id, ctx.bot.source.name, ignore_list)
     return media
 
@@ -908,18 +922,21 @@ def return_page_info(url, get_extra_info=False):
                         continue
                     xml_parse = ET.fromstring(soup)
                     break
-                info['image_count'] = xml_parse.get('count', None)
+                info['image_count'] = xml_parse.get('count')
         info['artists'] = artists
         info['characters'] = characters
         info['series'] = series
     return info
 
-
+# TODO: Test this more
+# Commonly get file not found convert_to .gif
 def convert_media(media, convert_to):
     filename, file_extension = os.path.splitext(media)
     new_media = media.replace(file_extension, "_converted" + convert_to)
     if convert_to == ".gif":
         # Generate palette.png
+        # TEMP
+        return media
         cmd = ("ffmpeg -v warning -i {input} -vf "
                "fps=15,scale=320:-1:flags=lanczos,palettegen "
                "palette.png".format(input=media))
@@ -927,7 +944,7 @@ def convert_media(media, convert_to):
         # Convert to gif
         cmd = ("ffmpeg -i {input} -i palette.png -filter_complex "
                "\"fps=10,scale=320:-1:flags=lanczos[x];[x][1:v]paletteuse\""
-               "{output}".format(input=media, output=new_media))
+               " {output}".format(input=media, output=new_media))
         process = subprocess.call(cmd)
         os.remove("palette.png")
     elif convert_to == ".mp4":
@@ -1075,3 +1092,28 @@ def datadog_online_check(datadog_obj, check, host_name, response='Response: 200 
             status= datadog_obj.api.constants.CheckStatus.OK,
             message=response)
         time.sleep(5 * 60)
+
+def patreon_reapeat_for(ctx):
+    """Try to guess how many images they want (1 - 4) (Patreon only)."""
+    if not ctx.is_patreon:
+        return 1
+    if len(ctx.args) == 1:
+        a = r'\d+'
+    else:
+        # This is used mostly for pictag when it comes to "pictag 2 1girl"
+        a = r'\d +'
+    try:
+        repeat_for = int(re.search(a, ctx.args[0:3]).group())
+    except AttributeError:
+        return 1
+    if repeat_for > 4:
+        repeat_for = 4
+    return repeat_for
+
+
+def md5_file(file):
+    hash_md5 = hashlib.md5()
+    with open(file, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
