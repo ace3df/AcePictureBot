@@ -243,7 +243,7 @@ def pictag(ctx):
     if repeat_for > 1:
         to_replace = re.search(r'\d +', args[0:3]).group()
         args = args.replace(to_replace, "", 1)
-    tags = [tag.strip() for tag in args.split(" ")]
+    tags = [tag.strip() for tag in args.split(" ")] + ["-asian"]
     if len(tags) > 5:
         return (("Sorry, websites don't allow more than 5 tags to be searched!\n"
                  "Use _ to connect words!"), False)

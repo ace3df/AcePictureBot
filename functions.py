@@ -102,7 +102,7 @@ class BotProcess(CommandGroup):
         if not rates:
             rates = default_rate_limits.get(
                 'default',
-                {"rate_seconds": 10800, "rate_per_user": 15})
+                {"rate_seconds": 10800, "rate_per_user": 10})
         self.rate_limit = {'rates': OrderedDict(), **rates}
         self.log = self.get_logging()
 
@@ -185,7 +185,7 @@ class BotProcess(CommandGroup):
             rate_per_user = or_per_user
         else:
             # TODO: Move back to 15
-            rate_per_user = self.rate_limit.get('rate_per_user', 12)
+            rate_per_user = self.rate_limit.get('rate_per_user', 10)
         user_rates = self.rate_limit['rates']
 
         if user_id in user_rates:
@@ -455,9 +455,9 @@ def create_token(screen_name, user_id, from_source, to_source):
             new_token = token[0]
             break
     if new_token is None:
-        new_token = ''.join(random.choice(list(screen_name) +\
+        new_token = ''.join(random.choice(list(slugify(screen_name)) +\
                                     list(from_source) +\
-                                    list(map(str, range(0, 10)))) for _ in range(15)).lower()
+                                    list(map(str, range(0, 10)))) for _ in range(15)).lower().replace(" ", "")
         tokens[new_token] = user_id
     with open(os.path.join(config_path, "Connect Tokens.json"), 'w') as f:
         json.dump(tokens, f, sort_keys=True, indent=4)

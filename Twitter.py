@@ -163,13 +163,14 @@ def process_tweet(data):
         ctx.user_id, ctx.command, ctx.message))
     reply_text = None
     reply_media = []
-    if not ctx.is_patreon and not ctx.is_mod:
-        is_limit = bot.check_rate_limit_per_cmd(ctx)
-        if not is_limit:  # User is limited, ignore them.
-            bot.log.info("User is limited. Ignoreing...")
-            return
-        if isinstance(is_limit, str):  # User is now limited, pass warning.
-            reply_text = is_limit
+    # TEMP WHILE FREE WEEK
+    #if not ctx.is_patreon and not ctx.is_mod:
+    is_limit = bot.check_rate_limit_per_cmd(ctx)
+    if not is_limit:  # User is limited, ignore them.
+        bot.log.info("User is limited. Ignoreing...")
+        return
+    if isinstance(is_limit, str):  # User is now limited, pass warning.
+        reply_text = is_limit
     if command in ["waifuregister", "husbandoregister"]:
         following = is_following(ctx)
         if isinstance(following, str):

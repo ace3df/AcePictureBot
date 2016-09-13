@@ -297,7 +297,7 @@ async def on_message(message):
             }
     ctx = UserContext(**attrs)
     # TODO: Move back to 10
-    if not bot.check_rate_limit(ctx.user_id, or_seconds=120, or_per_user=6):
+    if not bot.check_rate_limit(ctx.user_id, or_seconds=120, or_per_user=5):
         return
     if command in ["mywaifu", "myhusbando"]:
         if not ctx.user_ids.get('twitter', False):
