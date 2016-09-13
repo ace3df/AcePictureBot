@@ -289,8 +289,6 @@ async def on_message(message):
         bot.datadog.statsd.increment(bot.settings['datadog']['statsd_commands'] + "." + command)
 
     attrs = {'bot': bot,
-             'is_patreon': False,
-             'is_mod': False,
              'screen_name': message.author.name,
              'discord_id':message.author.id,
              'command': command,
@@ -298,7 +296,8 @@ async def on_message(message):
              'raw_data': message
             }
     ctx = UserContext(**attrs)
-    if not bot.check_rate_limit(ctx.user_id, or_seconds=120, or_per_user=10):
+    # TODO: Move back to 10
+    if not bot.check_rate_limit(ctx.user_id, or_seconds=120, or_per_user=6):
         return
     if command in ["mywaifu", "myhusbando"]:
         if not ctx.user_ids.get('twitter', False):
@@ -372,14 +371,9 @@ class Music:
                     try:
                         self.current_game = self.queued_games.popitem(last=False)
                         await self.game_ready(self.current_game[1])
-                    except:
+                    except Exception as e:
                         # TEMP, need to find the cause of this
-                        print("-------")
-                        print(traceback.print_exc())
-                        print("-------------")
-                        exc_type, exc_obj, exc_tb = sys.exc_info()
-                        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                        print(exc_type, fname, exc_tb.tb_lineno)
+                        print(traceback.print_tb(e.__traceback__))
                         bot.log.warning("MUSIC GAME CLOSED {}".format(self.current_game))
                     if self.player is not None:
                         await self.player.disconnect()

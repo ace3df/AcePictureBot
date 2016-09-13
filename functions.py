@@ -120,6 +120,14 @@ class BotProcess(CommandGroup):
         log.addHandler(handler)
         return log
 
+    def patreon_only_message(self):
+        reply_text = False
+        if self.settings.get('use_patreon', False):
+            p_url = self.settings.get('patreon_url', False)
+            reply_text = ("This is a Patreon only command!"
+                          "{}".format("\nFeel free to support us at: " + p_url if p_url else ""))
+        return reply_text, False
+
     def on_command(self, ctx):
         if not ctx.command:
             return False, False
@@ -131,29 +139,18 @@ class BotProcess(CommandGroup):
             return False, False
         if (self.commands[command].patreon_only and not ctx.is_patreon)\
         or (command in self.commands[command].patreon_aliases and not ctx.is_patreon):
-            if self.settings.get('use_patreon', False):
-                p_url = self.settings.get('patreon_url', False)
-                reply_text = ("This is a Patreon only command!"
-                              "{}".format("\nFeel free to support us at: " + p_url if p_url else ""))
-                return reply_text, reply_media
-            else:
-                # Used a Patreon cmd but don't have patreon settings set.
-                return False, False
+                return self.patreon_only_message()
         if update.get('auto_update', False):
             os.environ[update['is_busy_environ'] + self.source.name] = 'True'
         try:
             reply_text, reply_media = handle_reply(self.commands[command].callback(ctx))
         except Exception as e:
+            # This is like this and messy for now as it shouldn't really happen
+            # this way I can work on catching every problem for now
             import sys
             import traceback
             print(command)
-            print(e)
-            print("-------")
-            print(traceback.print_exc())
-            print("-------------")
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+            print(traceback.print_tb(e.__traceback__))
             quit()
             # The function broke somehow
             # TODO: record this
@@ -165,8 +162,7 @@ class BotProcess(CommandGroup):
 
     def uses_command(self, text):
         """Check to see if text contains a command."""
-        text = text.lower()
-        text = text.replace("🚢👧", "Shipgirl")
+        text = text.replace("🚢👧", "shipgirl").lower()
         command_list = list(self.commands.keys())
         command = [cmd for cmd in command_list if cmd in text]
         if command:
@@ -188,7 +184,8 @@ class BotProcess(CommandGroup):
         if or_per_user:
             rate_per_user = or_per_user
         else:
-            rate_per_user = self.rate_limit.get('rate_per_user', 15)
+            # TODO: Move back to 15
+            rate_per_user = self.rate_limit.get('rate_per_user', 12)
         user_rates = self.rate_limit['rates']
 
         if user_id in user_rates:
@@ -362,7 +359,8 @@ class UserContext:
         self.args = self.clean_message(self.message)
         self.raw_data = attrs.pop('raw_data')
         self.is_mod = self.get_is_mod()
-        self.is_patreon = self.get_is_patreon()
+        # TODO: This is temp Until Monday
+        self.is_patreon =  True  # self.get_is_patreon()
         self.get_other_ids()
 
     def clean_message(self, message):
@@ -1093,6 +1091,7 @@ def datadog_online_check(datadog_obj, check, host_name, response='Response: 200 
             message=response)
         time.sleep(5 * 60)
 
+
 def patreon_reapeat_for(ctx):
     """Try to guess how many images they want (1 - 4) (Patreon only)."""
     if not ctx.is_patreon:
@@ -1106,8 +1105,9 @@ def patreon_reapeat_for(ctx):
         repeat_for = int(re.search(a, ctx.args[0:3]).group())
     except AttributeError:
         return 1
-    if repeat_for > 4:
-        repeat_for = 4
+    # TODO: This is limited to 2 for now
+    if repeat_for > 2:
+        repeat_for = 2
     return repeat_for
 
 

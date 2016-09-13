@@ -21,7 +21,7 @@ from functions import (yaml_to_list, slugify, get_media, get_media_online,
                        append_warnings, patreon_reapeat_for)
 
 from bs4 import BeautifulSoup
-import requests
+
 
 @command("waifu", aliases=["husbando"])
 def waifu(ctx, gender=None, search_for=None, is_otp=False):
@@ -60,11 +60,12 @@ def waifu(ctx, gender=None, search_for=None, is_otp=False):
     reply_media = get_media(path=path_name, ctx=ctx, media_args=media_args)
     return reply_text, reply_media
 
-# Pat: yandere, Tsundere
+
 @command("shipgirl",
     aliases=["idol", "touhou", "vocaloid", "sensei", "senpai",
              "kouhai", "imouto", "shota", "onii", "onee",
-             "monstergirl", "tankgirl", "witchgirl", "granblue", "yandere", "tsundere"])
+             "monstergirl", "tankgirl", "witchgirl", "granblue"],
+    patreon_aliases=["yandere", "tsundere"])
 def random_list(ctx):
     # Male only lists.
     male_lists = ["shota", "onii"]
@@ -156,8 +157,7 @@ def random_list(ctx):
     return reply_text, reply_media
 
 
-# Make harem a patreon only cmd after a bit #patreon_aliases
-@command("otp", aliases=["harem"])
+@command("otp", patreon_aliases=["harem"])
 def otp(ctx):
     args = ctx.args.lower()
     max_harem = random.randint(3, 5)
@@ -260,16 +260,17 @@ def pictag(ctx):
 
 @command("!airing")
 def airing(ctx):
+    if ctx.bot.source.name != "twitter" and not ctx.is_patreon:
+        return ctx.bot.patreon_only_message()
     if len(ctx.args) <= 3:
         return False
 
     def find_show(url):
-        r = requests.get(url)
-        if r.status_code != 200:
+        soup = scrape_website(url)
+        if not soup:
             return "Sorry can't connect to livechart.me !"
-        soup = BeautifulSoup(r.content, 'html5lib')
         show_list = soup.find_all('h3', class_="main-title")
-        today = datetime.today() + timedelta(hours=-9)
+        today = datetime.today() + timedelta(hours=-1)
         reply_text = False
         for show in show_list:
             if slugify(show.text) != slugify(ctx.args):
@@ -283,6 +284,9 @@ def airing(ctx):
             hours, remainder = divmod(int(next_ep_time.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)
             days, hours = divmod(hours, 24)
+            if days < 0:
+                reply_text = ("{anime}\nEpisode {episode} has recently aired!".format(anime=show.text, episode=episode_number))
+                return reply_text
             if days:
                 fmt = '{d} days, {h} hours, {m} minutes, and {s} seconds'
             else:
@@ -291,7 +295,7 @@ def airing(ctx):
                           "Episode {episode} airing in {fmt}".format(
                           anime=show.text, episode=episode_number,
                           fmt=fmt.format(d=days, h=hours, m=minutes, s=seconds)))
-        return reply_text
+            return reply_text
 
     reply_text = find_show("https://www.livechart.me/schedule/tv")
     if not reply_text:
@@ -322,10 +326,27 @@ def connect(ctx):
     return reply_text
 
  
-@command("source", only_allow=["twitter"])
-def source(ctx):
-    is_gif = False
+@command("!source", patreon_only=True)
+def direct_source(ctx):
+    # Easy, simple way to handle Patreon version
     image_url = None
+    if ctx.bot.source.name == "discord":
+        if ctx.raw_data.attachments:
+            image_url = ctx.raw_data.attachments[0]['url']
+        else:
+            message = ctx.message
+    if image_url is None:
+        found_results = re.findall('(https?:/)?(/?[\w_\-&%?./]*?)\.(jpg|png|gif|jpeg)', message)
+        if not found_results:
+            return False
+        # I dunno regex
+        image_url = found_results[0][0] + found_results[0][1] + "." + found_results[0][2]
+    return source.callback(ctx, image_url=image_url)
+
+
+@command("source", only_allow=["twitter"])
+def source(ctx, image_url=None):
+    is_gif = False
     if image_url is None and ctx.raw_data.get('extended_entities', []):
         if ctx.raw_data['extended_entities'].get('media', []):
             image_url = ctx.raw_data['extended_entities']['media'][0].get('media_url_https', None)
