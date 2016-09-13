@@ -53,7 +53,7 @@ def waifu(ctx, gender=None, search_for=None, is_otp=False):
     if is_otp:
         return name, series, otp_image
     start_path = settings.get('image_location', os.path.join(os.path.realpath(__file__), 'images'))
-    path_name = os.path.join(start_path, list_name, slugify(name))
+    path_name = os.path.join(start_path, list_name, slugify(result[0]))
     end_tag.append(name.replace(" ", "_"))
     reply_text = "Your {} is {} ({})".format(list_name, name, series)
     media_args = {'tags': end_tag}
