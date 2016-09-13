@@ -33,7 +33,9 @@ def upload_media(media):
                     media_type='video/mp4')['media_id']
             else:
                 return bot.api.upload_media(media=fp)['media_id']
-    except twython.exceptions.TwythonError:
+    except twython.exceptions.TwythonError as e:
+        bot.log.warning("Uploading failed.")
+        bot.log.warning(e)
         return False
 
 
@@ -70,7 +72,6 @@ def post_tweet(ctx, reply_text, reply_media=None):
     except twython.exceptions.TwythonError as e:
         bot.log.warning(e)
         # Bad request, silent return
-        # TODO: Datadog +1 error
         return
 
 def is_following(ctx):

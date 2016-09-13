@@ -888,12 +888,12 @@ def return_page_info(url, get_extra_info=False):
         if not soup:
             return False
         artists, characters, series, tags = [], [], [], []
-        if "gelbooru" in url:
+        if "gelbooru" in url and "page=dapi" not in url:
             index_value = 3
             search_url = ("http://gelbooru.com/index.php?tags="
                           "{}%20rating:safe&pid=0&page=dapi"
                           "&s=post&q=index")
-        elif "safebooru" in url:
+        elif "safebooru" in url and "page=dapi" not in url:
             index_value = 2
             search_url = ("http://safebooru.org/index.php?tags="
                           "{}%20rating:safe&pid=0&page=dapi"

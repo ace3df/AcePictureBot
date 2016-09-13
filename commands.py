@@ -53,23 +53,23 @@ def waifu(ctx, gender=None, search_for=None, is_otp=False):
     if is_otp:
         return name, series, otp_image
     start_path = settings.get('image_location', os.path.join(os.path.realpath(__file__), 'images'))
-    path_name = os.path.join(start_path, list_name, slugify(name).lower())
+    path_name = os.path.join(start_path, list_name, slugify(name))
     end_tag.append(name.replace(" ", "_"))
     reply_text = "Your {} is {} ({})".format(list_name, name, series)
     media_args = {'tags': end_tag}
     reply_media = get_media(path=path_name, ctx=ctx, media_args=media_args)
     return reply_text, reply_media
 
-@command(
-    "shipgirl",
+# Pat: yandere, Tsundere
+@command("shipgirl",
     aliases=["idol", "touhou", "vocaloid", "sensei", "senpai",
              "kouhai", "imouto", "shota", "onii", "onee",
-             "monstergirl", "tankgirl", "witchgirl", "granblue"])
+             "monstergirl", "tankgirl", "witchgirl", "granblue", "yandere", "tsundere"])
 def random_list(ctx):
     # Male only lists.
     male_lists = ["shota", "onii"]
     # Both female and male can be under these.
-    special_male_lists = ["idol", "sensei", "senpai", "kouhai"]
+    special_male_lists = ["idol", "sensei", "senpai", "kouhai", "yandere", "tsundere"]
     # Simple way to make sure to not load male list if one of these are used.
     possible_search = ["love", "idolmaster", "cinderella",
                        "akb0048", "wake", "aikatsu"] 
@@ -333,7 +333,11 @@ def source(ctx):
         status_id = ctx.raw_data.get('in_reply_to_status_id', False)
         if not status_id:
             return "Are you sure you're asking for source on an image?"
-        tweet = ctx.bot.api.lookup_status(id=status_id)
+        try:
+            tweet = ctx.bot.api.lookup_status(id=status_id)
+        except:
+            # Probably twython.exceptions.TwythonError
+            return "Unable to search for source! Try using SauceNAO: http://saucenao.com/"
         tweet_media = tweet[0]['entities'].get('media', [])
         if 'tweet_video_thumb' in str(tweet):
             is_gif = True
