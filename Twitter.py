@@ -60,6 +60,15 @@ def post_tweet(ctx, reply_text, reply_media=None):
                 if uploaded:
                     media_ids.append(uploaded)
             if not media_ids and reply_text:
+                # TEMP
+                # Twitter rejected upload (seems to be API problem for now)
+                if ctx.command in ["mywaifu", "myhusbando"]:
+                    ctx.bot.check_rate_limit_per_cmd(ctx, remove=1)
+                    url_help = help_urls.get('waifuregister_websites_offline', False)
+                    reply_text = ("Websites are offline to get you your {}!\n"
+                                  "Try again later!{}".format(ctx.command,
+                        "\nHelp: " + url_help if url_help else ""))
+                    reply_text = "@{0} {1}".format(ctx.screen_name, reply_text)
                 # Failed to upload media
                 bot.api.update_status(status=reply_text,
                                   in_reply_to_status_id=ctx.raw_data['id'])
@@ -89,7 +98,7 @@ def is_following(ctx):
            "{url_help}".format(url_help="\nHelp: " + url_help if url_help else ""))
     try:
         user_info = bot.api.lookup_user(user_id=ctx.user_id)
-    except twython.exceptions.TwythonAuthError:
+    except (twython.exceptions.TwythonAuthError, twython.exceptions.TwythonError):
         return limited_msg
     if not can_bypass_genuine:
         if user_info[0]['statuses_count'] < 10:
@@ -99,7 +108,7 @@ def is_following(ctx):
     try:
         my_id = twitter_settings.get('my_id', '2910211797')
         friendship = bot.api.lookup_friendships(user_id="{},{}".format(my_id, ctx.user_id))
-    except twython.exceptions.TwythonAuthError:
+    except (twython.exceptions.TwythonAuthError, twython.exceptions.TwythonError):
         return limited_msg
     try:
         follow_result = 'followed_by' in friendship[1]['connections']

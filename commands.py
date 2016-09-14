@@ -254,7 +254,7 @@ def pictag(ctx):
         if not image:
             return ("Sorry, no images could be found! Try different tags!")
         reply_media.append(image)
-    reply_text = "Result(s) for: {}".format(' '.join(tags))
+    reply_text = "Result(s) for: {}".format(' '.join(tags).replace("-asian", ""))
     return reply_text, reply_media
 
 

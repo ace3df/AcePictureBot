@@ -178,7 +178,7 @@ async def send_reply(reply_text, reply_media, ctx, server_settings):
 
 async def change_status():
     """Change the account's current game to text that will show tips and tricks."""
-    custom_tips = discord_settings.get('custom_tips', [])
+    custom_tips = bot.settings.get('custom_tips', [])
     cmd_tips = ["Try saying: " + a for a in bot.commands if not bot.commands[a].patreon_only or\
            a not in bot.commands[a].patreon_aliases or\
            a not in bot.commands[a].mod_only]
@@ -190,7 +190,7 @@ async def change_status():
                 for a in status:
                     new_status = discord.Game(name=a, idle=False)
                     await discord_bot.change_status(game=new_status)
-                    await asyncio.sleep(30)
+                    await asyncio.sleep(10)
             else:
                 new_status = discord.Game(name=status, idle=False)
                 await discord_bot.change_status(game=new_status)
@@ -263,7 +263,7 @@ async def on_message(message):
         any(cmd[0] in message.content for cmd in settings_edits):
         if message.author == message.server.owner or\
            message.author.id in server_settings['mods'] or\
-           message.author.id in discord_settings.get('global_mods', []):
+           message.author.id in bot.settings['mod_ids'].get('discord', []):
             await change_settings(server_settings, message)
             return
     if not server_settings['active']:
@@ -820,10 +820,21 @@ class Music:
 
 @discord_bot.command()
 async def help():
-    help_message = discord_settings.get('help_message', False)
-    if not help_message:
+    message = discord_settings.get('help_message', False)
+    if not message:
         return
-    await discord_bot.say(help_message)
+    await discord_bot.say(message)
+
+
+@discord_bot.command()
+async def patreon():
+    if not bot.settings.get('use_patreon', False):
+        return
+    message = discord_settings.get('patreon_msg', False)
+    if not message:
+        return
+    await discord_bot.say(message)
+
 
 @discord_bot.command()
 async def invite():
