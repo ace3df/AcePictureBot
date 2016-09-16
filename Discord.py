@@ -190,7 +190,7 @@ async def change_status():
                 for a in status:
                     new_status = discord.Game(name=a, idle=False)
                     await discord_bot.change_status(game=new_status)
-                    await asyncio.sleep(10)
+                    await asyncio.sleep(8)
             else:
                 new_status = discord.Game(name=status, idle=False)
                 await discord_bot.change_status(game=new_status)
@@ -373,7 +373,8 @@ class Music:
                         await self.game_ready(self.current_game[1])
                     except Exception as e:
                         # TEMP, need to find the cause of this
-                        print(traceback.print_tb(e.__traceback__))
+                        traceback.print_tb(e.__traceback__)
+                        bot.log.info('{0.__class__.__name__}: {0}'.format(e))
                         bot.log.warning("MUSIC GAME CLOSED {}".format(self.current_game))
                     if self.player is not None:
                         await self.player.disconnect()
@@ -430,6 +431,8 @@ class Music:
         while True:
             new_msg = await discord_bot.wait_for_message(author=ctx.message.author, timeout=0, check=check)
             if new_msg:
+                log_str = "{0.timestamp}: {0.author.name} in {0.server.name} [{1}]: {0.content}".format(new_msg, "Music Game")
+                bot.log.info(log_str)
                 break
             if time.time() - timeout > 80:
                 reply_text = ("Sorry you took too long!"
@@ -464,44 +467,34 @@ class Music:
                 game_settings['hints'] = False
             else:
                 game_settings['hints'] = True
+
+        def limit_year(year):
+            if not year.isdigit():
+                year = 2010
+            year = int(year)
+            if year > datetime.now().year + 1 or year < 1970:
+                year = 2010
+            return year
+
         game_settings['year'] = msg_args.get('year', range(2008, datetime.now().year))
         if game_settings['year']:
             if "-" in game_settings['year']:
                 start_year, end_year = game_settings['year'].split("-")
-                if not start_year.isdigit():
-                    start_year = 2010
-                start_year = int(start_year)
-                if not end_year.isdigit():
-                    end_year = 2016
-                end_year = int(end_year)
-                if start_year > datetime.now().year or start_year < 1970:
-                    start_year = 2010
-                if end_year > 2017 or end_year < 1990:
-                    end_year = 2016
-                game_settings['year'] = range(start_year, end_year)
-            else:
-                if isinstance(game_settings['year'], str):
-                    if not game_settings['year'].isdigit():
-                        game_settings['year'] = range(2006, datetime.now().year)
-                    else:
-                        game_settings['year'] = int(game_settings['year'])
-                        if game_settings['year'] > datetime.now().year or game_settings['year'] < 1970:
-                            game_settings['year'] = 2010
-                        if game_settings['year'] in range(1960, 1979):
-                            game_settings['year'] = 1979
-                        elif game_settings['year'] in range(1980, 1989):
-                            game_settings['year'] = 1989
-                        elif game_settings['year'] in range(1990, 1999):
-                            game_settings['year'] = 1999
-                        elif game_settings['year'] in range(2000, 2009):
-                            game_settings['year'] = 2009
+                game_settings['year'] = range(limit_year(start_year), limit_year(end_year))
+            elif isinstance(game_settings['year'], str):
+                if not game_settings['year'].isdigit():
+                    game_settings['year'] = range(2006, datetime.now().year)
+                else:
+                    game_settings['year'] = limit_year(game_settings['year'])
         with open(os.path.join(bot.config_path, 'Music Game.json'), 'r') as f:
             anime_songs = json.load(f)
         anime_songs = list(anime_songs.items())
         random.shuffle(anime_songs)
         finished = []
+        complete_pack = []
         for name, data in anime_songs:
             for entry in data.items():
+                complete_pack.append({**{'series': name, 'type': entry[0]}, **entry[1]})
                 if game_settings['year']:
                     if entry[1].get('year', False):
                         year_str = entry[1]['year']
@@ -547,6 +540,13 @@ class Music:
             await discord_bot.send_message(new_msg.channel, help_msg)
         except discord.errors.Forbidden:
             return
+        if len(finished) < 6:
+            message = "**No entries found with them settings! Using default settings!**"
+            try:
+                await discord_bot.send_message(new_msg.channel, message)
+            except discord.errors.Forbidden:
+                return
+            finished = complete_pack
         player_leaderboard = {}
         current_round = 1
         while True:
@@ -916,12 +916,6 @@ async def on_ready():
     print('Username: ' + discord_bot.user.name)
     print('ID: ' + discord_bot.user.id)
     print('------')
-    discord_bot.loop.create_task(change_status())
-    discord_bot.add_cog(Music(discord_bot))
-    if bot.settings.get('datadog', False):
-        discord_bot.loop.create_task(datadog_data())
-        discord_bot.loop.create_task(
-            datadog_online_check('discord.ok', 'discord', 'Response: 200 OK'))
 
 
 if __name__ == '__main__':
@@ -929,4 +923,10 @@ if __name__ == '__main__':
         raise Exception("Missing Discord Bot Token from Discord Settings.json in /Configs/")
     discord_bot.client_id = bot.settings.get('client_id', '')
     discord_bot.owner_id = bot.settings.get('owner_id', '')
+    discord_bot.loop.create_task(change_status())
+    discord_bot.add_cog(Music(discord_bot))
+    if bot.settings.get('datadog', False):
+        discord_bot.loop.create_task(datadog_data())
+        discord_bot.loop.create_task(
+            datadog_online_check('discord.ok', 'discord', 'Response: 200 OK'))
     discord_bot.run(bot.settings['token'])

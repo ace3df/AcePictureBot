@@ -1029,26 +1029,27 @@ def create_otp_image(otp_results=[]):
     overlay = False
     if settings.get('otp_overlay_location', False):
         overlay = get_media_local(path=os.path.join(settings['otp_overlay_location']))
-    path = settings.get('default_dl_locaction', os.path.realpath(__file__))
+    path = settings.get('image_location', os.path.realpath(__file__))
     filename = os.path.join(path, str(random.randint(0, 999)) + ".jpg")
     img_size = (225 * len(otp_results), 350)
+    otp_images_path = os.path.join(path, 'OTP')
     with Image.new("RGB", img_size) as otp_image:
-        used_files = []  # To delete later.
         for result in otp_results:
             # check if file is in download folder first
             # split download link to get just the id then check
-            temp_dl = download_file(result[2])
-            if not temp_dl:
-                return False
-            used_files.append(temp_dl)
-            with Image.open(temp_dl) as temp_img:
+            otp_filename = result[2].split("/")[-1]
+            otp_image_file = os.path.join(otp_images_path, otp_filename)
+            if not os.path.isfile(otp_image_file):
+                otp_image_file = download_file(result[2], path=otp_images_path)
+                if not otp_image_file:
+                    return False
+            with Image.open(otp_image_file) as temp_img:
                 otp_image.paste(temp_img, (225 * otp_results.index(result), 0))
         if overlay:
             with Image.open(overlay) as ol:
                 overlay_open = ol.resize((img_size), Image.ANTIALIAS)
             otp_image.paste(overlay_open, (0, 0), mask=overlay_open)
         otp_image.save(filename)
-    [os.remove(file) for file in used_files]
     return filename
 
 

@@ -78,33 +78,30 @@ def random_list(ctx):
     ignore_series_lists = ["shipgirl", "touhou", "witchgirl", "tankgirl", "vocaloid"]
     list_name = "Waifu"
     end_tag = ["1girl", "solo"]
-    if ctx.command in special_male_lists\
-        and ("male" in ctx.args and not "female" in ctx.args)\
-        or ctx.command in male_lists:
+    args = ctx.message.lower()
+    if (ctx.command in special_male_lists and "male" in args and not "female" in args) or ctx.command in male_lists:
         list_name = "Husbando"
         end_tag = ["-1girl", "-female", "1boy"]
-    elif ctx.command in special_male_lists\
-        and not ("female" in ctx.args)\
-        and not (any(show in ctx.args for show in possible_search)):
+    elif (ctx.command in special_male_lists and not "female" in args):
         random_gender = random.randint(0, 10)
-        if random_gender > 7:
+        if random_gender > 8:
             list_name = "Husbando"
             end_tag = ["-1girl", "-female", "1boy"]
     result = ()
     search_for = ""
-    show_series = False if ctx.command in ignore_series_lists else True
+    show_series = ctx.command in ignore_series_lists
     support_otp = False
     # Special per list stuff
     if ctx.command == "shipgirl":
         # Default shipgirl to kantai collection only
         search_for = "Kantai Collection"
         support_otp = True
-        if "all" in ctx.args.lower():
+        if "all" in args:
             search_for = ""
-        elif "aoki" in ctx.args.lower():
+        elif "aoki" in args:
             search_for = "Aoki Hagane no Arpeggio"
     elif ctx.command == "idol":
-        args = ctx.message.lower().replace("!", "").replace("@", "a")
+        args = args.replace("!", "").replace("@", "a")
         if "love live sunshine" in args:
             search_for = "Love Live! Sunshine!!"
         elif "love live" in args:
@@ -122,7 +119,7 @@ def random_list(ctx):
             search_for = "Aikatsu!"
     elif ctx.command == "onee" or ctx.command == "onii":
         ctx.command = ctx.command + "-chan"
-    if support_otp and "otp" in ctx.message.lower():
+    if support_otp and "otp" in args:
         list_name = "otp"
     path = os.path.join(ctx.bot.config_path, '{} List.yaml'.format(list_name))
     char_list = yaml_to_list(path, ctx.command.lower())
@@ -181,12 +178,14 @@ def otp(ctx):
         end_msg = ""
         if is_harem:
             for person in range(0, max_harem):
-                otp_genders.append("waifu" if random.randint(0, 10) < 7 else "husbando")
+                otp_genders.append("waifu" if random.randint(0, 10) < 9 else "husbando")
         else:
             otp_genders.append("waifu")
             otp_genders.append("husbando")
     if is_harem:
-        end_msg = "Harem " + end_msg
+        end_msg += "Harem"
+    else:
+        end_msg += "OTP"
     search_for = [args.strip()]
     safe_loop = 0
     if "(x)" in args:
@@ -226,7 +225,7 @@ def otp(ctx):
             series_list.append(result[1])
     # Werid way but this is good enough of not duping series name in text
     end_msg_series = "(" + ' / '.join(series_list) + ")"
-    reply_text = "Your {}OTP is {} {}".format(end_msg, end_msg_names, end_msg_series)
+    reply_text = "Your {} is {} {}".format(end_msg, end_msg_names, end_msg_series)
     reply_media = create_otp_image(results)
     if len(reply_text) > ctx.bot.source.character_limit:
         reply_text = reply_text.split("(")[0].strip()
@@ -344,7 +343,7 @@ def direct_source(ctx):
     return source.callback(ctx, image_url=image_url)
 
 
-@command("source", only_allow=["twitter"])
+@command("source", aliases=["sauce", "anime?", "manga?"], only_allow=["twitter"])
 def source(ctx, image_url=None):
     is_gif = False
     if image_url is None and ctx.raw_data.get('extended_entities', []):
