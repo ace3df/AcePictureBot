@@ -27,7 +27,7 @@ discord_bot = commands.Bot(command_prefix=prefix, pm_help=None)
 if not discord.opus.is_loaded():
     discord.opus.load_opus('libopus-0.x86')
 discord_bot.remove_command("help")
-attrs = {'name': 'discord', 'character_limit': 1000, 'support_embedded': True, 'download_media': False, 'allow_new_mywaifu': False}
+attrs = {'name': 'discord', 'character_limit': 1000, 'support_embedded': False, 'download_media': False, 'allow_new_mywaifu': False}
 bot = BotProcess(Source(**attrs))
 settings_edits = [["active", "The bot is now online for this server!", "The bot is now offline for this server!"],
                   ["media", "The bot will now post media (images) when it can!", "The bot will now not post any media!"],
@@ -37,7 +37,6 @@ settings_edits = [["active", "The bot is now online for this server!", "The bot 
 
 async def change_settings(server_settings, message):
     new_settings = copy.deepcopy(server_settings)
-    temp_msg = message.content
     prefix_used = [pre for pre in prefix if message.content.startswith(pre)]
     args = ' '.join(message.content.lower().split(prefix_used[0], 1)).split()
     if len(args) < 2:
@@ -141,8 +140,8 @@ async def send_reply(reply_text, reply_media, ctx, server_settings):
         return
     message = ctx.raw_data
     command = ctx.command
-    if command in ["mywaifu", "myhusbando"]:
-        reply_text = reply_text.format(user_mention=message.author.mention)
+    if command in ["mywaifu", "myhusbando"] or ctx.is_patreon_vip and command in ["myidol", "myotp"]:
+        reply_text = "{0.author.mention}'s {1}".format(message, reply_text)
     else:
         reply_text = "{0} {1.author.mention} ".format(reply_text, message)
     destination = None
@@ -179,7 +178,7 @@ async def send_reply(reply_text, reply_media, ctx, server_settings):
 async def change_status():
     """Change the account's current game to text that will show tips and tricks."""
     custom_tips = bot.settings.get('custom_tips', [])
-    cmd_tips = ["Try saying: " + a for a in bot.commands if not bot.commands[a].patreon_only or\
+    cmd_tips = ["Try: " + a for a in bot.commands if not bot.commands[a].patreon_only or\
            a not in bot.commands[a].patreon_aliases or\
            a not in bot.commands[a].mod_only]
     complete_tips = custom_tips + cmd_tips
@@ -285,46 +284,29 @@ async def on_message(message):
     if not command:
         return
 
-    if bot.settings.get('datadog', False) and bot.settings['datadog'].get('statsd_commands', False):
-        bot.datadog.statsd.increment(bot.settings['datadog']['statsd_commands'] + "." + command)
-
     attrs = {'bot': bot,
              'screen_name': message.author.name,
-             'discord_id':message.author.id,
+             'discord_id': message.author.id,
              'command': command,
              'message': message.content,
              'raw_data': message
             }
     ctx = UserContext(**attrs)
-    # TODO: Move back to 10
-    if not bot.check_rate_limit(ctx.user_id, or_seconds=120, or_per_user=5):
+    if not bot.check_rate_limit(ctx.user_id, or_seconds=120, or_per_user=10):
         return
     if command in ["mywaifu", "myhusbando"]:
         if not ctx.user_ids.get('twitter', False):
             # Don't have a Twitter account linked
-            reply_text = create_token(
-                message.author.name, message.author.id, bot.source.name, "twitter")
+            reply_text = create_token(message.author.name, message.author.id, bot.source.name)
             await discord_bot.send_message(message.author, reply_text)
             return
     reply_text, reply_media = bot.on_command(ctx)
     # Handle MyWaifu command as we handle it a little differently on Discord.
-    if reply_text and command == "mywaifu" or command == "myhusbando":
+    # TODO: make a better way to handle this based on ctx.bot.source.get_new_mywaifu
+    if reply_text and command in ["mywaifu", "myhusbando"]:
         if "I don't know who" in reply_text:
-            if not ctx.user_ids.get('twitter', False):
-                # Don't have a Twitter account linked
-                reply_text = create_token(
-                    message.member.name, message.member.id,
-                    bot.source.name, "DiscordConnect")
-                await self.send_message(message.member, reply_text)
-                return
-            else:
-                # Have a Twitter accoutn linked, but no waifu registered
-                reply_text = reply_text.replace("Register or try tweeting",
-                                                "Register on Twitter or try saying")
-        elif reply_media:
-            reply_text = "{0.mention}'s {1}".format(message.author, reply_text)
-        else:
-            reply_text = "{0.mention} {1}".format(message.author, reply_text)
+            reply_text = reply_text.replace("Register or try tweeting",
+                                            "Register on Twitter or try saying")
     bot.commands_used[ctx.command] += 1
     await send_reply(reply_text, reply_media, ctx, server_settings)
 
@@ -364,6 +346,11 @@ class Music:
 
     async def read_music_game_queue(self):
         """Loop queued_games and join next game when ready."""
+        # TODO:
+        # Still a lot of problems with this
+        # Current ones:
+        # Fails to download song (connection to site problem)
+        # int has no .name 
         await discord_bot.wait_until_ready()
         while not discord_bot.is_closed:
             if self.queued_games:
@@ -371,13 +358,19 @@ class Music:
                     try:
                         self.current_game = self.queued_games.popitem(last=False)
                         await self.game_ready(self.current_game[1])
+                        if self.player is not None:
+                            await self.player.disconnect()
                     except Exception as e:
                         # TEMP, need to find the cause of this
                         traceback.print_tb(e.__traceback__)
                         bot.log.info('{0.__class__.__name__}: {0}'.format(e))
                         bot.log.warning("MUSIC GAME CLOSED {}".format(self.current_game))
-                    if self.player is not None:
+                    try:
                         await self.player.disconnect()
+                    except Exception as e:
+                        traceback.print_tb(e.__traceback__)
+                        bot.log.info('{0.__class__.__name__}: {0}'.format(e))
+                        bot.log.warning("MUSIC GAME COULDNT LEAVE VOICE {}".format(self.current_game))
                     self.current_game = None
                     self.break_leave = None
                     self.player = None
@@ -890,24 +883,13 @@ async def datadog_data():
     await discord_bot.wait_until_ready()
     await asyncio.sleep(5)
     while not discord_bot.is_closed:
-        await asyncio.sleep(360)
-        if bot.settings['datadog'].get('metric_servers', False):
+        await asyncio.sleep(5)
+        if bot.settings['datadog'].get('statsd_servers', False):
             datadog_server_count = len(discord_bot.servers)
-            bot.datadog.api.Metric.send(metric=bot.settings['datadog']['metric_servers'],
-                                                points=(time.time(), datadog_server_count))
-        if bot.settings['datadog'].get('metric_members', False):
-            datadog_server_count = len(discord_bot.get_all_members())
-            bot.datadog.api.Metric.send(metric=bot.settings['datadog']['metric_members'],
-                                                points=(time.time(), datadog_server_count))
-                
-
-async def datadog_online_check(check, host_name, response='Response: 200 OK'):
-    while True:
-        bot.datadog.api.ServiceCheck.check(
-            check=check, host_name=host_name,
-            status=bot.datadog.api.constants.CheckStatus.OK,
-            message=response)
-        await asyncio.sleep(5 * 60)
+            bot.datadog.statsd.gauge(bot.settings['datadog']['statsd_servers'], datadog_server_count)
+        if bot.settings['datadog'].get('statsd_members', False):
+            datadog_server_count = len(list(discord_bot.get_all_members()))
+            bot.datadog.statsd.gauge(bot.settings['datadog']['statsd_members'], datadog_server_count)                
 
 
 @discord_bot.event
@@ -927,6 +909,4 @@ if __name__ == '__main__':
     discord_bot.add_cog(Music(discord_bot))
     if bot.settings.get('datadog', False):
         discord_bot.loop.create_task(datadog_data())
-        discord_bot.loop.create_task(
-            datadog_online_check('discord.ok', 'discord', 'Response: 200 OK'))
     discord_bot.run(bot.settings['token'])

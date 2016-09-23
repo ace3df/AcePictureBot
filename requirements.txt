@@ -10,3 +10,13 @@ twython
 # Discord
 discord.py[voice]
 tabulate
+
+# Facebook
+facebook-sdk
+
+# Twitch
+irc
+imgurpython
+
+# Reddit
+praw

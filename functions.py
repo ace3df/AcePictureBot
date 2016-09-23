@@ -42,6 +42,7 @@ class Source:
         self.download_media = attrs.get('download_media', False)
         self.allow_new_mywaifu = attrs.get('allow_new_mywaifu', False)
         self.max_filesize = attrs.get('max_filesize', 3145728)  # Bytes
+        self.thrid_party_upload = attrs.get('thrid_party_upload', False)  # Upload to imgur
 
     def __str__(self):
         return self.name
@@ -68,23 +69,30 @@ class BotProcess(CommandGroup):
         except FileNotFoundError:
             source_settings = {}
         self.settings = global_settings
+        self.patreon_ids = self.get_patreon_ids()
         for item in source_settings.items():
             if not self.settings.get(item[0], False):
                 self.settings[item[0]] = item[1]
             else:
                 self.settings[item[0]] = {**self.settings[item[0]], **item[1]}
         self.mod_list = self.settings.get('mod_ids', [])
-        self.patreon_list = self.settings.get('patreon_ids', [])
         if self.settings.get('datadog', False):
             import datadog
+            from datadog.api.constants import CheckStatus
             options = {
                 'api_key': self.settings['datadog']['api_key'],
-                'app_key': self.settings['datadog']['app_key'],
-                'statsd_host': self.settings['datadog']["statsd_host"],
-                'statsd_port': self.settings['datadog']["statsd_port"]
+                'app_key': self.settings['datadog']['app_key']
             }
             datadog.initialize(**options)
             self.datadog = datadog
+            self.datadog_checkstatus = CheckStatus
+
+        if self.source.thrid_party_upload:
+            from imgurpython import ImgurClient
+            from imgurpython.helpers.error import ImgurClientError
+            client_id = api_keys['imgur_client_id']
+            client_secret = api_keys['imgur_client_secret']
+            self.imgur_client = ImgurClient(client_id, client_secret)
 
         import commands
         members = getmembers(commands)
@@ -103,7 +111,7 @@ class BotProcess(CommandGroup):
             rates = default_rate_limits.get(
                 'default',
                 {"rate_seconds": 10800, "rate_per_user": 10})
-        self.rate_limit = {'rates': OrderedDict(), **rates}
+        self.rate_limit = {'rates': OrderedDict(), **rates, 'patreon_rates': OrderedDict()}
         self.log = self.get_logging()
 
     def get_logging(self):
@@ -119,6 +127,16 @@ class BotProcess(CommandGroup):
         handler = logging.StreamHandler(sys.stdout)
         log.addHandler(handler)
         return log
+
+    def get_patreon_ids(self):
+        patreon_ids = {}
+        if self.settings.get('use_patreon', False):
+            try:
+                with open(os.path.join(self.config_path, 'Patreons.json'), 'r') as f:
+                    patreon_ids = json.load(f)
+            except FileNotFoundError:
+                return {}
+        return patreon_ids
 
     def patreon_only_message(self):
         reply_text = False
@@ -137,9 +155,28 @@ class BotProcess(CommandGroup):
         if self.commands[command].mod_only and not ctx.is_mod:
             # Mod only command, return nothing
             return False, False
-        if (self.commands[command].patreon_only and not ctx.is_patreon)\
-        or (command in self.commands[command].patreon_aliases and not ctx.is_patreon):
+
+        if self.source.name == "twitter" and command == "!source":
+            ctx.command = "source"
+
+        if self.commands[command].patreon_only and not ctx.is_patreon\
+           or command in self.commands[command].patreon_aliases and not ctx.is_patreon:
                 return self.patreon_only_message()
+
+        if self.commands[command].patreon_vip_only and not ctx.is_patreon_vip\
+            or command in self.commands[command].patreon_vip_aliases and not ctx.is_patreon_vip:
+                # Don't trigger Patreon message on these as lots of people don't space "myidol"
+                if "idol" in ctx.command:
+                    ctx.command = "idol"
+                elif "otp" in ctx.command:
+                    ctx.command = "otp"
+                else:
+                    return self.patreon_only_message()
+
+        if self.settings.get('datadog', False):
+            if self.settings['datadog'].get('statsd_commands', False):
+                self.datadog.statsd.increment(self.settings['datadog']['statsd_commands'])
+
         if update.get('auto_update', False):
             os.environ[update['is_busy_environ'] + self.source.name] = 'True'
         try:
@@ -174,6 +211,33 @@ class BotProcess(CommandGroup):
             return False
         return command
 
+    def check_rate_patreon(self, ctx):
+        """Warn the user that overusing MyWaifu will just make it worse for them."""
+        if ctx.command not in ["mywaifu", "myhusbando", "waifuregister", "husbandoregister"]:
+            return True
+        current_time = datetime.now()
+        user_rates = self.rate_limit['patreon_rates']
+        add_on = patreon_reapeat_for(ctx)
+        rate_seconds = 10800  # 4 Hours
+        warning_when = 9
+        if ctx.user_id in user_rates:
+            # User is now limited.
+            if ((current_time - user_rates[ctx.user_id][0]).total_seconds() < rate_seconds)\
+                and (user_rates[ctx.user_id][1] >= warning_when):
+                    return False
+            elif ((current_time - user_rates[ctx.user_id][0]).total_seconds() >= rate_seconds):
+                # Limit is over
+                del user_rates[ctx.user_id]
+            else:
+                # Add on limit
+                user_rates[ctx.user_id][1] += add_on
+        else:
+            for person in list(user_rates):
+                if ((current_time - user_rates[person][0]).total_seconds() > rate_seconds):
+                    del user_rates[person]
+            user_rates[ctx.user_id] = [current_time, add_on]
+        return True
+
     def check_rate_limit(self, user_id, or_seconds=False, or_per_user=False):
         """Check to see if the user is under basic ratelimit."""
         current_time = datetime.now()
@@ -184,8 +248,7 @@ class BotProcess(CommandGroup):
         if or_per_user:
             rate_per_user = or_per_user
         else:
-            # TODO: Move back to 15
-            rate_per_user = self.rate_limit.get('rate_per_user', 10)
+            rate_per_user = self.rate_limit.get('rate_per_user', 15)
         user_rates = self.rate_limit['rates']
 
         if user_id in user_rates:
@@ -358,10 +421,13 @@ class UserContext:
         self.message = attrs.pop('message')
         self.args = self.clean_message(self.message)
         self.raw_data = attrs.pop('raw_data')
-        self.is_mod = self.get_is_mod()
-        # TODO: This is temp Until Monday
-        self.is_patreon =  True  # self.get_is_patreon()
         self.get_other_ids()
+        self.is_mod = self.get_is_mod()
+        self.is_patreon_vip = self.get_is_patreon_vip()
+        if self.is_patreon_vip:
+            self.is_patreon = True
+        else:
+            self.is_patreon = self.get_is_patreon()
 
     def clean_message(self, message):
         ignore_cmd_case = re.compile(re.escape(self.command), re.IGNORECASE)
@@ -377,9 +443,16 @@ class UserContext:
         return self.user_ids.get(self.bot.source.name) in mod_ids
 
     def get_is_patreon(self):
-        if not self.bot.settings.get('patreon_ids', {}):
+        if not self.bot.patreon_ids.get('patreon_ids', {}):
             return False
-        patreon_ids = self.bot.settings['patreon_ids'].get(self.bot.source.name, [])
+        patreon_ids = self.bot.patreon_ids['patreon_ids'].get(self.bot.source.name, [])
+        return self.user_ids.get(self.bot.source.name) in patreon_ids
+
+    def get_is_patreon_vip(self):
+        """This is $10+ for the commands of IdolRegister, etc."""
+        if not self.bot.patreon_ids.get('patreon_vip_ids', {}):
+            return False
+        patreon_ids = self.bot.patreon_ids['patreon_vip_ids'].get(self.bot.source.name, [])
         return self.user_ids.get(self.bot.source.name) in patreon_ids
 
     def get_other_ids(self):
@@ -397,7 +470,7 @@ class UserContext:
                 return
 
 
-def connect_token(user_id, token, from_source, to_source):
+def connect_token(user_id, token, to_source):
     tokens = {}
     config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
     with open(os.path.join(config_path, "Connect Tokens.json"), 'r') as f:
@@ -410,15 +483,21 @@ def connect_token(user_id, token, from_source, to_source):
             accounts = json.load(f)
     except FileNotFoundError:
             accounts = {}
-    # TODO: Support muilti conencts
-    """
-    @a connect discord token
-    {
-        "discord": "ABC1TWOTHREE"
-    }
-    """
-    accounts.append({from_source: user_id,
-                     to_source: connected_user_id})
+    in_accounts = False
+    count = 0
+    for account in accounts:
+        if account.get("twitter", False) == user_id:
+            if account.get(to_source, False):
+                # Already in accounts and already linked.
+                return False
+            in_accounts = True
+            break
+        count += 1
+    if in_accounts:
+        accounts[count][to_source] = connected_user_id
+    else:
+        accounts.append({"twitter": user_id,
+                         to_source: connected_user_id})
     with open(os.path.join(config_path, 'Connected Accounts.json'), 'w') as f:
         json.dump(accounts, f, sort_keys=True, indent=4)
     with open(os.path.join(config_path, "Connect Tokens.json"), 'w') as f:
@@ -426,7 +505,7 @@ def connect_token(user_id, token, from_source, to_source):
     return "You can now use MyWaifu / MyHusbando on {}!".format(to_source.title())
 
 
-def create_token(screen_name, user_id, from_source, to_source):    
+def create_token(screen_name, user_id, from_source):    
     config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
     try:
         with open(os.path.join(config_path, 'Connected Accounts.json'), 'r') as f:
@@ -443,7 +522,6 @@ def create_token(screen_name, user_id, from_source, to_source):
     if is_in_accounts:
         # TODO: Suggest disconnect discord, etc
         return "You already have an account linked!"
-    #accounts.append({from_source: user_id})
     try:
         with open(os.path.join(config_path, 'Connect Tokens.json'), 'r') as f:
             tokens = json.load(f)
@@ -461,8 +539,6 @@ def create_token(screen_name, user_id, from_source, to_source):
         tokens[new_token] = user_id
     with open(os.path.join(config_path, "Connect Tokens.json"), 'w') as f:
         json.dump(tokens, f, sort_keys=True, indent=4)
-    """with open(os.path.join(config_path, 'Connected Accounts.json'), 'w') as f:
-                    json.dump(accounts, f, sort_keys=True, indent=4)"""
     msg = ("Link your account by tweeting to {twitter_account_url}"
            "\n@{twitter_account_handle} connect {source_name} {token}".format(
             twitter_account_url=settings.get('twitter_account_url', 'https://twitter.com/AcePictureBot'),
@@ -738,7 +814,11 @@ def get_media_online(path=None, ctx=None, media_args={}, ignore_used=False):
             if not soup:
                 time.sleep(0.5)
                 continue
-            xml_parse = ET.fromstring(soup)
+            try:
+                xml_parse = ET.fromstring(soup)
+            except:
+                print(soup)
+                return False
             entries = [post for post in xml_parse if post.tag == "post"]
             random.shuffle(entries)
             if media_args.get('return_count', False):
@@ -845,11 +925,34 @@ def get_media_local(path, ctx=None, media_args={}):
     return media
 
 
+def upload_media(file, ctx=None):
+    try:
+        if ctx is None:
+            from imgurpython import ImgurClient
+            from imgurpython.helpers.error import ImgurClientError
+            client_id = api_keys['imgur_client_id']
+            client_secret = api_keys['imgur_client_secret']
+            imgur_client = ImgurClient(client_id, client_secret)
+            image = imgur_client.upload_from_path(file)
+        else:
+            print(file)
+            image = ctx.bot.imgur_client.upload_from_path(file)
+        if image.get('link', False):
+            return image['link']
+    except Exception as e:
+        print(e)
+        pass
+    return False
+
+
 def get_media(path=None, ctx=False, media_args={}):
     """Uses get_media_local and if False, use get_media_online."""
+    # TODO: Clean this up to handle all the new ifs
     media = False
     if path is not None:
         media = get_media_local(path=path, ctx=ctx, media_args=media_args)
+    if media and ctx and ctx.bot.source.thrid_party_upload:
+        return upload_media(media, ctx)
     if ctx and not ctx.bot.source.download_media:
         return media
     if not media and media_args:
@@ -1059,9 +1162,13 @@ def make_paste(text, title=""):
                'paste': text,
                'description': title}
     headers = {'content-type': 'application/json'}
-    r = requests.post(post_url,
-                      data=json.dumps(payload),
-                      headers=headers)
+    try:
+        # TIMEOUT
+        r = requests.post(post_url,
+                          data=json.dumps(payload),
+                          headers=headers)
+    except:
+        return False
     return r.json()['paste']['link']
 
 
@@ -1106,9 +1213,8 @@ def patreon_reapeat_for(ctx):
         repeat_for = int(re.search(a, ctx.args[0:3]).group())
     except AttributeError:
         return 1
-    # TODO: This is limited to 2 for now
-    if repeat_for > 2:
-        repeat_for = 2
+    if repeat_for > 4:
+        repeat_for = 4
     return repeat_for
 
 

@@ -155,8 +155,7 @@ def process_tweet(data):
             command = "waifu"
         else:
             return
-    if bot.settings.get('datadog', False) and bot.settings['datadog'].get('statsd_commands', False):
-        bot.datadog.statsd.increment(bot.settings['datadog']['statsd_commands'] + "." + command)
+
     attrs = {'bot': bot,
              'screen_name': data['user']['screen_name'],
              'twitter_id': data['user']['id_str'],
@@ -172,14 +171,19 @@ def process_tweet(data):
         ctx.user_id, ctx.command, ctx.message))
     reply_text = None
     reply_media = []
-    # TEMP WHILE FREE WEEK
-    #if not ctx.is_patreon and not ctx.is_mod:
-    is_limit = bot.check_rate_limit_per_cmd(ctx)
-    if not is_limit:  # User is limited, ignore them.
-        bot.log.info("User is limited. Ignoreing...")
-        return
-    if isinstance(is_limit, str):  # User is now limited, pass warning.
-        reply_text = is_limit
+    if not ctx.is_patreon and not ctx.is_mod:
+        is_limit = bot.check_rate_limit_per_cmd(ctx)
+        if not is_limit:  # User is limited, ignore them.
+            bot.log.info("User is limited. Ignoreing...")
+            return
+        if isinstance(is_limit, str):  # User is now limited, pass warning.
+            reply_text = is_limit
+    elif ctx.is_patreon:
+        is_limit = bot.check_rate_patreon(ctx)
+        if not is_limit:  # User is limited, ignore them.
+            reply_text = ("Wah! Slow down there! "
+                          "It's best that you don't go overboard on using {} {}".format(
+                            ctx.command, r"ace3df.github.io/AcePictureBot/faq_patreon/"))
     if command in ["waifuregister", "husbandoregister"]:
         following = is_following(ctx)
         if isinstance(following, str):
@@ -220,7 +224,8 @@ class TwitterStream(twython.TwythonStreamer):
         status_code (int) – Non-200 status code sent from stream
         data (dict) – Error message sent from stream 
         """
-        print(data)
+        bot.log.warning("Problem:")
+        bot.log.warning(data)
         pass
 
     def on_timeout(self):

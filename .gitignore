@@ -22,3 +22,5 @@ main.py
 config_example.py
 
 # Twitter (Tython)
+Reddit.py
+Facebook.py

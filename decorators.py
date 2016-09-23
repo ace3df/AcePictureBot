@@ -13,9 +13,11 @@ class Command:
         self.callback = callback
         self.enabled = kwargs.get('enabled', True)
         self.aliases = kwargs.get('aliases', [])
-        self.patreon_aliases = kwargs.get('patreon_aliases', [])
         self.mod_only = kwargs.get('mod_only', False)
         self.patreon_only = kwargs.get('patreon_only', False)
+        self.patreon_vip_only = kwargs.get('patreon_vip_only', False)
+        self.patreon_aliases = kwargs.get('patreon_aliases', [])
+        self.patreon_vip_aliases = kwargs.get('patreon_vip_aliases', [])
         try:
             self.description = inspect.cleandoc(callback.__doc__)
         except AttributeError:
@@ -42,7 +44,7 @@ class CommandGroup:
             raise TypeError('Command {0.name} is already registered.'.format(command))
         
         self.commands[command.prefix + command.name] = command
-        cmd_list = command.aliases + command.patreon_aliases
+        cmd_list = command.aliases + command.patreon_aliases + command.patreon_vip_aliases
         
         for alias in cmd_list:
             if alias in self.commands:

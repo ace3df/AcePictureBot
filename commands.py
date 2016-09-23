@@ -89,7 +89,7 @@ def random_list(ctx):
             end_tag = ["-1girl", "-female", "1boy"]
     result = ()
     search_for = ""
-    show_series = ctx.command in ignore_series_lists
+    show_series = False if ctx.command in ignore_series_lists else True
     support_otp = False
     # Special per list stuff
     if ctx.command == "shipgirl":
@@ -242,7 +242,7 @@ def pictag(ctx):
     if repeat_for > 1:
         to_replace = re.search(r'\d +', args[0:3]).group()
         args = args.replace(to_replace, "", 1)
-    tags = [tag.strip() for tag in args.split(" ")] + ["-asian"]
+    tags = [tag.strip() for tag in args.split(" ")] + ["-asian", "-photo"]
     if len(tags) > 5:
         return (("Sorry, websites don't allow more than 5 tags to be searched!\n"
                  "Use _ to connect words!"), False)
@@ -253,7 +253,7 @@ def pictag(ctx):
         if not image:
             return ("Sorry, no images could be found! Try different tags!")
         reply_media.append(image)
-    reply_text = "Result(s) for: {}".format(' '.join(tags).replace("-asian", ""))
+    reply_text = "Result(s) for: {}".format(' '.join(tags).replace("-asian", "").replace("-photo", ""))
     return reply_text, reply_media
 
 
@@ -314,10 +314,11 @@ def connect(ctx):
         reply_text = "You haven't given either a source or your token! Example: 'connect discord token_here'"
         return reply_text
     to_source, token = result
+    to_source = to_source.lower()
     if ctx.bot.source.name in to_source or to_source not in settings.get('bot_sources', []):
         reply_text = "You have given an invalid source! Example: 'connect discord token_here'"
         return reply_text   
-    reply_text = connect_token(ctx.user_id, token, ctx.bot.source.name, to_source)
+    reply_text = connect_token(ctx.user_id, token, to_source)
     if not reply_text:
         reply_text = ("Invalid token!"
                       "\nSay MyWaifu on {} to get your token!".format(to_source.title()))
@@ -327,26 +328,27 @@ def connect(ctx):
  
 @command("!source", patreon_only=True)
 def direct_source(ctx):
-    # Easy, simple way to handle Patreon version
+    # Easy, simple way to handle Patreon version from other sources.
     image_url = None
+    message = None
     if ctx.bot.source.name == "discord":
         if ctx.raw_data.attachments:
             image_url = ctx.raw_data.attachments[0]['url']
-        else:
-            message = ctx.message
-    if image_url is None:
+    else:
+        message = ctx.message
+    if image_url is None and message:
         found_results = re.findall('(https?:/)?(/?[\w_\-&%?./]*?)\.(jpg|png|gif|jpeg)', message)
-        if not found_results:
-            return False
-        # I dunno regex
-        image_url = found_results[0][0] + found_results[0][1] + "." + found_results[0][2]
+        if found_results:
+            image_url = found_results[0][0] + found_results[0][1] + "." + found_results[0][2]
+    if image_url is None and ctx.bot.source.name != "twitter":
+        return False
     return source.callback(ctx, image_url=image_url)
 
 
 @command("source", aliases=["sauce", "anime?", "manga?"], only_allow=["twitter"])
 def source(ctx, image_url=None):
     is_gif = False
-    if image_url is None and ctx.raw_data.get('extended_entities', []):
+    if image_url is None and ctx.bot.source.name == "twitter" and ctx.raw_data.get('extended_entities', []):
         if ctx.raw_data['extended_entities'].get('media', []):
             image_url = ctx.raw_data['extended_entities']['media'][0].get('media_url_https', None)
     if image_url is None:
@@ -430,6 +432,8 @@ def source(ctx, image_url=None):
     reply_text = '\n'.join(reply_list)
     if (len(reply_text) + 23) > ctx.bot.source.character_limit:
         paste_link = make_paste(reply_text, url)
+        if not paste_link:
+            return "Unable to search for source! Try using SauceNAO: " + sauce_nao_url
         reply_text = "Source infomation is too long: " + paste_link
     return reply_text + "\n" + sauce_nao_url
 
@@ -467,10 +471,15 @@ def mywaifudata(ctx):
     return reply_text
 
 
-@command("mywaifu", aliases=["myhusbando"])
+@command("mywaifu", aliases=["myhusbando"],
+         patreon_vip_aliases=["myidol", "myotp"])
 def mywaifu(ctx):
     if "waifu" in ctx.command:
         list_name = "Waifu"
+    elif "idol" in ctx.command:
+        list_name = "Idol"
+    elif "otp" in ctx.command:
+        list_name = "OTP"
     else:
         list_name = "Husbando"
     if not ctx.user_ids.get('twitter', False):
@@ -550,13 +559,22 @@ def mywaifu(ctx):
             break
     return reply_text, reply_media
 
-
-@command("waifuregister", aliases=["husbandoregister"], only_allow=["twitter"])
+# 
+@command("waifuregister", aliases=["husbandoregister"],
+         patreon_vip_aliases=["idolregister", "otpregister"], only_allow=["twitter"])
 def waifuregister(ctx):
     if "waifu" in ctx.command:
         list_name = "Waifu"
         end_tag = ["solo", "-1boy"]
         min_imgs = 30
+    elif "idol" in ctx.command:
+        list_name = "Idol"
+        end_tag = ["solo", "-1boy"]
+        min_imgs = 20
+    elif "otp" in ctx.command:
+        list_name = "OTP"
+        end_tag = []
+        min_imgs = 5
     else:
         list_name = "Husbando"
         end_tag = ["-1girl", "-female", "1boy", "solo"]
@@ -578,31 +596,54 @@ def waifuregister(ctx):
     if len(ctx.args) >= 40:
         return False
     # Clean the name and ready it for searching.
-    name = ctx.args.lower().replace("+", "").replace("( ", "(").replace(" )", ")")
+    override = False
+    name = re.sub(r"pic.twitter.(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", "", ctx.args)
+    name = name.lower().replace("+", "").replace("( ", "(").replace(" )", ")")
     name = re.sub('[<>"@#*~\'$%£]', '', name).strip()
     name = re.sub(' +', ' ', name).replace(" ", "_")
-    # Help mass replace common differances.
-    # TODO: move to file? this could get pretty big
-    replace_help = {
-        "kancolle": "kantai_collection",
-        "hestia": "hestia_(danmachi!)",
-        "zelda": "princess_zelda",
-        "asuna": "asuna_(sao)",
-        "rem": "rem_(re:zero)"
-    }
-    for i, j in replace_help.items():
-        if name.lower() == i.lower():
-            name = name.replace(i, j)
-    # First see if they included a meme, if so ignore.
-    config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
-    blocked_waifus_file = os.path.join(config_path, 'Blocked Waifus.txt')
-    with open(blocked_waifus_file, 'r', encoding="utf-8") as f:
-        blocked_waifus = f.read().splitlines()
-    if any(True for waifu in blocked_waifus if waifu in name):
-        # They included banned name, silent warn and ignore.
-        append_warnings(ctx.user_ids['twitter'], "twitter", "{}Register {}".format(list_name, name))
-        return False
-    # Everything is fine so far.
+    if ctx.command == "idolregister":
+        path = os.path.join(ctx.bot.config_path, 'Waifu List.yaml')
+        idol_list = yaml_to_list(path, "idol")
+        found_entry = None
+        for entry in idol_list:
+            print(slugify(entry[0]))
+            print(slugify(name.replace("_", " ")))
+            if slugify(entry[0]) == slugify(name.replace("_", " ")):
+                found_entry = entry
+                break
+            elif slugify(entry[0]) == slugify(' '.join(reversed(name.split("_")))):
+                found_entry = entry
+                break
+        if found_entry is None:
+            url = r"https://github.com/ace3df/AcePictureBot/blob/23c79825b876ae17f0d842a3a83483d2dc0289ba/Configs/Waifu%20List.yaml"
+            reply_text = "Idol '{}' was not found! Use this list to find possible idols: {}".format(ctx.args, url)
+            return reply_text
+        else:
+            override = True
+            name = found_entry[0]
+    else:
+        # Help mass replace common differances.
+        # TODO: move to file? this could get pretty big
+        replace_help = {
+            "kancolle": "kantai_collection",
+            "hestia": "hestia_(danmachi!)",
+            "zelda": "princess_zelda",
+            "asuna": "asuna_(sao)",
+            "rem": "rem_(re:zero)"
+        }
+        for i, j in replace_help.items():
+            if name.lower() == i.lower():
+                name = name.replace(i, j)
+        # First see if they included a meme, if so ignore.
+        config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
+        blocked_waifus_file = os.path.join(config_path, 'Blocked Waifus.txt')
+        with open(blocked_waifus_file, 'r', encoding="utf-8") as f:
+            blocked_waifus = f.read().splitlines()
+        if any(True for waifu in blocked_waifus if waifu in name):
+            # They included banned name, silent warn and ignore.
+            append_warnings(ctx.user_ids['twitter'], "twitter", "{}Register {}".format(list_name, name))
+            return False
+        # Everything is fine so far.
     new_entry = {
         "date": datetime.now().strftime("%Y-%m-%d"),
         "name": name,
@@ -612,42 +653,48 @@ def waifuregister(ctx):
         "twitter_id": ctx.user_ids['twitter'],
         "web_index": 0
     }
-    # web_index will not be used now. 0 = gelbooru, 1 = safebooru, etc
-    is_subbed = False
-    user_reigster_list = []
-    path = os.path.join(ctx.bot.config_path, "Users {}Register.json".format(list_name))
-    if not os.path.isfile(path):
+    if not override:
+        # web_index will not be used now. 0 = gelbooru, 1 = safebooru, etc
+        is_subbed = False
         user_reigster_list = []
-    else:
-        with open(path, 'r', encoding="utf-8") as f:
-            user_reigster_list = json.load(f)
-    # See if they're already registered, if true, remove.
-    count = 0
-    for entry in user_reigster_list:
-        if str(entry['twitter_id']) == ctx.user_ids['twitter']:
-            """if entry['name'] == name:
-                                                    # Reregistering, cheat them to use "-MyWafiu"
-                                                    ctx.args = "-"
-                                                    args = mywaifu.callback(ctx)
-                                                    return handle_reply(args)"""
-            if entry['subscribed']:
-                is_subbed = True
-            user_reigster_list.pop(count)
-            break
-        count += 1
-    # See if the name has already been registered before - 
-    # so we can save on searching.
-    entry = None
-    override = False
-    # TEMP OFF WHILE FIX NAMES
-    """for entry in user_reigster_list:
-                    if name == entry['name']:
-                        override = True
-                        break
-                    elif '_'.join(reversed(name.split("_"))) == entry['name']:
-                        new_entry['name'] = '_'.join(reversed(name.split("_")))
-                        override = True
-                        break"""
+        path = os.path.join(ctx.bot.config_path, "Users {}Register.json".format(list_name))
+        if not os.path.isfile(path):
+            user_reigster_list = []
+        else:
+            with open(path, 'r', encoding="utf-8") as f:
+                user_reigster_list = json.load(f)
+        if ctx.bot.source.name == "twitter" and ctx.bot.settings.get('datadog', False):
+            if ctx.bot.settings['datadog'].get('statsd_{}sregistered'.format(list_name.lower()), False):
+                ctx.bot.datadog.statsd.gauge(
+                    ctx.bot.settings['datadog']['statsd_{}sregistered'.format(list_name.lower())],
+                    len(list(user_reigster_list)))
+        # See if they're already registered, if true, remove.
+        count = 0
+        for entry in user_reigster_list:
+            if str(entry['twitter_id']) == ctx.user_ids['twitter']:
+                # TEMP OFF WHILE FIX NAMES
+                """if entry['name'] == name:
+                                                        # Reregistering, cheat them to use "-MyWafiu"
+                                                        ctx.args = "-"
+                                                        args = mywaifu.callback(ctx)
+                                                        return handle_reply(args)"""
+                if entry['subscribed']:
+                    is_subbed = True
+                user_reigster_list.pop(count)
+                break
+            count += 1
+        # See if the name has already been registered before - 
+        # so we can save on searching.
+        entry = None
+        # TEMP OFF WHILE FIX NAMES
+        """for entry in user_reigster_list:
+                        if name == entry['name']:
+                            override = True
+                            break
+                        elif '_'.join(reversed(name.split("_"))) == entry['name']:
+                            new_entry['name'] = '_'.join(reversed(name.split("_")))
+                            override = True
+                            break"""
     if not override:
         # Check name to make sure it's not a series name, etc.
         search_url = "http://gelbooru.com/index.php?page=post&s=list&tags=rating:safe+"
