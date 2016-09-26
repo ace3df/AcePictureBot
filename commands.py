@@ -236,7 +236,6 @@ def otp(ctx):
 def pictag(ctx):
     """ Search Safebooru or Gelbooru and return random results.
     Patreon supporter only command.
-    No repeat_for here has it can get a bit crazy
     """
     args = ctx.args.replace("nsfw", "")
     repeat_for = patreon_reapeat_for(ctx)
@@ -249,11 +248,12 @@ def pictag(ctx):
         return (("Sorry, websites don't allow more than 5 tags to be searched!\n"
                  "Use _ to connect words!"), False)
     reply_media = []
-    media_args = {'tags': tags, 'random_page': True, 'return_url': ctx.bot.source.support_embedded}
-    image = get_media_online(path=None, ctx=False, media_args=media_args)
-    if not image:
-        return ("Sorry, no images could be found! Try different tags!")
-    reply_media.append(image)
+    for x in range(0, repeat_for):
+        media_args = {'tags': tags, 'random_page': True, 'return_url': ctx.bot.source.support_embedded}
+        image = get_media_online(path=None, ctx=False, media_args=media_args)
+        if not image:
+            return ("Sorry, no images could be found! Try different tags!")
+        reply_media.append(image)
     reply_text = "Result(s) for: {}".format(' '.join(tags).replace("-asian", "").replace("-photo", ""))
     return reply_text, reply_media
 
@@ -573,7 +573,7 @@ def mywaifu(ctx):
             break
     return reply_text, reply_media
 
-# 
+
 @command("waifuregister", aliases=["husbandoregister"],
          patreon_vip_aliases=["idolregister", "otpregister"], only_allow=["twitter"])
 def waifuregister(ctx):

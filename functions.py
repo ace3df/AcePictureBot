@@ -138,12 +138,13 @@ class BotProcess(CommandGroup):
                 return {}
         return patreon_ids
 
-    def patreon_only_message(self):
+    def patreon_only_message(self, is_vip=False):
         reply_text = False
         if self.settings.get('use_patreon', False):
             p_url = self.settings.get('patreon_url', False)
-            reply_text = ("This is a Patreon only command!"
-                          "{}".format("\nFeel free to support us at: " + p_url if p_url else ""))
+            reply_text = ("This is a Patreon{} only command!"
+                          "{}".format("" if not is_vip else "+",
+                                      "\nFeel free to support us at: " + p_url if p_url else ""))
         return reply_text, False
 
     def on_command(self, ctx):
@@ -170,7 +171,7 @@ class BotProcess(CommandGroup):
                 elif "otp" in ctx.command:
                     ctx.command = "otp"
                 else:
-                    return self.patreon_only_message()
+                    return self.patreon_only_message(is_vip=True)
 
         if self.settings.get('datadog', False):
             if self.settings['datadog'].get('statsd_commands', False):
@@ -212,7 +213,7 @@ class BotProcess(CommandGroup):
 
     def check_rate_patreon(self, ctx):
         """Warn the user that overusing MyWaifu will just make it worse for them."""
-        if ctx.command not in ["mywaifu", "myhusbando", "waifuregister", "husbandoregister"]:
+        if ctx.command not in ["pictag", "mywaifu", "myhusbando", "waifuregister", "husbandoregister"]:
             return True
         current_time = datetime.now()
         user_rates = self.rate_limit['patreon_rates']
@@ -1206,8 +1207,8 @@ def datadog_online_check(datadog_obj, check, host_name, response='Response: 200 
         time.sleep(5 * 60)
 
 
-def patreon_reapeat_for(ctx):
-    """Try to guess how many images they want (1 - 4) (Patreon only)."""
+def patreon_reapeat_for(ctx, max_limit=2):
+    """Try to guess how many images they want (1 - 2) (Patreon only)."""
     if not ctx.is_patreon:
         return 1
     if len(ctx.args) == 1:
@@ -1219,8 +1220,8 @@ def patreon_reapeat_for(ctx):
         repeat_for = int(re.search(a, ctx.args[0:3]).group())
     except AttributeError:
         return 1
-    if repeat_for > 4:
-        repeat_for = 4
+    if repeat_for > max_limit:
+        repeat_for = max_limit
     return repeat_for
 
 

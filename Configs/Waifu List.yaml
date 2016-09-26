@@ -2321,11 +2321,15 @@ Johanna Wiese:
   otp image: null
   series: Strike Witches
 Jougasaki Mika:
-  lists: onee
+  lists:
+    - onee
+    - idol
   otp image: null
   series: Idolmaster Cinderella Girls
 Jougasaki Rika:
-  lists: imouto
+  lists:
+    - imouto
+    - idol
   otp image: null
   series: Idolmaster Cinderella Girls
 Joy (pokemon):
