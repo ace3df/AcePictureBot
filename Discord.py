@@ -27,7 +27,7 @@ discord_bot = commands.Bot(command_prefix=prefix, pm_help=None)
 if not discord.opus.is_loaded():
     discord.opus.load_opus('libopus-0.x86')
 discord_bot.remove_command("help")
-attrs = {'name': 'discord', 'character_limit': 1000, 'support_embedded': False, 'download_media': False, 'allow_new_mywaifu': False}
+attrs = {'name': 'discord', 'character_limit': 1000, 'support_embedded': True, 'download_media': False, 'allow_new_mywaifu': False}
 bot = BotProcess(Source(**attrs))
 settings_edits = [["active", "The bot is now online for this server!", "The bot is now offline for this server!"],
                   ["media", "The bot will now post media (images) when it can!", "The bot will now not post any media!"],
@@ -906,7 +906,7 @@ if __name__ == '__main__':
     discord_bot.client_id = bot.settings.get('client_id', '')
     discord_bot.owner_id = bot.settings.get('owner_id', '')
     discord_bot.loop.create_task(change_status())
-    discord_bot.add_cog(Music(discord_bot))
     if bot.settings.get('datadog', False):
         discord_bot.loop.create_task(datadog_data())
+    discord_bot.add_cog(Music(discord_bot))
     discord_bot.run(bot.settings['token'])

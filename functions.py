@@ -149,22 +149,21 @@ class BotProcess(CommandGroup):
     def on_command(self, ctx):
         if not ctx.command:
             return False, False
-        command = ctx.command
         reply_text = None
         reply_media = None
-        if self.commands[command].mod_only and not ctx.is_mod:
+        if self.commands[ctx.command].mod_only and not ctx.is_mod:
             # Mod only command, return nothing
             return False, False
 
-        if self.source.name == "twitter" and command == "!source":
+        if self.source.name == "twitter" and ctx.command == "!source":
             ctx.command = "source"
 
-        if self.commands[command].patreon_only and not ctx.is_patreon\
-           or command in self.commands[command].patreon_aliases and not ctx.is_patreon:
+        if self.commands[ctx.command].patreon_only and not ctx.is_patreon\
+           or ctx.command in self.commands[ctx.command].patreon_aliases and not ctx.is_patreon:
                 return self.patreon_only_message()
 
-        if self.commands[command].patreon_vip_only and not ctx.is_patreon_vip\
-            or command in self.commands[command].patreon_vip_aliases and not ctx.is_patreon_vip:
+        if self.commands[ctx.command].patreon_vip_only and not ctx.is_patreon_vip\
+            or ctx.command in self.commands[ctx.command].patreon_vip_aliases and not ctx.is_patreon_vip:
                 # Don't trigger Patreon message on these as lots of people don't space "myidol"
                 if "idol" in ctx.command:
                     ctx.command = "idol"
@@ -180,19 +179,19 @@ class BotProcess(CommandGroup):
         if update.get('auto_update', False):
             os.environ[update['is_busy_environ'] + self.source.name] = 'True'
         try:
-            reply_text, reply_media = handle_reply(self.commands[command].callback(ctx))
+            reply_text, reply_media = handle_reply(self.commands[ctx.command].callback(ctx))
         except Exception as e:
             # This is like this and messy for now as it shouldn't really happen
             # this way I can work on catching every problem for now
             import sys
             import traceback
-            print(command)
+            print(ctx.command)
             print(traceback.print_tb(e.__traceback__))
             quit()
             # The function broke somehow
             # TODO: record this
             pass
-        self.commands_used[command] += 1
+        self.commands_used[ctx.command] += 1
         if update.get('auto_update', False):
             os.environ[update['is_busy_environ'] + self.source.name] = 'False'
         return reply_text, reply_media
@@ -248,7 +247,7 @@ class BotProcess(CommandGroup):
         if or_per_user:
             rate_per_user = or_per_user
         else:
-            rate_per_user = self.rate_limit.get('rate_per_user', 15)
+            rate_per_user = self.rate_limit.get('rate_per_user', 10)
         user_rates = self.rate_limit['rates']
 
         if user_id in user_rates:
@@ -423,7 +422,7 @@ class UserContext:
         self.raw_data = attrs.pop('raw_data')
         self.get_other_ids()
         self.is_mod = self.get_is_mod()
-        self.is_patreon_vip = self.get_is_patreon_vip()
+        self.is_patreon_vip = self.get_is_patreon(is_vip=True)
         if self.is_patreon_vip:
             self.is_patreon = True
         else:
@@ -442,18 +441,21 @@ class UserContext:
         mod_ids = self.bot.settings['mod_ids'].get(self.bot.source.name, [])
         return self.user_ids.get(self.bot.source.name) in mod_ids
 
-    def get_is_patreon(self):
-        if not self.bot.patreon_ids.get('patreon_ids', {}):
+    def get_is_patreon(self, is_vip=False):
+        section = "patreon_ids"
+        if is_vip:
+            section = "patreon_vip_ids"
+        if not self.bot.patreon_ids.get(section, {}):
             return False
-        patreon_ids = self.bot.patreon_ids['patreon_ids'].get(self.bot.source.name, [])
-        return self.user_ids.get(self.bot.source.name) in patreon_ids
-
-    def get_is_patreon_vip(self):
-        """This is $10+ for the commands of IdolRegister, etc."""
-        if not self.bot.patreon_ids.get('patreon_vip_ids', {}):
-            return False
-        patreon_ids = self.bot.patreon_ids['patreon_vip_ids'].get(self.bot.source.name, [])
-        return self.user_ids.get(self.bot.source.name) in patreon_ids
+        is_patreon = False
+        for entry in self.bot.patreon_ids[section].items():
+            if len(entry) < 2:
+                continue
+            source, user_ids = entry
+            if self.user_ids.get(source) in [a[0] for a in user_ids]:
+                is_patreon = True
+                break
+        return is_patreon
 
     def get_other_ids(self):
         accounts = {}
@@ -461,8 +463,7 @@ class UserContext:
             with open(os.path.join(self.bot.config_path, 'Connected Accounts.json'), 'r') as f:
                 accounts = json.load(f)
         except FileNotFoundError:
-            with open(os.path.join(self.bot.config_path, 'Connected Accounts.json'), 'w') as f:
-                json.dump(accounts, f, sort_keys=True, indent=4)
+            accounts = {}
         for account in accounts:
             if account.get(self.bot.source.name, False) and account[self.bot.source.name] == self.user_id:
                 for source in account.items():
@@ -587,7 +588,7 @@ def slugify(text):
     return re.sub('\-$', '', text)
 
 
-def yaml_to_list(file_path, filter_section):
+def yaml_to_list(file_path, filter_section=None):
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             yaml_file = yaml_load(f.read(), Loader=Loader)
@@ -595,9 +596,11 @@ def yaml_to_list(file_path, filter_section):
         raise FileNotFoundError("yaml file '{}' was not found!".format(file))
     if yaml_file is None:
         raise Exception("yaml file '{}' was empty!".format(file))
-    # Only get the people if they're in filter_section
-    return [char for char in list(
-            yaml_file.items()) if filter_section in char[1].get('lists', [])]
+    if filter_section:
+        # Only get the people if they're in filter_section
+        return [char for char in list(yaml_file.items()) if filter_section in char[1].get('lists', [])]
+    else:
+        return list(yaml_file.items())
 
 
 def get_user_ignore_list(user_id, source="twitter"):
@@ -766,6 +769,7 @@ def scrape_website(url, sess=False, content_only=False):
 
 
 def get_media_online(path=None, ctx=None, media_args={}, ignore_used=False):
+    print(media_args)
     if path is not None and not os.path.exists(path):
         os.makedirs(path)
     ignore_list = []
@@ -856,7 +860,8 @@ def get_media_online(path=None, ctx=None, media_args={}, ignore_used=False):
                 if media_hash in ignore_list:
                     continue
                 else:
-                    if any(tag in ["solo", "1girl", "1boy"] for tag in post_tags):
+                    if any(tag in ["solo", "1girl", "1boy"] for tag in post_tags)\
+                    or ctx and "otp" in ctx.command:
                         # This sucks but it's the only way.
                         # This will make sure only 1 charater is in the image-
                         # when the tag "solo"/"1girl"/"1boy" is used.
@@ -865,6 +870,7 @@ def get_media_online(path=None, ctx=None, media_args={}, ignore_used=False):
                         while True:
                             a_break += 1
                             if a_break == 3:
+                                print(333)
                                 return False
                             soup = scrape_website(url, sess)
                             if not soup:
@@ -1224,3 +1230,23 @@ def md5_file(file):
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+
+def check_if_name_in_list(name, gender, search_list=None):
+    found_entry = None
+    config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
+    if gender.lower() == "otp":
+        gender = "OTP"
+    else:
+        gender = gender.title()
+    path = os.path.join(config_path, '{} List.yaml'.format(gender))
+    entry_list = yaml_to_list(path, search_list)
+    found_entry = None
+    for entry in entry_list:
+        if slugify(entry[0]) == slugify(name.replace("_", " ")):
+            found_entry = entry
+            break
+        elif slugify(entry[0]) == slugify(' '.join(reversed(name.split("_")))):
+            found_entry = entry
+            break
+    return found_entry

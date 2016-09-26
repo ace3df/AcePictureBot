@@ -180,10 +180,10 @@ def process_tweet(data):
             reply_text = is_limit
     elif ctx.is_patreon:
         is_limit = bot.check_rate_patreon(ctx)
-        if not is_limit:  # User is limited, ignore them.
+        if not is_limit:
             reply_text = ("Wah! Slow down there! "
                           "It's best that you don't go overboard on using {} {}".format(
-                            ctx.command, r"ace3df.github.io/AcePictureBot/faq_patreon/"))
+                           ctx.command, r"http://ace3df.github.io/AcePictureBot/faq_patreon/#wah-slow-down-twitter-only"))
     if command in ["waifuregister", "husbandoregister"]:
         following = is_following(ctx)
         if isinstance(following, str):
