@@ -2346,6 +2346,24 @@ Julis-Alexia von Riessfeld:
   - waifu
   otp image: http://cdn.myanimelist.net/images/characters/14/293702.jpg
   series: Gakusen Toshi Asterisk
+Izayoi Riko:
+  lists:
+    - waifu
+    - kouhai
+  otp image: https://myanimelist.cdn-dena.com/images/characters/12/298215.jpg
+  series: Mahoutsukai Precure!
+Shiraishi Urara:
+  lists:
+    - waifu
+    - senpai
+    - onee-chan
+  otp image: https://myanimelist.cdn-dena.com/images/characters/7/281783.jpg
+  series: Yamada-kun to 7-nin no Majo
+Nene Odagiri:
+  lists:
+    - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/9/281780.jpg
+  series: Yamada-kun to 7-nin no Majo
 Jun'you (Kantai Collection):
   lists:
   - waifu
@@ -3248,8 +3266,10 @@ Kunihiro Hajime:
   otp image: http://cdn.myanimelist.net/images/characters/9/231063.jpg
   series: Saki
 Kunikida Hanamaru:
-  lists: idol
-  otp image: null
+  lists:
+  - idol
+  - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/11/299828.jpg
   series: Love Live! Sunshine!!
 Kuon (utawarerumono):
   lists:
@@ -3338,12 +3358,16 @@ Kurosaki Mea:
   otp image: http://cdn.myanimelist.net/images/characters/15/226343.jpg
   series: To LOVE-Ru
 Kurosawa Dia:
-  lists: idol
-  otp image: null
+  lists: 
+  - idol
+  - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/2/294741.jpg
   series: Love Live! Sunshine!!
 Kurosawa Ruby:
-  lists: idol
-  otp image: null
+  lists: 
+  - idol
+  - waifu
+  otp image: Kurosawa Ruby
   series: Love Live! Sunshine!!
 Kuroshio (Kantai Collection):
   lists: shipgirl
@@ -3787,8 +3811,10 @@ Matsuoka Gou:
   otp image: http://cdn.myanimelist.net/images/characters/15/213829.jpg
   series: Free!
 Matsuura Kanan:
-  lists: idol
-  otp image: null
+  lists: 
+  - idol
+  - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/11/299822.jpg
   series: Love Live! Sunshine!!
 Maya (Aoki Hagane no Arpeggio):
   lists: shipgirl
@@ -4945,8 +4971,10 @@ Ogiso Setsuna:
   otp image: http://cdn.myanimelist.net/images/characters/14/244679.jpg
   series: White Album 2
 Ohara Mari:
-  lists: idol
-  otp image: null
+  lists: 
+  - idol
+  - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/10/303940.jpg
   series: Love Live! Sunshine!!
 Oikawa Shizuku:
   lists: idol
@@ -5507,8 +5535,10 @@ Sakurai Rihoko:
   otp image: http://cdn.myanimelist.net/images/characters/13/154653.jpg
   series: Amagami SS
 Sakurauchi Riko:
-  lists: idol
-  otp image: null
+  lists: 
+  - idol
+  - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/13/294743.jpg
   series: Love Live! Sunshine!!
 Samidare (Kantai Collection):
   lists: shipgirl
@@ -6316,8 +6346,10 @@ Takakura Himari:
   otp image: http://cdn.myanimelist.net/images/characters/4/129767.jpg
   series: Mawaru Penguindrum
 Takami Chika:
-  lists: idol
-  otp image: null
+  lists: 
+  - idol
+  - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/16/303938.jpg
   series: Love Live! Sunshine!!
 Takamiya Kasumi:
   lists: imouto
@@ -6781,8 +6813,10 @@ Tsuruya:
   otp image: http://cdn.myanimelist.net/images/characters/4/31011.jpg
   series: Suzumiya Haruhi no Yuuutsu
 Tsushima Yoshiko:
-  lists: idol
-  otp image: null
+  lists: 
+    - waifu
+    - idol
+  otp image: https://myanimelist.cdn-dena.com/images/characters/11/309403.jpg
   series: Love Live! Sunshine!!
 Tsutsukakushi Tsukiko:
   lists:
@@ -6997,8 +7031,10 @@ Watanabe Saki:
   otp image: http://cdn.myanimelist.net/images/characters/12/183069.jpg
   series: Shinsekai yori
 Watanabe You:
-  lists: idol
-  otp image: null
+  lists: 
+    - idol
+    - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/5/294745.jpg
   series: Love Live! Sunshine!!
 Wendy Marvell:
   lists:
@@ -7036,6 +7072,7 @@ Wo-Class Aircraft Carrier:
 Xenovia (High School DxD):
   lists:
   - waifu
+  - kouhai
   otp image: http://cdn.myanimelist.net/images/characters/13/279781.jpg
   series: High School DxD
 Yaegashi Rina:

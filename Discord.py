@@ -12,7 +12,8 @@ import re
 
 from config import settings, discord_settings
 from functions import (BotProcess, Source, UserContext,
-                       datadog_online_check, create_token, slugify)
+                       datadog_online_check, create_token,
+                       slugify, yaml_to_list, download_file)
 
 from bs4 import BeautifulSoup
 from tabulate import tabulate
@@ -311,53 +312,32 @@ async def on_message(message):
     await send_reply(reply_text, reply_media, ctx, server_settings)
 
 
-class Music:
-    def __init__(self, discord_bot):
-        self.music_bot = discord_bot
-        self.last_played_global = []
-        self.queued_games = OrderedDict()
+class Games:
+    def __init__(self, bot):
+        from PIL import Image
+        self.bot = bot
+        self.char_current_games = []
+        self.char_last_used = []
+
+        self.music_current_games = []
+        self.music_last_used = []
+        self.music_queued_games = OrderedDict()
+        # These two will be changed when supporting up to 2 players at once
         self.player = None
         self.break_leave = None
         self.current_game = None
-        discord_bot.loop.create_task(self.read_music_game_queue())
 
-    async def add_score_to_global(self, ctx, leaderboard):
-        path = os.path.join(bot.config_path, 'Global Music Game Leaderboard.json')
-        try:
-            with open(path, 'r') as f:
-                current_leaderboard = json.load(f)
-        except FileNotFoundError:
-            current_leaderboard = {}
-        server_id = ctx.message.server.id
-        if not current_leaderboard.get(server_id, False):
-            current_leaderboard[server_id] = {}
-        for player in leaderboard:
-            if not current_leaderboard[server_id].get(player[0].id, False):
-                current_leaderboard[server_id][player[0].id] = player[1]
-            else:
-                current_leaderboard[server_id][player[0].id] += player[1]
-        with open(path, 'w') as f:
-            json.dump(current_leaderboard, f, sort_keys=True, indent=4)
-
-    async def check_if_audio_chanel(self, ctx, channel):
-        check = lambda c: c.name == channel.name and \
-            c.type == discord.ChannelType.voice
-        return discord.utils.find(check, ctx.message.server.channels)
+        self.bot.loop.create_task(self.read_music_game_queue())
 
     async def read_music_game_queue(self):
         """Loop queued_games and join next game when ready."""
-        # TODO:
-        # Still a lot of problems with this
-        # Current ones:
-        # Fails to download song (connection to site problem)
-        # int has no .name 
-        await discord_bot.wait_until_ready()
-        while not discord_bot.is_closed:
-            if self.queued_games:
+        await self.bot.wait_until_ready()
+        while not self.bot.is_closed:
+            if self.music_queued_games:
                 if self.player is None:
                     try:
-                        self.current_game = self.queued_games.popitem(last=False)
-                        await self.game_ready(self.current_game[1])
+                        self.current_game = self.music_queued_games.popitem(last=False)
+                        await self.music_game_start(self.current_game[1])
                         if self.player is not None:
                             await self.player.disconnect()
                     except Exception as e:
@@ -376,36 +356,45 @@ class Music:
                     self.player = None
             await asyncio.sleep(1)
 
-    async def game_ready(self, ctx):
-        voice_channel = ctx['voice_channel']
-        ctx = ctx['ctx']
-        is_channel = await self.check_if_audio_chanel(ctx, voice_channel)
-        if not is_channel:
-            reply_text = ("Could not find a Voice Channel by that name!")
-            try:
-                await discord_bot.say(ctx.message.server, reply_text)
-            except discord.errors.Forbidden:
+    async def check_queue(self, ctx, channel, server_id):
+        if self.player is not None:
+            if self.current_game is not None and self.current_game[0] == ctx.message.server.id:
+                reply_text = "A game is already running in this server!"
+                await self.bot.say(reply_text)
                 return
+            else:
+                q_pos = len(list(self.music_queued_games.keys())) + 1
+                if self.music_queued_games.get(server_id, False):
+                    q_pos = list(self.music_queued_games.keys()).index(server_id) + 1
+                reply_text = ("A game is already running!"
+                              "\nYour queue position is **{}**"
+                              "\nYour estimated wait time is **{} minutes**".format(
+                                q_pos, q_pos * 5))
+            await self.bot.say(reply_text)
+        if self.music_queued_games.get(server_id, False):
             return
-        try:
-            self.player = await discord_bot.join_voice_channel(voice_channel)
-        except (discord.errors.Forbidden, discord.errors.InvalidArgument):
-            return
-        music_game_help = discord_settings.get('music_game_help', False)
-        help_text = ("\nYou can use any of the game settings here: " + music_game_help) if music_game_help else ""
-        reply_text = ("{0.author.mention} The bot is now ready to play!"
-                      "\nStart by saying '**start game**' in the channel you want to play in!"
-                      "{1}\n*(You have 80 seconds before the bot auto-disconnects)*".format(
-                        ctx.message, help_text))
-        try:
-            await discord_bot.send_message(ctx.message.channel, reply_text)
-        except discord.errors.Forbidden:
-            return
+        self.music_queued_games[ctx.message.server.id] = {'ctx': ctx, 'voice_channel': channel}
 
-        def check(msg):
-            if not msg.server == ctx.message.server:
-                return False
-            return msg.content.startswith('start game')
+    async def add_score_to_global(self, ctx, gametype, leaderboard):
+        path = os.path.join(bot.config_path,
+                            'Global {} Game Leaderboard.json'.format(gametype))
+        try:
+            with open(path, 'r') as f:
+                current_leaderboard = json.load(f)
+        except FileNotFoundError:
+            current_leaderboard = {}
+        server_id = ctx.message.server.id
+        if not current_leaderboard.get(server_id, False):
+            current_leaderboard[server_id] = {}
+        for player in leaderboard:
+            if not current_leaderboard[server_id].get(player[0].id, False):
+                current_leaderboard[server_id][player[0].id] = player[1]
+            else:
+                current_leaderboard[server_id][player[0].id] += player[1]
+        with open(path, 'w') as f:
+            json.dump(current_leaderboard, f, sort_keys=True, indent=4)
+
+    async def return_settings(self, message, options={}):
 
         def fix_setting(var, num_max=3, num_min=1):
             if isinstance(var, int):
@@ -420,37 +409,25 @@ class Music:
                 return False
             return int(var)
 
-        timeout = time.time()
-        while True:
-            new_msg = await discord_bot.wait_for_message(author=ctx.message.author, timeout=0, check=check)
-            if new_msg:
-                log_str = "{0.timestamp}: {0.author.name} in {0.server.name} [{1}]: {0.content}".format(new_msg, "Music Game")
-                bot.log.info(log_str)
-                break
-            if time.time() - timeout > 80:
-                reply_text = ("Sorry you took too long!"
-                              "\nYou were holding other games up :(")
-                try:
-                    await discord_bot.send_message(ctx.message.channel, reply_text)
-                except discord.errors.Forbidden:
-                    return
-                return
-        game_channel = new_msg.channel
         game_settings = {}
         msg_args = {}
-        msg_args = new_msg.content.lower().replace("game start", "").replace("=", " ").split()
+        msg_args = message.content.lower().replace("game start", "").replace("=", " ").split()
         msg_args = dict(msg_args[i:i+2] for i in range(0, len(msg_args), 2))
         # How many rounds. Max: 5, Min: 1
         game_settings['rounds'] = fix_setting(msg_args.get('rounds', 3), num_max=5, num_min=1)
         if not game_settings['rounds']:
             game_settings['rounds'] = 3
         # Gametype. 1 = Openings and Endings, 2 = Openings only, 3 = Endings only.
-        game_settings['gametype'] = fix_setting(msg_args.get('gametype', 1), num_max=3, num_min=1)
+        game_settings['gametype'] = fix_setting(
+            msg_args.get('gametype', 1),
+            num_max=options.get('gametype_max', 3), num_min=1)
         if not game_settings['gametype']:
             game_settings['gametype'] = 1
         # Difficulty. 1 = Guess if OP/ED, 2 = Guess if OP/ED + Number, 3 = Guess Anime name and OP/ED
         #             4 = Guess Anime name and OP/ED + Number, 5 = Guess Song name
-        game_settings['difficulty'] = fix_setting(msg_args.get('difficulty', 3), num_max=5, num_min=1)
+        game_settings['difficulty'] = fix_setting(
+                msg_args.get('difficulty', options.get('difficulty_default', 3)),
+                num_max=options.get('difficulty_max', 5), num_min=1)
         if game_settings['gametype'] != 1 and game_settings['difficulty'] == 1:
             # Stop them from getting very easy points
             game_settings['difficulty'] = 2
@@ -460,7 +437,6 @@ class Music:
                 game_settings['hints'] = False
             else:
                 game_settings['hints'] = True
-
         def limit_year(year):
             if not year.isdigit():
                 year = 2010
@@ -468,7 +444,6 @@ class Music:
             if year > datetime.now().year + 1 or year < 1970:
                 year = 2010
             return year
-
         game_settings['year'] = msg_args.get('year', range(2008, datetime.now().year))
         if game_settings['year']:
             if "-" in game_settings['year']:
@@ -479,6 +454,249 @@ class Music:
                     game_settings['year'] = range(2006, datetime.now().year)
                 else:
                     game_settings['year'] = limit_year(game_settings['year'])
+        return game_settings
+
+    async def return_end_scoreboard(self, ctx, gametype, player_leaderboard):
+        if not player_leaderboard:
+            return("No one got any right. Damn.")
+        # Order by points
+        game_leaderboard = list(reversed(sorted(player_leaderboard.items(), key=itemgetter(1))))
+        await self.add_score_to_global(ctx, gametype, game_leaderboard)
+        player_pos = 1
+        past_player_score = 1337
+        score_string = ["**Leaderboard:**\n"]
+        past_player_score = None
+        for player in game_leaderboard:
+            is_tie = False
+            score = player[1]
+            if score == past_player_score:
+                is_tie = True
+            if is_tie:
+                s = score_string[player_pos - 1].split("|", 1)
+                score_string[player_pos - 1] = s[0] + ", " + player[1].name + " | " + s[1]
+            else:
+                if player_pos == 1:
+                    s = "**First: **" + player[0].name + " | " + str(player[1])
+                elif player_pos == 2:
+                    s = "\n**Second: **" + player[0].name + " | " + str(player[1])
+                elif player_pos == 3:
+                    s = "\n**Thrid: **" + player[0].name + " | " + str(player[1])
+                elif player_pos == 4:
+                    s = "\n**Others: **" + player[0].name + " | " + str(player[1])
+                elif player_pos >= 5:
+                    s = "\n" + player[0].name + " | " + str(player[1])
+                score_string.append(s)
+            past_player_score = score
+            player_pos += 1
+        score_string.append("\nThanks for playing!")
+        return(''.join(score_string))
+
+    @commands.command(name="game", pass_context=True)
+    async def character_game_start(self, ctx):
+        
+        def guess_check(msg):
+            if slugify(text_guess) in slugify(msg):
+                return True
+            return '-'.join(reversed(slugify(text_guess).split("-"))) in slugify(msg)
+        if ctx.message.channel.id in self.char_current_games:
+            return  # Channel currently has a game running.
+        self.char_current_games.append(ctx.message.channel.id)
+        otp_path = settings.get('image_location', os.path.realpath(__file__))
+        otp_images_path = os.path.join(otp_path, 'OTP')
+        game_settings = await self.return_settings(ctx.message, {'difficulty_default': 2, 'difficulty_max': 3})
+        include_series = True
+        # cheap
+        if game_settings['difficulty'] == 1:
+            first_top_right = 30
+            first_top_left = 60
+            first_bottom_right = random.randint(40, 50)
+            first_bottom_left = random.randint(50, 60)
+            second_top_right = 40
+            second_top_left = 80
+            second_bottom_right = random.randint(40, 90)
+            second_bottom_left = random.randint(60, 100)
+        elif game_settings['difficulty'] == 2:
+            first_top_right = 10
+            first_top_left = 40
+            first_bottom_right = random.randint(20, 50)
+            first_bottom_left = random.randint(50, 60)
+            second_top_right = 40
+            second_top_left = 60
+            second_bottom_right = random.randint(40, 70)
+            second_bottom_left = random.randint(60, 80)
+        elif game_settings['difficulty'] == 3:
+            first_top_right = 10
+            first_top_left = 20
+            first_bottom_right = random.randint(10, 70)
+            first_bottom_left = random.randint(20, 70)
+            second_top_right = 20
+            second_top_left = 30
+            second_bottom_right = random.randint(20, 50)
+            second_bottom_left = random.randint(30, 70)
+            include_series = False
+        if game_settings['gametype'] == 1:
+            gender_random = 7
+        elif game_settings['gametype'] == 2:
+            gender_random = 11
+        elif game_settings['gametype'] == 3:
+            gender_random = 0
+        list_name = "Waifu"
+        random_gender = random.randint(0, 10)
+        if random_gender > gender_random:
+            list_name = "Husbando"
+        config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
+        path = os.path.join(config_path, '{} List.yaml'.format(list_name))
+        guess_list = yaml_to_list(path)
+        help_msg = ("**How to play:**"
+                    "\nYou will have to guess the anime character's full name!"
+                    "\nRounds last for 60 seconds! The order of the name does not matter."
+                    "\nAfter **{0} round(s)** the game will end!".format(
+                    game_settings['rounds']))
+        try:
+            await self.bot.send_message(ctx.message.channel, help_msg)
+        except discord.errors.Forbidden:
+            return
+        player_leaderboard = {}
+        current_round = 1
+        while True:
+            while True:
+                players_corrent_round = []
+                # Loop until either entry has OTP image or local images
+                entry = random.choice(guess_list)
+                if not entry[1].get('otp image', False):
+                    continue
+                otp_filename = entry[1]['otp image'].split("/")[-1]
+                otp_image_file = os.path.join(otp_images_path, otp_filename)
+                if not os.path.isfile(otp_image_file):
+                    otp_image_file = download_file(entry[1]['otp image'], path=otp_images_path)
+                    if not otp_image_file:
+                        continue
+                if otp_image_file:
+                    break
+            img = Image.open(otp_image_file)
+            w, h = img.size
+            w, h = w / 2, h / 2
+            # Cut the image up
+            hint_1 = img.crop((w - random.randint(first_top_right, int(w / 2)),
+                               h - random.randint(first_top_left, int(h / 2)),
+                               w + first_bottom_right,
+                               h + first_bottom_left))
+            hint_2 = img.crop((w - random.randint(second_top_right, int(w)),
+                               h - random.randint(second_top_left, int(h)),
+                               (w + 40) + second_bottom_right,
+                               (h + 40) + second_bottom_left))
+            hint_1.save('otp_{}_1.png'.format(ctx.message.channel.id))
+            hint_2.save('otp_{}_2.png'.format(ctx.message.channel.id))
+            text_guess = entry[0]
+            print(text_guess)
+            first_correct = None
+            timer = time.time()
+            max_help_count = 3
+            current_help_count = 1
+            points_to_add = 1
+            if game_settings['hints']:
+                showed_hint = False
+            else:
+                showed_hint = True
+            await asyncio.sleep(1)
+            reply_text = "**Round: {} - Start!**".format(current_round)
+            with open('otp_{}_1.png'.format(ctx.message.channel.id), 'rb') as file:
+                await self.bot.send_file(ctx.message.channel, file, content=reply_text)
+            while True:
+                guess = await self.bot.wait_for_message(channel=ctx.message.channel, timeout=0)
+                if guess is not None:
+                    if guess_check(guess.content):
+                        if guess.author not in players_corrent_round:
+                            if not players_corrent_round:
+                                first_correct = guess
+                            players_corrent_round.append(guess.author)
+                            if not player_leaderboard.get(guess.author, False):
+                                player_leaderboard[guess.author] = points_to_add
+                            else:
+                                player_leaderboard[guess.author] += points_to_add
+                            break
+                if time.time() - timer > 30 and not showed_hint:
+                    # Show second image.
+                    showed_hint = True
+                    reply_text = ":exclamation: **Hint{}**".format(
+                        "" if not include_series else ": They are from {}".format(entry[1]['series']))
+                    with open('otp_{}_2.png'.format(ctx.message.channel.id), 'rb') as file:
+                        await self.bot.send_file(ctx.message.channel, file, content=reply_text)  
+                elif time.time() - timer > 60:
+                    break  # Round over
+            # Rounds finished
+            if first_correct is None:
+                round_end_msg = "**No one got the answer right!**"
+            else:
+                second = "" if len(players_corrent_round) < 2 else "\nSecond: **" + players_corrent_round[1].name + "**"
+                thrid = "" if len(players_corrent_round) < 3 else "\nThird: **" + players_corrent_round[2].name + "**"
+                others = ""
+                if len(players_corrent_round) > 3:
+                    others = [a.name for a in players_corrent_round[3:]]
+                    others = "\nFollowed by: {}".format(', '.join(others))
+                round_end_msg = ("**{first}** got it right first!"
+                                 "{second}{thrid}{others}".format(
+                                    first=players_corrent_round[0].name,
+                                    second=second, thrid=thrid, others=others))
+            round_end_msg += ("\nThe correct answer was: "
+                              "**{}**").format(entry[0])
+            try:
+                with open(otp_image_file, 'rb') as file:
+                    await self.bot.send_file(ctx.message.channel, file, content=round_end_msg)
+            except discord.errors.Forbidden:
+                return
+            # Song has finished playing.
+            current_round += 1
+            if current_round > game_settings['rounds']:
+                # End of the game
+                break
+        game_end_msg = await self.return_end_scoreboard(ctx, "Character", player_leaderboard)
+        try:
+            await self.bot.send_message(ctx.message.channel, game_end_msg)
+        except discord.errors.Forbidden:
+            return
+        self.char_current_games.remove(ctx.message.channel.id)
+
+    async def music_game_start(self, ctx):
+        voice_channel = ctx['voice_channel']
+        ctx = ctx['ctx']
+        try:
+            self.player = await self.bot.join_voice_channel(voice_channel)
+        except (discord.errors.Forbidden, discord.errors.InvalidArgument):
+            return
+        music_game_help = discord_settings.get('music_game_help', False)
+        help_text = ("\nYou can use any of the game settings here: " + music_game_help) if music_game_help else ""
+        reply_text = ("{0.author.mention} The bot is now ready to play!"
+                      "\nStart by saying '**start game**' in the channel you want to play in!"
+                      "{1}\n*(You have 80 seconds before the bot auto-disconnects)*".format(
+                        ctx.message, help_text))
+        try:
+            await self.bot.send_message(ctx.message.channel, reply_text)
+        except discord.errors.Forbidden:
+            return
+
+        def check(msg):
+            if not msg.server == ctx.message.server:
+                return False
+            return msg.content.startswith('start game')
+
+        timeout = time.time()
+        while True:
+            new_msg = await self.bot.wait_for_message(author=ctx.message.author, timeout=0, check=check)
+            if new_msg:
+                log_str = "{0.timestamp}: {0.author.name} in {0.server.name} [{1}]: {0.content}".format(new_msg, "Music Game")
+                bot.log.info(log_str)
+                break
+            if time.time() - timeout > 80:
+                reply_text = ("Sorry you took too long!"
+                              "\nYou were holding other games up :(")
+                try:
+                    await self.bot.send_message(ctx.message.channel, reply_text)
+                except discord.errors.Forbidden:
+                    return
+                return
+        game_channel = new_msg.channel
+        game_settings = await self.return_settings(ctx.message)
         with open(os.path.join(bot.config_path, 'Music Game.json'), 'r') as f:
             anime_songs = json.load(f)
         anime_songs = list(anime_songs.items())
@@ -530,13 +748,13 @@ class Music:
                     "\nAfter **{1} round(s)** the game will end!".format(
                         diff_msg, game_settings['rounds']))
         try:
-            await discord_bot.send_message(new_msg.channel, help_msg)
+            await self.bot.send_message(new_msg.channel, help_msg)
         except discord.errors.Forbidden:
             return
         if len(finished) < 6:
             message = "**No entries found with them settings! Using default settings!**"
             try:
-                await discord_bot.send_message(new_msg.channel, message)
+                await self.bot.send_message(new_msg.channel, message)
             except discord.errors.Forbidden:
                 return
             finished = complete_pack
@@ -551,15 +769,15 @@ class Music:
             random.shuffle(finished)
             entry = random.choice(finished)
             safe_break = 0
-            while entry in self.last_played_global:
+            while entry in self.music_last_used:
                 safe_break += 1
                 if safe_break == 5:
                     break
                 entry = random.choice(finished)
             bot.log.info("Music Game Entry: " + str(entry))
-            self.last_played_global.append(entry)
-            if len(self.last_played_global) > 30:
-                self.last_played_global = self.last_played_global[-10:]
+            self.music_last_used.append(entry)
+            if len(self.music_last_used) > 30:
+                self.music_last_used = self.music_last_used[-10:]
             op_ed_text = entry['type'].replace("ED", "Ending").replace("OP", "Opening")
             full_string = entry['series']
             if game_settings['difficulty'] == 1:
@@ -589,7 +807,7 @@ class Music:
             await asyncio.sleep(3)
             yt_player.start()
             try:
-                await discord_bot.send_message(new_msg.channel, "**Round: {} - Start!**".format(current_round))
+                await self.bot.send_message(new_msg.channel, "**Round: {} - Start!**".format(current_round))
             except discord.errors.Forbidden:
                 return
 
@@ -612,7 +830,7 @@ class Music:
                     return
                 if safe_timer - time.time() > 250:
                     break
-                guess = await discord_bot.wait_for_message(channel=new_msg.channel, timeout=0)
+                guess = await self.bot.wait_for_message(channel=new_msg.channel, timeout=0)
                 if guess is not None:
                     if guess_check(guess.content):
                         # Correct!
@@ -639,7 +857,7 @@ class Music:
                         end_string = "{}:exclamation: **Hint {}: {}**".format(
                             clock, current_help_count, ''.join(hint_str).replace("_", " \_ "))
                         try:
-                            await discord_bot.send_message(game_channel, end_string)
+                            await self.bot.send_message(game_channel, end_string)
                         except discord.errors.Forbidden:
                             return
                         current_help_count += 1
@@ -668,7 +886,7 @@ class Music:
                                 opening=entry['type'].replace("OP", "Opening ").replace("ED", "Ending "),
                                 artist="" if not entry.get('song_title', False) else "\n**Song Name: **" + entry['song_title']))
             try:
-                await discord_bot.send_message(new_msg.channel, round_end_msg)
+                await self.bot.send_message(new_msg.channel, round_end_msg)
             except discord.errors.Forbidden:
                 return
             # Song has finished playing.
@@ -676,93 +894,36 @@ class Music:
             if current_round > game_settings['rounds']:
                 # End of the game
                 break
-        # Final Score
-        if not player_leaderboard:
-            game_end_msg = "No one got any right. Damn."
-        else:
-            # Order by points
-            game_leaderboard = list(reversed(sorted(player_leaderboard.items(), key=itemgetter(1))))
-            await self.add_score_to_global(ctx, game_leaderboard)
-            player_pos = 1
-            past_player_score = 1337
-            score_string = ["**Leaderboard:**\n"]
-            past_player_score = None
-            for player in game_leaderboard:
-                is_tie = False
-                score = player[1]
-                if score == past_player_score:
-                    is_tie = True
-                if is_tie:
-                    s = score_string[player_pos - 1].split("|", 1)
-                    score_string[player_pos - 1] = s[0] + ", " + player[1].name + " | " + s[1]
-                else:
-                    if player_pos == 1:
-                        s = "**First: **" + player[0].name + " | " + str(player[1])
-                    elif player_pos == 2:
-                        s = "\n**Second: **" + player[0].name + " | " + str(player[1])
-                    elif player_pos == 3:
-                        s = "\n**Thrid: **" + player[0].name + " | " + str(player[1])
-                    elif player_pos == 4:
-                        s = "\n**Others: **" + player[0].name + " | " + str(player[1])
-                    elif player_pos >= 5:
-                        s = "\n" + player[0].name + " | " + str(player[1])
-                    score_string.append(s)
-                past_player_score = score
-                player_pos += 1
-            score_string.append("\nThanks for playing!")
-            game_end_msg = ''.join(score_string)
+        game_end_msg = await self.return_end_scoreboard(ctx, "Music", player_leaderboard)
         try:
-            await discord_bot.send_message(new_msg.channel, game_end_msg)
+            await self.bot.send_message(new_msg.channel, game_end_msg)
         except discord.errors.Forbidden:
             return
 
-    async def check_queue(self, ctx, channel, server_id):
-        if self.player is not None:
-            if self.current_game is not None and self.current_game[0] == ctx.message.server.id:
-                reply_text = "A game is already running in this server!"
-                await discord_bot.say(reply_text)
-                return
-            else:
-                q_pos = len(list(self.queued_games.keys())) + 1
-                if self.queued_games.get(server_id, False):
-                    q_pos = list(self.queued_games.keys()).index(server_id) + 1
-                reply_text = ("A game is already running!"
-                              "\nYour queue position is **{}**"
-                              "\nYour estimated wait time is **{} minutes**".format(
-                                q_pos, q_pos * 5))
-            await discord_bot.say(reply_text)
-        if self.queued_games.get(server_id, False):
-            return
-        self.queued_games[ctx.message.server.id] = {'ctx': ctx, 'voice_channel': channel}
-
     @commands.command(pass_context=True)
     async def summon(self, ctx):
-        """Summons the bot to join your voice channel."""
+        """Music Game:
+        Summons the bot to join your voice channel."""
         summoned_channel = ctx.message.author.voice_channel
         server_id = ctx.message.server.id
         if summoned_channel is None:
-            await discord_bot.say('You are not in a voice channel.')
-            return False
+            await self.bot.say('You are not in a voice channel.')
+            return
         await self.check_queue(ctx, summoned_channel, server_id)
 
-    @commands.command(pass_context=True)
-    async def join(self, ctx, *, channel : discord.Channel):
-        """Joins a voice channel."""
-        server_id = ctx.message.server.id
-        is_channel = await self.check_if_audio_chanel(ctx, channel)
-        if not is_channel:
-            reply_text = ("Could not find a Voice Channel by that name!")
-            await discord_bot.send_message(ctx.message.server, reply_text)
-            return
-        await self.check_queue(ctx, channel, server_id)
-
-    @commands.command(pass_context=True)
-    async def leaderboard(self, ctx, *, get_server_lb : str=None):
+    @commands.group(pass_context=True)
+    async def leaderboard(self, ctx, *, gametype):
         this_server_only = False
-        if get_server_lb and get_server_lb.lower() == "server":
+        if "server" in gametype.lower():
             this_server_only = True
+        if "music" in gametype.lower():
+            filename = 'Global Music Game Leaderboard.json'
+        elif "character" in gametype.lower():
+            filename = 'Global Character Game Leaderboard.json'
+        else:
+            await self.bot.say('Invalid gametype: "music" or "character"')
         try:
-            with open(os.path.join(bot.config_path, 'Global Music Game Leaderboard.json'), 'r') as f:
+            with open(os.path.join(bot.config_path, filename), 'r') as f:
                 current_leaderboard = json.load(f)
         except FileNotFoundError:
             current_leaderboard = {}
@@ -792,7 +953,7 @@ class Music:
         rank = 1
         # Get top 10 only
         for user in ordered_leaderboard[:10]:
-            member = discord.utils.get(discord_bot.get_all_members(), id=user[0])
+            member = discord.utils.get(self.bot.get_all_members(), id=user[0])
             name = user[0] + " [USER ID]"
             if member:
                 name = member.name
@@ -808,7 +969,7 @@ class Music:
                 reply_text += "\nYou: {} | Score: {}".format(ctx.message.author.name, user_rank)
             first_msg = "**Top 10 Global**\n" if not this_server_only else "**Top 10 This Server**\n"
             reply_text = first_msg + "```\n" + reply_text + "```"
-        await discord_bot.say(reply_text)
+        await self.bot.say(reply_text)
 
 
 @discord_bot.command()
@@ -908,5 +1069,5 @@ if __name__ == '__main__':
     discord_bot.loop.create_task(change_status())
     if bot.settings.get('datadog', False):
         discord_bot.loop.create_task(datadog_data())
-    discord_bot.add_cog(Music(discord_bot))
+    discord_bot.add_cog(Games(discord_bot))
     discord_bot.run(bot.settings['token'])

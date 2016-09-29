@@ -217,7 +217,7 @@ class BotProcess(CommandGroup):
             return True
         current_time = datetime.now()
         user_rates = self.rate_limit['patreon_rates']
-        add_on = patreon_reapeat_for(ctx)
+        add_on = ctx.media_repeat_for
         rate_seconds = 10800  # 4 Hours
         warning_when = 9
         if ctx.user_id in user_rates:
@@ -428,6 +428,10 @@ class UserContext:
             self.is_patreon = True
         else:
             self.is_patreon = self.get_is_patreon()
+        if self.is_patreon:
+            self.media_repeat_for = self.patreon_reapeat_for(args=self.args, is_vip=self.is_patreon_vip)
+        else:
+            self.media_repeat_for = 1
 
     def clean_message(self, message):
         ignore_cmd_case = re.compile(re.escape(self.command), re.IGNORECASE)
@@ -457,6 +461,27 @@ class UserContext:
                 is_patreon = True
                 break
         return is_patreon
+
+    @staticmethod 
+    def patreon_reapeat_for(args, is_vip):
+        """Try to guess how many images they want (1 - 2) (Patreon only)."""
+        if args is None or not args:
+            return 1
+        if len(args) == 1:
+            a = r'\d+'
+        else:
+            # This is used mostly for pictag when it comes to "pictag 2 1girl"
+            a = r'\d +'
+        try:
+            media_repeat_for = int(re.search(a, args[0:3]).group())
+        except AttributeError:
+            return 1
+        max_limit = 2
+        if is_vip:
+            max_limit = 4
+        if media_repeat_for > max_limit:
+            media_repeat_for = max_limit
+        return media_repeat_for
 
     def get_other_ids(self):
         accounts = {}
@@ -1205,24 +1230,6 @@ def datadog_online_check(datadog_obj, check, host_name, response='Response: 200 
             status= datadog_obj.api.constants.CheckStatus.OK,
             message=response)
         time.sleep(5 * 60)
-
-
-def patreon_reapeat_for(ctx, max_limit=2):
-    """Try to guess how many images they want (1 - 2) (Patreon only)."""
-    if not ctx.is_patreon:
-        return 1
-    if len(ctx.args) == 1:
-        a = r'\d+'
-    else:
-        # This is used mostly for pictag when it comes to "pictag 2 1girl"
-        a = r'\d +'
-    try:
-        repeat_for = int(re.search(a, ctx.args[0:3]).group())
-    except AttributeError:
-        return 1
-    if repeat_for > max_limit:
-        repeat_for = max_limit
-    return repeat_for
 
 
 def md5_file(file):

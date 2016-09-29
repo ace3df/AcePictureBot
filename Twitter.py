@@ -178,12 +178,13 @@ def process_tweet(data):
             return
         if isinstance(is_limit, str):  # User is now limited, pass warning.
             reply_text = is_limit
-    elif ctx.is_patreon:
-        is_limit = bot.check_rate_patreon(ctx)
-        if not is_limit:
-            reply_text = ("Wah! Slow down there! "
-                          "It's best that you don't go overboard on using {} {}".format(
-                           ctx.command, r"http://ace3df.github.io/AcePictureBot/faq_patreon/#wah-slow-down-twitter-only"))
+    # This triggeres even if already warned (no 4 hour cool down thing)
+    """elif ctx.is_patreon:
+                    is_limit = bot.check_rate_patreon(ctx)
+                    if not is_limit:
+                        reply_text = ("Wah! Slow down there! "
+                                      "It's best that you don't go overboard on using {} {}".format(
+                                       ctx.command, r"http://ace3df.github.io/AcePictureBot/faq_patreon/#wah-slow-down-twitter-only"))"""
     if command in ["waifuregister", "husbandoregister"]:
         following = is_following(ctx)
         if isinstance(following, str):

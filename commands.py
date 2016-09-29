@@ -18,7 +18,7 @@ from functions import (yaml_to_list, slugify, get_media, get_media_online,
                        return_page_info, create_otp_image, make_paste,
                        write_user_ignore_list, handle_reply, append_json,
                        filter_per_series, connect_token, scrape_website,
-                       append_warnings, patreon_reapeat_for, check_if_name_in_list)
+                       append_warnings, check_if_name_in_list)
 
 from bs4 import BeautifulSoup
 
@@ -79,14 +79,6 @@ def random_list(ctx):
     list_name = "Waifu"
     end_tag = ["1girl", "solo"]
     args = ctx.message.lower()
-    if (ctx.command in special_male_lists and "male" in args and not "female" in args) or ctx.command in male_lists:
-        list_name = "Husbando"
-        end_tag = ["-1girl", "-female", "1boy"]
-    elif (ctx.command in special_male_lists and not "female" in args):
-        random_gender = random.randint(0, 10)
-        if random_gender > 8:
-            list_name = "Husbando"
-            end_tag = ["-1girl", "-female", "1boy"]
     result = ()
     search_for = ""
     show_series = False if ctx.command in ignore_series_lists else True
@@ -117,10 +109,22 @@ def random_list(ctx):
             search_for = "Wake Up Girls!"
         elif "aikatsu" in args:
             search_for = "Aikatsu!"
-    elif ctx.command == "onee" or ctx.command == "onii":
-        ctx.command = ctx.command + "-chan"
+    if (ctx.command in special_male_lists and "male" in args and not "female" in args and not search_for)\
+        or ctx.command in male_lists:
+            list_name = "Husbando"
+            end_tag = ["-1girl", "-female", "1boy"]
+    elif (ctx.command in special_male_lists and not "female" in args and not search_for):
+        random_gender = random.randint(0, 10)
+        if random_gender > 8:
+            list_name = "Husbando"
+            end_tag = ["-1girl", "-female", "1boy"]
+    if ctx.command in male_lists:
+        list_name = "Husbando"
+        end_tag = ["-1girl", "-female", "1boy"]
     if support_otp and "otp" in args:
         list_name = "OTP"
+    if ctx.command == "onee" or ctx.command == "onii":
+        ctx.command = ctx.command + "-chan"
     path = os.path.join(ctx.bot.config_path, '{} List.yaml'.format(list_name))
     char_list = yaml_to_list(path, ctx.command.lower())
     if search_for:
@@ -238,17 +242,20 @@ def pictag(ctx):
     Patreon supporter only command.
     """
     args = ctx.args.replace("nsfw", "")
-    repeat_for = patreon_reapeat_for(ctx)
-    if repeat_for > 1:
+    if ctx.media_repeat_for > 1:
         # Still filter out the first number though.
-        to_replace = re.search(r'\d +', args[0:3]).group()
+        if len(args) == 1:
+            a = r'\d+'
+        else:
+            a = r'\d +'
+        to_replace = re.search(a, args[0:3]).group()
         args = args.replace(to_replace, "", 1)
     tags = [tag.strip() for tag in args.split(" ")] + ["-asian", "-photo"]
     if len(tags) > 5:
         return (("Sorry, websites don't allow more than 5 tags to be searched!\n"
                  "Use _ to connect words!"), False)
     reply_media = []
-    for x in range(0, repeat_for):
+    for x in range(0, ctx.media_repeat_for):
         media_args = {'tags': tags, 'random_page': True, 'return_url': ctx.bot.source.support_embedded}
         image = get_media_online(path=None, ctx=False, media_args=media_args)
         if not image:
@@ -501,7 +508,6 @@ def mywaifu(ctx):
                       "Try again later!{}".format(list_name,
             "\nHelp: " + url_help if url_help else ""))
         return reply_text
-    repeat_for = patreon_reapeat_for(ctx)
     user_file = os.path.join(ctx.bot.config_path, "Users {}Register.json".format(list_name))
     if not os.path.isfile(user_file):
         reply_text = ("I don't know who your {gender} is!\n"
@@ -546,7 +552,7 @@ def mywaifu(ctx):
     else:
         reply_text = "{gender} is {name}".format(gender=list_name, name=clean_name)
     reply_media = []
-    for x in range(0, repeat_for):
+    for x in range(0, ctx.media_repeat_for):
         media_args = {'ignore_used': skip_already_used}
         if ctx.bot.source.allow_new_mywaifu:
             media_args = {'tags': tags, 'random_page': True, 'return_url': ctx.bot.source.support_embedded,
@@ -587,7 +593,7 @@ def waifuregister(ctx):
         min_imgs = 20
     elif "otp" in ctx.command:
         list_name = "OTP"
-        end_tag = []
+        end_tag = ["-3girls", ""]
         min_imgs = 5
     else:
         list_name = "Husbando"
@@ -648,7 +654,8 @@ def waifuregister(ctx):
             "zelda": "princess_zelda",
             "asuna": "asuna_(sao)",
             "rem": "rem_(re:zero)",
-            "ram": "ram_(re:zero)"
+            "ram": "ram_(re:zero)",
+            "bayonetta": "bayonetta_(character)"
         }
         for i, j in replace_help.items():
             if name.lower() == i.lower():
