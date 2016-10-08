@@ -26,12 +26,10 @@ def upload_media(media):
     bot.log.info("[{}] Uploading Media: {}".format(
         time.strftime("%Y-%m-%d %H:%M"), media))
     try:
-        with open(media, 'rb') as fp:
-            if media.lower().endswith(".mp4"):
-                return bot.api.upload_video(
-                    media=fp,
-                    media_type='video/mp4')['media_id']
-            else:
+        if media.lower().endswith(".mp4"):
+            return bot.api.upload_video(media=media, media_type='video/mp4')['media_id']
+        else:
+            with open(media, 'rb') as fp:
                 return bot.api.upload_media(media=fp)['media_id']
     except twython.exceptions.TwythonError as e:
         bot.log.warning("Uploading failed.")
@@ -62,7 +60,7 @@ def post_tweet(ctx, reply_text, reply_media=None):
             if not media_ids and reply_text:
                 # TEMP
                 # Twitter rejected upload (seems to be API problem for now)
-                if ctx.command in ["mywaifu", "myhusbando"]:
+                if ctx.command in ["mywaifu", "myhusbando", "waifuregister", "husbandoregister"]:
                     ctx.bot.check_rate_limit_per_cmd(ctx, remove=1)
                     url_help = help_urls.get('waifuregister_websites_offline', False)
                     reply_text = ("Websites are offline to get you your {}!\n"
@@ -178,13 +176,12 @@ def process_tweet(data):
             return
         if isinstance(is_limit, str):  # User is now limited, pass warning.
             reply_text = is_limit
-    # This triggeres even if already warned (no 4 hour cool down thing)
-    """elif ctx.is_patreon:
-                    is_limit = bot.check_rate_patreon(ctx)
-                    if not is_limit:
-                        reply_text = ("Wah! Slow down there! "
-                                      "It's best that you don't go overboard on using {} {}".format(
-                                       ctx.command, r"http://ace3df.github.io/AcePictureBot/faq_patreon/#wah-slow-down-twitter-only"))"""
+    elif ctx.is_patreon:
+        is_limit = bot.check_rate_patreon(ctx)
+        if not is_limit:
+            reply_text = ("Wah! Slow down there! "
+                          "It's best that you don't go overboard on using {} {}".format(
+                           ctx.command, r"http://ace3df.github.io/AcePictureBot/faq_patreon/#wah-slow-down-twitter-only"))
     if command in ["waifuregister", "husbandoregister"]:
         following = is_following(ctx)
         if isinstance(following, str):
