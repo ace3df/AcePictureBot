@@ -60,17 +60,17 @@ def waifu(ctx, gender=None, search_for=None, is_otp=False):
     reply_media = get_media(path=path_name, ctx=ctx, media_args=media_args)
     return reply_text, reply_media
 
-
+#  "kuudere", "himedere"
 @command("shipgirl",
     aliases=["idol", "touhou", "vocaloid", "sensei", "senpai",
              "kouhai", "imouto", "shota", "onii", "onee",
-             "monstergirl", "tankgirl", "witchgirl", "granblue"],
-    patreon_aliases=["yandere", "tsundere"])
+             "monstergirl", "tankgirl", "witchgirl", "granblue",
+             "yandere", "kuudere", "himedere"],
+    patreon_aliases=["tsundere"])
 def random_list(ctx):
-    # Male only lists.
-    male_lists = ["shota", "onii"]
+    male_only_lists = ["shota", "onii"]
     # Both female and male can be under these.
-    special_male_lists = ["idol", "sensei", "senpai", "kouhai", "yandere", "tsundere"]
+    both_gender_lists = ["idol", "sensei", "senpai", "kouhai", "yandere", "tsundere"]
     # Simple way to make sure to not load male list if one of these are used.
     possible_search = ["love", "idolmaster", "cinderella",
                        "akb0048", "wake", "aikatsu"] 
@@ -109,16 +109,16 @@ def random_list(ctx):
             search_for = "Wake Up Girls!"
         elif "aikatsu" in args:
             search_for = "Aikatsu!"
-    if (ctx.command in special_male_lists and "male" in args and not "female" in args and not search_for)\
-        or ctx.command in male_lists:
+    if (ctx.command in both_gender_lists and "male" in args and not "female" in args and not search_for)\
+        or ctx.command in male_only_lists:
             list_name = "Husbando"
             end_tag = ["-1girl", "-female", "1boy"]
-    elif (ctx.command in special_male_lists and not "female" in args and not search_for):
+    elif (ctx.command in both_gender_lists and not "female" in args and not search_for):
         random_gender = random.randint(0, 10)
         if random_gender > 8:
             list_name = "Husbando"
             end_tag = ["-1girl", "-female", "1boy"]
-    if ctx.command in male_lists:
+    if ctx.command in male_only_lists:
         list_name = "Husbando"
         end_tag = ["-1girl", "-female", "1boy"]
     if support_otp and "otp" in args:
@@ -446,8 +446,8 @@ def source(ctx, image_url=None):
     return reply_text + "\n" + sauce_nao_url
 
 
-@command("mywaifu data", aliases=["myhusbando data"])  # Test to make sure this actually works
-def mywaifudata(ctx):
+@command("mywaifu data", aliases=["myhusbando data"])
+def mywaifu_data(ctx):
     if "waifu" in ctx.command:
         list_name = "Waifu"
     else:
@@ -480,7 +480,8 @@ def mywaifudata(ctx):
 
 
 @command("mywaifu", aliases=["myhusbando"],
-         patreon_vip_aliases=["myidol", "myotp"])
+         patreon_aliases=["myidol"],
+         patreon_vip_aliases=["myotp"])
 def mywaifu(ctx):
     if "waifu" in ctx.command:
         list_name = "Waifu"
@@ -581,24 +582,25 @@ def mywaifu(ctx):
 
 
 @command("waifuregister", aliases=["husbandoregister"],
-         patreon_vip_aliases=["idolregister", "otpregister"], only_allow=["twitter"])
+         patreon_aliases=["idolregister"], patreon_vip_aliases=["otpregister"],
+         only_allow=["twitter"])
 def waifuregister(ctx):
     if "waifu" in ctx.command:
         list_name = "Waifu"
         end_tag = ["solo", "-1boy"]
         min_imgs = 30
+    elif "husbando" in ctx.command:
+        list_name = "Husbando"
+        end_tag = ["-1girl", "-female", "1boy", "solo"]
+        min_imgs = 25
     elif "idol" in ctx.command:
         list_name = "Idol"
         end_tag = ["solo"]
-        min_imgs = 20
+        min_imgs = 15
     elif "otp" in ctx.command:
         list_name = "OTP"
         end_tag = ["-3girls", ""]
         min_imgs = 5
-    else:
-        list_name = "Husbando"
-        end_tag = ["-1girl", "-female", "1boy", "solo"]
-        min_imgs = 25
     if not ast.literal_eval(os.environ.get('gelbooru_online', 'True')) and\
        not ast.literal_eval(os.environ.get('safebooru_online', 'False')):
         # Both websites are offline.
@@ -655,7 +657,8 @@ def waifuregister(ctx):
             "asuna": "asuna_(sao)",
             "rem": "rem_(re:zero)",
             "ram": "ram_(re:zero)",
-            "bayonetta": "bayonetta_(character)"
+            "bayonetta": "bayonetta_(character)",
+            "asuka_langley": "soryu_asuka_langley"
         }
         for i, j in replace_help.items():
             if name.lower() == i.lower():
@@ -711,8 +714,7 @@ def waifuregister(ctx):
                     ctx.bot.settings['datadog']['statsd_{}sregistered'.format(list_name.lower())],
                     len(list(user_reigster_list)))
         # See if they're already registered, if true, remove.
-        # See if the name has already been registered before - 
-        # so we can save on searching.
+        # See if the name has already been registered before so we can save on searching.
         entry = None
         # TEMP OFF WHILE FIX NAMES
         """

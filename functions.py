@@ -179,19 +179,17 @@ class BotProcess(CommandGroup):
 
         if update.get('auto_update', False):
             os.environ[update['is_busy_environ'] + self.source.name] = 'True'
+
         try:
             reply_text, reply_media = handle_reply(self.commands[ctx.command].callback(ctx))
         except Exception as e:
             # This is like this and messy for now as it shouldn't really happen
-            # this way I can work on catching every problem for now
+            # this way I can work on catching every problem for now one by one
             import sys
             import traceback
             print(ctx.command)
             print(traceback.print_tb(e.__traceback__))
             quit()
-            # The function broke somehow
-            # TODO: record this
-            pass
         self.commands_used[ctx.command] += 1
         if update.get('auto_update', False):
             os.environ[update['is_busy_environ'] + self.source.name] = 'False'
@@ -213,29 +211,28 @@ class BotProcess(CommandGroup):
 
     def check_rate_patreon(self, ctx):
         """Warn the user that overusing MyWaifu will just make it worse for them."""
-        if ctx.command not in ["pictag", "mywaifu", "myhusbando", "waifuregister", "husbandoregister"]:
+        if ctx.command not in ["mywaifu", "myhusbando", "waifuregister", "husbandoregister"]:
             return True
         current_time = datetime.now()
         user_rates = self.rate_limit['patreon_rates']
         add_on = ctx.media_repeat_for
-        rate_seconds = 10800  # 4 Hours
+        rate_seconds = 3600  # 1 Hour
         warning_when = 9
         if ctx.user_id in user_rates:
             # User is now limited.
             if ((current_time - user_rates[ctx.user_id][0]).total_seconds() < rate_seconds)\
-                and (user_rates[ctx.user_id][1] >= warning_when):
+                and (user_rates[ctx.user_id][1] >= warning_when) and (not user_rates[ctx.user_id][2]):
+                    user_rates[ctx.user_id][2] = True
                     return False
             elif ((current_time - user_rates[ctx.user_id][0]).total_seconds() >= rate_seconds):
-                # Limit is over
-                del user_rates[ctx.user_id]
+                del user_rates[ctx.user_id]  # Limit is over
             else:
-                # Add on limit
-                user_rates[ctx.user_id][1] += add_on
+                user_rates[ctx.user_id][1] += add_on  # Add on limit
         else:
             for person in list(user_rates):
                 if ((current_time - user_rates[person][0]).total_seconds() > rate_seconds):
                     del user_rates[person]
-            user_rates[ctx.user_id] = [current_time, add_on]
+            user_rates[ctx.user_id] = [current_time, add_on, False]
         return True
 
     def check_rate_limit(self, user_id, or_seconds=False, or_per_user=False):
@@ -244,13 +241,12 @@ class BotProcess(CommandGroup):
         if or_seconds:
             rate_seconds = or_seconds
         else:
-            rate_seconds = self.rate_limit.get('rate_seconds', 10800)
+            rate_seconds = self.rate_limit.get('rate_seconds', 21600)
         if or_per_user:
             rate_per_user = or_per_user
         else:
             rate_per_user = self.rate_limit.get('rate_per_user', 10)
         user_rates = self.rate_limit['rates']
-
         if user_id in user_rates:
             # User is now limited.
             if ((current_time - user_rates[user_id][0])
@@ -364,7 +360,6 @@ class BotProcess(CommandGroup):
                 current_time, "False")
             current_user_limits += [list_add]
             file_changed = True
-
         if file_changed:
             # save to file
             while True:
@@ -383,14 +378,14 @@ class BotProcess(CommandGroup):
             minutes, seconds = divmod(remainder, 60)
             days, hours = divmod(hours, 24)
             if days:
-                fmt = '{d} days, {h} hours, {m} minutes, and {s} seconds'
+                fmt = '{d} days, {h} hours, and {m} minutes'
             elif not days and hours:
-                fmt = '{h} hours, {m} minutes, and {s} seconds'
+                fmt = '{h} hours, and {m} minutess'
             elif not days and not hours and minutes:
-                fmt = '{m} minutes, and {s} seconds'
+                fmt = '{m} minutes'
             else:
                 fmt = '{s} seconds'
-            msg = "You can not use {} for another {}"
+            msg = "You can not use {} for another {}\nTry other commands: ace3df.github.io/AcePictureBot/commands/"
             return msg.format(command, fmt.format(d=days, h=hours, m=minutes, s=seconds))
         return True
 
@@ -584,10 +579,9 @@ def filter_per_series(entry_list, search_for, needed_match=None):
     if not matched:
         # No matches.
         return False
-    if needed_match is not None:
-        if len(matched) <= needed_match:
-            # Not enough results.
-            return False
+    elif needed_match and len(matched) <= needed_match:
+        # Not enough results.
+        return False
     return random.choice(matched)
 
 
