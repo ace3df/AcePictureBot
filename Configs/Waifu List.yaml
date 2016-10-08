@@ -93,6 +93,11 @@ Aizawa Nagisa (Jitsu wa Watashi wa):
   - monstergirl
   otp image: http://cdn.myanimelist.net/images/characters/9/279984.jpg
   series: Jitsu wa Watashi wa
+Lum:
+  lists:
+    - monstergirl
+  otp image: null
+  series: Urusei Yatsura
 Akado Harue:
   lists:
   - waifu
@@ -164,13 +169,9 @@ Akemi Homura:
   lists:
   - waifu
   - yandere
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/6/219771.jpg
   series: Puella Magi Madoka Magica
-Akemi Mikan:
-  lists:
-  - waifu
-  otp image: http://cdn.myanimelist.net/images/characters/9/289694.jpg
-  series: Jitsu wa Watashi wa
 Akigumo (Kantai Collection):
   lists: shipgirl
   otp image: null
@@ -194,7 +195,7 @@ Akiyama Yukari:
   lists: tankgirl
   otp image: null
   series: Girls und Panzer
-Anzai Chiyomi:
+Anchovy:
   lists:
   - waifu
   - tankgirl
@@ -446,6 +447,7 @@ Aori (Splatoon):
 Aoyama Mio:
   lists:
   - waifu
+  - himedere
   otp image: http://cdn.myanimelist.net/images/characters/3/120788.jpg
   series: Kami nomi zo Shiru Sekai
 Aoyama Nanami:
@@ -649,6 +651,7 @@ Ayukawa Tenri:
 Azuki Azusa:
   lists:
   - waifu
+  - himedere
   otp image: http://cdn.myanimelist.net/images/characters/15/203695.jpg
   series: Hentai Ouji to Warawanai Neko.
 Azuma Tokaku:
@@ -701,6 +704,7 @@ Blue Rose:
 Boa Hancock:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/14/146013.jpg
   series: One Piece
 Bridget Evans:
@@ -708,11 +712,6 @@ Bridget Evans:
   - waifu
   otp image: http://cdn.myanimelist.net/images/characters/5/106195.jpg
   series: OreImo
-Brioche d'Arquien:
-  lists:
-  - waifu
-  otp image: http://cdn.myanimelist.net/images/characters/15/164963.jpg
-  series: Dog Days
 Bulma:
   lists:
   - waifu
@@ -731,6 +730,7 @@ Busujima Saeko:
 C.C.:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/13/33815.jpg
   series: Code Geass
 Cagliostro (granblue fantasy):
@@ -870,6 +870,7 @@ Constantia Cantacuzino:
 Cornelia li Britannia:
   lists:
   - waifu
+  - himedere
   otp image: http://cdn.myanimelist.net/images/characters/11/33793.jpg
   series: Code Geass
 Cross Yuki:
@@ -959,6 +960,8 @@ Ebisuzawa Kurumi:
 Eclair Martinozzi:
   lists:
   - waifu
+  - monstergirl
+  - senpai
   otp image: http://cdn.myanimelist.net/images/characters/9/113959.jpg
   series: Dog Days
 Edomae Lunar:
@@ -1067,6 +1070,7 @@ Eucliwood Hellscythe:
   lists:
   - waifu
   - monstergirl
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/12/167045.jpg
   series: Kore wa Zombie Desu ka?
 Eugenia Horbaczewski:
@@ -1349,6 +1353,8 @@ Gokou Ruri:
   - waifu
   - onee-chan
   - kouhai
+  - kuudere
+  - tsundere
   otp image: http://cdn.myanimelist.net/images/characters/9/101412.jpg
   series: OreImo
 Gokou Tamaki:
@@ -1474,10 +1480,6 @@ Harime Nui:
   - yandere
   otp image: http://cdn.myanimelist.net/images/characters/7/229073.jpg
   series: Kill la Kill
-Harpy (muromi-san):
-  lists: monstergirl
-  otp image: null
-  series: Namiuchigiwa no Muromi-san
 Haruka (Senran Kagura):
   lists:
   - waifu
@@ -1800,6 +1802,7 @@ Hiyou (Kantai Collection):
 Holo:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/16/284126.jpg
   series: Spice and Wolf
 Homura (sekirei):
@@ -1878,12 +1881,16 @@ Hotaru (Splatoon):
   otp image: null
   series: Splatoon
 Hoto Cocoa:
-  lists: imouto
-  otp image: null
+  lists: 
+  - waifu
+  - imouto
+  otp image: https://myanimelist.cdn-dena.com/images/characters/11/242945.jpg
   series: Gochuumon wa Usagi Desu ka?
 Hoto Mocha:
-  lists: onee
-  otp image: null
+  lists: 
+  - waifu
+  - onee
+  otp image: https://myanimelist.cdn-dena.com/images/characters/15/293002.jpg
   series: Gochuumon wa Usagi Desu ka?
 Hotogi Shirayuki:
   lists:
@@ -2048,6 +2055,7 @@ Ikamusume:
 Ikaros:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/7/120790.jpg
   series: Sora no Otoshimono
 Ikaruga (Senran Kagura):
@@ -2231,6 +2239,7 @@ Isshiki Iroha:
 Isurugi Mio:
   lists:
   - waifu
+  - himedere
   otp image: http://cdn.myanimelist.net/images/characters/5/102385.jpg
   series: MM!
 Isurugi Noe:
@@ -2337,7 +2346,7 @@ Joy (pokemon):
   - waifu
   otp image: http://cdn.myanimelist.net/images/characters/14/215001.jpg
   series: Pokemon
-Julia:
+Julia (idolmaster):
   lists: idol
   otp image: null
   series: Idolmaster
@@ -2697,11 +2706,6 @@ Kawashiro Nitori:
   - touhou
   otp image: null
   series: Touhou
-Kawazoe Tamaki:
-  lists:
-  - waifu
-  otp image: http://cdn.myanimelist.net/images/characters/5/76147.jpg
-  series: Bamboo Blade
 Kay (Girls und Panzer):
   lists: tankgirl
   otp image: null
@@ -2850,6 +2854,7 @@ Kirigaya Suguha:
 Kirigiri Kyouko:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/2/214781.jpg
   series: Danganronpa The Animation
 Kirihara Misaki:
@@ -3104,6 +3109,8 @@ Kongou (Kantai Collection):
 Konjiki no Yami:
   lists:
   - waifu
+  - monstergirl
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/11/226347.jpg
   series: To LOVE-Ru
 Konoe Subaru:
@@ -3284,6 +3291,7 @@ Kurashima Chiyuri:
 Kurihara Mari:
   lists:
   - waifu
+  - himedere
   otp image: http://cdn.myanimelist.net/images/characters/6/256035.jpg
   series: Prison School
 Kuriyama Mirai:
@@ -3367,7 +3375,7 @@ Kurosawa Ruby:
   lists: 
   - idol
   - waifu
-  otp image: Kurosawa Ruby
+  otp image: https://myanimelist.cdn-dena.com/images/characters/12/294740.jpg
   series: Love Live! Sunshine!!
 Kuroshio (Kantai Collection):
   lists: shipgirl
@@ -3382,6 +3390,7 @@ Kuroyukihime:
   lists:
   - waifu
   - senpai
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/3/185407.jpg
   series: Accel World
 Kurugaya Yuiko:
@@ -3448,6 +3457,7 @@ Kuwahara Sayako:
 Kyon no Imouto:
   lists:
   - waifu
+  - imouto
   otp image: http://cdn.myanimelist.net/images/characters/7/93966.jpg
   series: Suzumiya Haruhi no Yuuutsu
 La Folia Rihavein:
@@ -3467,6 +3477,7 @@ Lala Satalin Deviluke:
   lists:
   - waifu
   - onee-chan
+  - monstergirl
   otp image: http://cdn.myanimelist.net/images/characters/11/113782.jpg
   series: To LOVE-Ru
 Last Order:
@@ -3510,6 +3521,9 @@ Lenalee Lee:
 Leonmitchelli Galette des Rois:
   lists:
   - waifu
+  - monstergirl
+  - onee
+  - senpai
   otp image: http://cdn.myanimelist.net/images/characters/2/245989.jpg
   series: Dog Days
 Levia-san:
@@ -3756,6 +3770,7 @@ Mashu (Control):
 Master Nemesis:
   lists:
   - waifu
+  - monstergirl
   otp image: http://cdn.myanimelist.net/images/characters/3/185795.jpg
   series: To LOVE-Ru
 Matoi Ryuuko:
@@ -4001,6 +4016,11 @@ Ashido Mina:
   - monstergirl
   otp image: https://myanimelist.cdn-dena.com/images/characters/5/300748.jpg
   series: Boku no Hero Academia
+Mumei (kabaneri):
+  lists:
+    - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/7/305010.jpg
+  series: Koutetsujou no Kabaneri
 Niyama Nico:
   lists:
   - waifu
@@ -4087,6 +4107,7 @@ Michishio (Kantai Collection):
 Midorikawa Hana:
   lists:
   - waifu
+  - himedere
   otp image: http://cdn.myanimelist.net/images/characters/13/287340.jpg
   series: Prison School
 Mifune Ryuuko:
@@ -4104,6 +4125,7 @@ Mikasa Ackerman:
   lists:
   - waifu
   - yandere
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/9/215563.jpg
   series: Shingeki no Kyojin
 Mikazuki (Kantai Collection):
@@ -4129,6 +4151,7 @@ Mikuma (Kantai Collection):
 Millhiore F Biscotti:
   lists:
   - waifu
+  - monstergirl
   otp image: http://cdn.myanimelist.net/images/characters/8/110096.jpg
   series: Dog Days
 Milly Ashford:
@@ -4254,6 +4277,7 @@ Misaki Mei:
   lists:
   - waifu
   - imouto
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/12/237389.jpg
   series: Another
 Misawa Mizuki:
@@ -4432,6 +4456,7 @@ Momiji (binbougami ga!):
 Momo Velia Deviluke:
   lists:
   - waifu
+  - monstergirl
   otp image: http://cdn.myanimelist.net/images/characters/3/273413.jpg
   series: To LOVE-Ru
 Momoi Satsuki:
@@ -4600,6 +4625,7 @@ Nagato (Kantai Collection):
 Nagato Yuki:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/3/75522.jpg
   series: Suzumiya Haruhi no Yuuutsu
 Nagatsuki (Kantai Collection):
@@ -4668,6 +4694,7 @@ Namine Ritsu:
 Nana Asta Deviluke:
   lists:
   - waifu
+  - monstergirl
   otp image: http://cdn.myanimelist.net/images/characters/9/150175.jpg
   series: To LOVE-Ru
 Nanami Ao:
@@ -4896,6 +4923,7 @@ Nohotoke Honne:
 Noir Vinocacao:
   lists:
   - waifu
+  - monstergirl
   otp image: http://cdn.myanimelist.net/images/characters/14/260039.jpg
   series: Dog Days
 Nonna:
@@ -5253,8 +5281,22 @@ Rebecca Miyamoto:
 Reikadou Ayame:
   lists:
   - waifu
+  - himedere
   otp image: http://cdn.myanimelist.net/images/characters/2/226017.jpg
   series: NouCome
+Celia Kumani Entory:
+  lists:
+    - waifu
+    - himedere
+    - tsundere
+  otp image: https://myanimelist.cdn-dena.com/images/characters/11/247395.jpg
+  series: Walkure Romanze
+Angelise Ikaruga Misurugi:
+  lists:
+    - waifu
+    - himedere
+  otp image: https://myanimelist.cdn-dena.com/images/characters/10/282625.jpg
+  series: Cross Ange
 Reisen Udongein Inaba:
   lists:
   - touhou
@@ -5308,6 +5350,7 @@ Rias Gremory:
 Ricotta Elmar:
   lists:
   - waifu
+  - monstergirl
   otp image: http://cdn.myanimelist.net/images/characters/2/113962.jpg
   series: Dog Days
 Rider:
@@ -5323,6 +5366,7 @@ Rindou Ranmaru:
 Riza Hawkeye:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/7/186275.jpg
   series: Fullmetal Alchemist
 Roma (Kantai Collection):
@@ -5381,6 +5425,19 @@ Ryuuguu Otohime:
   - yandere
   otp image: http://cdn.myanimelist.net/images/characters/7/99793.jpg
   series: Ookami-san
+Ryuuguu Rena:
+  lists:
+    - waifu
+    - yandere
+  otp image: https://myanimelist.cdn-dena.com/images/characters/3/34750.jpg
+  series: Higurashi no Naku Koro ni
+Sonozaki Mion:
+  lists:
+    - waifu
+    - yandere
+    - onee
+  otp image: https://myanimelist.cdn-dena.com/images/characters/3/34750.jpg
+  series: Higurashi no Naku Koro ni
 Ryuujou (Kantai Collection):
   lists: shipgirl
   otp image: null
@@ -5388,6 +5445,7 @@ Ryuujou (Kantai Collection):
 Saber:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/6/275276.jpg
   series: Fate (Series)
 Sae (hidamari sketch):
@@ -5446,8 +5504,35 @@ Saitou Aiko:
 Sakagami Tomoyo:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/2/34293.jpg
   series: Clannad
+Nakiri Erina:
+  lists:
+    - waifu
+    - himedere
+  otp image: https://myanimelist.cdn-dena.com/images/characters/15/266029.jpg
+  series: Shokugeki No Souma
+Tadokoro Megumi:
+  lists:
+    - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/11/280189.jpg
+  series: Shokugeki No Souma
+Arato Hisako:
+  lists:
+    - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/8/290070.jpg
+  series: Shokugeki No Souma
+Mito Ikumi:
+  lists:
+    - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/7/298267.jpg
+  series: Shokugeki No Souma
+Nakiri Alice:
+  lists:
+    - waifu
+  otp image: https://myanimelist.cdn-dena.com/images/characters/16/285712.jpg
+  series: Shokugeki No Souma
 Sakaguchi Karina:
   lists: tankgirl
   otp image: null
@@ -5709,6 +5794,7 @@ Senjougahara Hitagi:
   - waifu
   - yandere
   - tsundere
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/7/78433.jpg
   series: Monogatari (Series)
 Senomiya Akiho:
@@ -5830,6 +5916,7 @@ Shiina (Angel Beats!):
 Shiina Mashiro:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/5/183449.jpg
   series: Sakurasou no Pet na Kanojo
 Shiina Mayuri:
@@ -5976,6 +6063,7 @@ Shiodome Miuna:
 Ayanami Rei:
   lists:
   - waifu
+  - kuudere
   otp image: https://myanimelist.cdn-dena.com/images/characters/7/79491.jpg
   series: Neon Genesis Evangelion
 Katsuragi Misato:
@@ -6024,6 +6112,8 @@ Shirai Kuroko:
 Shiraki Meiko:
   lists:
   - waifu
+  - senpai
+  - himedere
   otp image: http://cdn.myanimelist.net/images/characters/8/252153.jpg
   series: Prison School
 Shirakiin Ririchiyo:
@@ -6077,6 +6167,7 @@ Shiro (No Game No Life):
 Shirogane Naoto:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/16/138013.jpg
   series: Persona 4
 Shishido Shiho:
@@ -6591,6 +6682,7 @@ Tenryuu (Kantai Collection):
 Tenshi (Angel Beats!):
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/2/74523.jpg
   series: Angel Beats!
 Teruzuki (Kantai Collection):
@@ -6619,6 +6711,7 @@ Toa:
 Tobiichi Origami:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/11/226431.jpg
   series: Date A Live
 Todoroki Yachiyo:
@@ -6708,6 +6801,7 @@ Toudou Yurika:
 Toujou Koneko:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/7/279778.jpg
   series: High School DxD
 Toujou Nozomi:
@@ -6930,7 +7024,9 @@ Ushio (Kantai Collection):
   otp image: null
   series: Kantai Collection
 Ushiromiya Ange:
-  lists: imouto
+  lists: 
+  - imouto
+  - kuudere
   otp image: null
   series: Umineko no Naku Koro Ni
 Ushiromiya Jessica:
@@ -6963,11 +7059,6 @@ Vampy:
   - granblue
   otp image: null
   series: Granblue Fantasy
-Vert Farbreton:
-  lists:
-  - waifu
-  otp image: http://cdn.myanimelist.net/images/characters/11/119426.jpg
-  series: Dog Days
 Victorica de Blois:
   lists:
   - waifu
@@ -7054,6 +7145,7 @@ Wii Fit Trainer:
 Wilhelmina Carmel:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/9/50367.jpg
   series: Shakugan no Shana
 Wilma Bishop:
@@ -7245,6 +7337,7 @@ Yeti (muromi-san):
 Yin:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/2/80129.jpg
   series: Darker than Black
 Yokokawa Kazumi:
@@ -7342,6 +7435,7 @@ Yukikaze (Kantai Collection):
 Yukikaze Panettone:
   lists:
   - waifu
+  - monstergirl
   otp image: http://cdn.myanimelist.net/images/characters/10/164965.jpg
   series: Dog Days
 Yukine Chris:
@@ -7393,6 +7487,8 @@ Yusa (Angel Beats!):
 Yusa Emi:
   lists:
   - waifu
+  - senpai
+  - himedere
   otp image: http://cdn.myanimelist.net/images/characters/8/205261.jpg
   series: Hataraku Maou-sama!
 Yuubari (Kantai Collection):
@@ -7434,6 +7530,7 @@ Yuzuki Yukari:
 Yuzuriha Inori:
   lists:
   - waifu
+  - kuudere
   otp image: http://cdn.myanimelist.net/images/characters/10/139621.jpg
   series: Guilty Crown
 Zange:
