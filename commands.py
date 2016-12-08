@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import random
 import json
+import time
 import ast
 import os
 import re
@@ -18,25 +19,57 @@ from functions import (yaml_to_list, slugify, get_media, get_media_online,
                        return_page_info, create_otp_image, make_paste,
                        write_user_ignore_list, handle_reply, append_json,
                        filter_per_series, connect_token, scrape_website,
-                       append_warnings, check_if_name_in_list)
+                       append_warnings, check_if_name_in_list, create_level_image,
+                       calculate_level, return_command_usage, write_command_usage,
+                       UserContext, upload_media, get_global_level_cache)
 
 from bs4 import BeautifulSoup
 
 
-@command("waifu", aliases=["husbando"])
+@command("pictag", patreon_only=True, cooldown=10)
+def pictag(ctx):
+    """ Search Safebooru or Gelbooru and return random results.
+    Patreon supporter only command.
+    """
+    args = ctx.args.replace("nsfw", "")
+    if ctx.media_repeat_for > 1:
+        # Still filter out the first number though.
+        if len(args) == 1:
+            a = r'\d+'
+        else:
+            a = r'\d +'
+        to_replace = re.search(a, args[0:3]).group()
+        args = args.replace(to_replace, "", 1)
+    tags = [tag.strip() for tag in args.split(" ")] + ["-asian", "-photo"]
+    if len(tags) > 5:
+        return (("Sorry, websites don't allow more than 5 tags to be searched!\n"
+                 "Use _ to connect words!"), False)
+    reply_media = []
+    for x in range(0, ctx.media_repeat_for):
+        media_args = {'tags': tags, 'random_page': True, 'return_url': ctx.bot.source.support_embedded}
+        image = get_media_online(path=None, ctx=False, media_args=media_args)
+        if not image:
+            return ("Sorry, no images could be found! Try different tags!")
+        reply_media.append(image)
+    reply_text = "Result(s) for: {}".format(' '.join(tags).replace("-asian", "").replace("-photo", ""))
+    return reply_text, reply_media
+
+
+@command(["waifu", "husbando"])
 def waifu(ctx, gender=None, search_for=None, is_otp=False):
+    """Get a random {OPTION}"""
     if ctx.command == "waifu" or gender == "waifu":
         list_name = "Waifu"
         end_tag = ["1girl", "solo"]
     else:
         list_name = "Husbando"
-        end_tag = ["-1girl", "-female", "1boy", "solo"]
+        end_tag = ["-1girl", "-genderbend", "1boy", "solo"]
     result = ()
     path = os.path.join(ctx.bot.config_path, '{} List.yaml'.format(list_name))
     char_list = yaml_to_list(path, list_name.lower())
     # This is used so they can't get aroun dbeing limited with x cmd
     # Plus to the odd series to make people actually use other cmds 😠.
-    ignore = ["high-school-dxd", "love-live",
+    ignore = ["high-school-dxd", "love-live", "love-live-sunshine"
               "aoki-hagane-no-arpeggio", "kantai-collection",
               "aikatsu", "akb0048", "idolmaster",
               "idolmaster-cinderella-girls"]
@@ -60,13 +93,12 @@ def waifu(ctx, gender=None, search_for=None, is_otp=False):
     reply_media = get_media(path=path_name, ctx=ctx, media_args=media_args)
     return reply_text, reply_media
 
-#  "kuudere", "himedere"
-@command("shipgirl",
-    aliases=["idol", "touhou", "vocaloid", "sensei", "senpai",
-             "kouhai", "imouto", "shota", "onii", "onee",
-             "monstergirl", "tankgirl", "witchgirl", "granblue",
-             "yandere", "kuudere", "himedere"],
-    patreon_aliases=["tsundere"])
+
+@command(["shipgirl", "idol", "touhou", "vocaloid", "sensei", "senpai",
+          "kouhai", "imouto", "shota", "onii", "onee",
+          "monstergirl", "tankgirl", "witchgirl", "granblue",
+          "yandere"],
+    patreon_aliases=["tsundere", "kuudere", "himedere"])
 def random_list(ctx):
     male_only_lists = ["shota", "onii"]
     # Both female and male can be under these.
@@ -236,41 +268,10 @@ def otp(ctx):
     return reply_text, reply_media
 
 
-@command("pictag", patreon_only=True)
-def pictag(ctx):
-    """ Search Safebooru or Gelbooru and return random results.
-    Patreon supporter only command.
-    """
-    args = ctx.args.replace("nsfw", "")
-    if ctx.media_repeat_for > 1:
-        # Still filter out the first number though.
-        if len(args) == 1:
-            a = r'\d+'
-        else:
-            a = r'\d +'
-        to_replace = re.search(a, args[0:3]).group()
-        args = args.replace(to_replace, "", 1)
-    tags = [tag.strip() for tag in args.split(" ")] + ["-asian", "-photo"]
-    if len(tags) > 5:
-        return (("Sorry, websites don't allow more than 5 tags to be searched!\n"
-                 "Use _ to connect words!"), False)
-    reply_media = []
-    for x in range(0, ctx.media_repeat_for):
-        media_args = {'tags': tags, 'random_page': True, 'return_url': ctx.bot.source.support_embedded}
-        image = get_media_online(path=None, ctx=False, media_args=media_args)
-        if not image:
-            return ("Sorry, no images could be found! Try different tags!")
-        reply_media.append(image)
-    reply_text = "Result(s) for: {}".format(' '.join(tags).replace("-asian", "").replace("-photo", ""))
-    return reply_text, reply_media
-
-
-@command("!airing")
+@command("!airing", cooldown=10)
 def airing(ctx):
-    if ctx.bot.source.name != "twitter" and not ctx.is_patreon:
-        return ctx.bot.patreon_only_message()
     if len(ctx.args) <= 3:
-        return False
+        return "Cannot search with less than 3 characters!"
 
     def find_show(url):
         soup = scrape_website(url)
@@ -279,8 +280,9 @@ def airing(ctx):
         show_list = soup.find_all('h3', class_="main-title")
         today = datetime.today() + timedelta(hours=-1)
         reply_text = False
+        results = []
         for show in show_list:
-            if slugify(show.text) != slugify(ctx.args):
+            if slugify(ctx.args) not in slugify(show.text):
                 continue
             episode_number = show.find_next('div', attrs={'class': "episode-countdown"})
             if show != episode_number.find_previous('h3'):
@@ -297,19 +299,24 @@ def airing(ctx):
             if days:
                 fmt = '{d} days, {h} hours, {m} minutes, and {s} seconds'
             else:
-                fmt = '{h} hours, {m} minutes, and {s} seconds'        
-            reply_text = ("{anime}\n"
-                          "Episode {episode} airing in {fmt}".format(
-                          anime=show.text, episode=episode_number,
-                          fmt=fmt.format(d=days, h=hours, m=minutes, s=seconds)))
-            return reply_text
-
-    reply_text = find_show("https://www.livechart.me/schedule/tv")
-    if not reply_text:
-        reply_text = find_show("https://www.livechart.me/")
-    if not reply_text:
-        return "No match found for '{}'".format(ctx.args)
-    return reply_text
+                fmt = '{h} hours, {m} minutes, and {s} seconds'
+            if ctx.bot.source.name == "discord":
+                results.append("**{anime}**\n"
+                              "**Episode {episode}** - airing in {fmt}".format(
+                              anime=show.text, episode=episode_number,
+                              fmt=fmt.format(d=days, h=hours, m=minutes, s=seconds)))
+            else:
+                results.append("{anime}\n"
+                              "Episode {episode} - airing in {fmt}".format(
+                              anime=show.text, episode=episode_number,
+                              fmt=fmt.format(d=days, h=hours, m=minutes, s=seconds)))
+        return results
+    results = find_show("https://www.livechart.me/schedule/tv")
+    if not results:
+        results = find_show("https://www.livechart.me/")
+    if not results:
+        return "No anime found named '{}'".format(ctx.args)
+    return '\n'.join(results)
 
 
 @command("connect", only_allow=["twitter"])
@@ -353,7 +360,101 @@ def direct_source(ctx):
     return source.callback(ctx, image_url=image_url)
 
 
-@command("source", aliases=["sauce", "anime?", "manga?"], only_allow=["twitter"])
+@command("!level", cooldown=120)
+def user_level(ctx):
+
+    def user_level_file(ctx, user_id):
+        user_cmd_path = os.path.join(ctx.bot.config_path, "Users", "Levels", ctx.bot.source.name.title())
+        user_cmd_file = os.path.join(user_cmd_path, user_id + ".json")
+        if not os.path.exists(user_cmd_file):
+            return False
+        user_cmd_usage = {}
+        try:
+            with open(user_cmd_file, 'r') as f:
+                user_cmd_usage = json.load(f)
+        except FileNotFoundError:
+            user_cmd_usage = {}
+        return user_cmd_usage
+
+    def handle_file(file):
+        if not file.endswith(".json"):
+            return False
+        file = file.replace(".json", "")
+        if not file.isdigit():
+            return False
+        attrs = {'bot': ctx.bot,
+                 'screen_name': '',
+                 '{}_id'.format(ctx.bot.source.name): file,
+                 'command': "!level",
+                 'message': '',
+                 'raw_data': '',
+                 'raw_bot': ''
+                }
+        member_ctx = UserContext(**attrs)
+        member_usage = return_command_usage(member_ctx)
+        if not member_usage:
+            return False
+        member_data = calculate_level(member_usage)
+        if not member_data:
+            return False
+        return member_data['total_exp']
+
+    user_level_dict = return_command_usage(ctx)
+    exp_data = calculate_level(user_level_dict)
+    lb_path = os.path.join(ctx.bot.config_path, "Users", "Levels", ctx.bot.source.name.title())
+    a = time.time()
+    global_leaderboard = get_global_level_cache(ctx)
+    # Only need the exp
+    global_leaderboard = [user['total_exp'] for user in global_leaderboard]
+    print("Time to process Global Leaderboard: {}".format(time.time() - a))
+    server_leaderboard = []
+    if ctx.bot.source.name == "discord":
+        # Get server_leaderboard
+        if ctx.raw_data.server is not None:
+            for member in ctx.raw_data.server.members:
+                if member.id == ctx.user_id:
+                    continue
+                elif member.bot:
+                    continue
+                attrs = {'bot': ctx.bot,
+                         'screen_name': '',
+                         'discord_id': member.id,
+                         'command': "!level",
+                         'message': '',
+                         'raw_data': '',
+                         'raw_bot': ''
+                        }
+                member_ctx = UserContext(**attrs)
+                member_usage = return_command_usage(member_ctx)
+                if not member_usage:
+                    continue
+                member_data = calculate_level(member_usage)
+                server_leaderboard.append(member_data['total_exp'])
+    global_leaderboard.append(exp_data['total_exp'])
+    global_leaderboard.sort(reverse=True)
+    try:
+        exp_data['global_leaderboard'] = global_leaderboard.index(exp_data['total_exp']) + 1
+    except ValueError:
+        exp_data['global_leaderboard'] = len(global_leaderboard) + 1
+    if server_leaderboard:
+        server_leaderboard.append(exp_data['total_exp'])
+        server_leaderboard.sort(reverse=True)
+        try:
+            exp_data['server_leaderboard'] = server_leaderboard.index(exp_data['total_exp']) + 1
+        except ValueError:
+            exp_data['server_leaderboard'] = len(server_leaderboard) + 1
+    exp_data['cash'] -= user_level_dict['level_card']['cash_spent']
+    exp_data['background_number'] = user_level_dict['level_card']['background_number']
+    exp_data['background_tint'] = user_level_dict['level_card']['background_tint']
+    exp_data['theme'] = user_level_dict['level_card']['theme']
+    exp_data['sources'] = user_level_dict['level_card']['sources']
+    reply_media = create_level_image(ctx, exp_data)
+    if reply_media and ctx and ctx.bot.source.thrid_party_upload:
+        return "", upload_media(reply_media, ctx)
+    return "", reply_media
+
+
+@command("source", only_allow=["twitter"], aliases=["sauce", "anime?", "manga?"])
 def source(ctx, image_url=None):
     is_gif = False
     if image_url is None and ctx.bot.source.name == "twitter" and ctx.raw_data.get('extended_entities', []):
@@ -439,7 +540,10 @@ def source(ctx, image_url=None):
         reply_list.append("*Source is a gif so this could be inaccurate.")
     reply_text = '\n'.join(reply_list)
     if (len(reply_text) + 23) > ctx.bot.source.character_limit:
-        paste_link = make_paste(reply_text, url)
+        try:
+            paste_link = make_paste(reply_text, url)
+        except:
+            paste_link = False
         if not paste_link:
             return "Unable to search for source! Try using SauceNAO: " + sauce_nao_url
         reply_text = "Source infomation is too long: " + paste_link
@@ -479,7 +583,7 @@ def mywaifu_data(ctx):
     return reply_text
 
 
-@command("mywaifu", aliases=["myhusbando"],
+@command(["mywaifu", "myhusbando"],
          patreon_aliases=["myidol"],
          patreon_vip_aliases=["myotp"])
 def mywaifu(ctx):
@@ -553,12 +657,16 @@ def mywaifu(ctx):
     else:
         reply_text = "{gender} is {name}".format(gender=list_name, name=clean_name)
     reply_media = []
+    checked_main_dir = False
+    media_args = {'ignore_used': skip_already_used}
+    if ctx.bot.source.allow_new_mywaifu:
+        media_args = {'tags': tags, 'random_page': True, 'return_url': ctx.bot.source.support_embedded,
+                      'ignore_used': skip_already_used}
     for x in range(0, ctx.media_repeat_for):
-        media_args = {'ignore_used': skip_already_used}
-        if ctx.bot.source.allow_new_mywaifu:
-            media_args = {'tags': tags, 'random_page': True, 'return_url': ctx.bot.source.support_embedded,
-                          'ignore_used': skip_already_used}
         image = get_media(path=path_name, ctx=ctx, media_args=media_args)
+        if not image and not checked_main_dir:
+            checked_main_dir = True
+            path_name = os.path.join(path_name, "My" + list_name)
         if image:
             reply_media.append(image)
         if not reply_media:
@@ -581,8 +689,8 @@ def mywaifu(ctx):
     return reply_text, reply_media
 
 
-@command("waifuregister", aliases=["husbandoregister"],
-         patreon_aliases=["idolregister"], patreon_vip_aliases=["otpregister"],
+@command(["waifuregister", "husbandoregister"],
+         patreon_vip_aliases=["otpregister", "idolregister"], 
          only_allow=["twitter"])
 def waifuregister(ctx):
     if "waifu" in ctx.command:
@@ -591,7 +699,7 @@ def waifuregister(ctx):
         min_imgs = 30
     elif "husbando" in ctx.command:
         list_name = "Husbando"
-        end_tag = ["-1girl", "-female", "1boy", "solo"]
+        end_tag = ["-1girl", "-genderbend", "1boy", "solo"]
         min_imgs = 25
     elif "idol" in ctx.command:
         list_name = "Idol"
@@ -615,7 +723,7 @@ def waifuregister(ctx):
         reply_text = ("You forgot to include a name!{}".format(
             "\nHelp: " + url_help if url_help else ""))
         return reply_text
-    if len(ctx.args) >= 40 and not ctx.command == "otpregister":
+    if len(ctx.args) >= 45 and not ctx.command == "otpregister":
         return False
     # Clean the name and ready it for searching.
     override = False
@@ -657,6 +765,7 @@ def waifuregister(ctx):
             "asuna": "asuna_(sao)",
             "rem": "rem_(re:zero)",
             "ram": "ram_(re:zero)",
+            "c.c": "c.c.",
             "bayonetta": "bayonetta_(character)",
             "asuka_langley": "soryu_asuka_langley"
         }
@@ -775,7 +884,16 @@ def waifuregister(ctx):
                         reply_text = "More than one name was found: " + paste_link
                         return reply_text
             # Check if there are any images
-            img_count = int(info.get('image_count', 0))
+            try:
+                img_count = int(info.get('image_count', 0))
+            except:
+                # Low chance of happening while in the middle, but it can.
+                ctx.bot.check_rate_limit_per_cmd(ctx, remove=1)
+                url_help = help_urls.get('waifuregister_websites_offline', False)
+                reply_text = ("Websites are offline to register your waifu!\n"
+                              "Try again later!{}".format(
+                    "\nHelp: " + url_help if url_help else ""))
+                return reply_text
             if not is_flipped:
                 # Store how many before flip
                 count_before_flip = img_count

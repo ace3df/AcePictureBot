@@ -429,7 +429,7 @@ Aoi Sena:
   lists:
   - waifu
   otp image: http://cdn.myanimelist.net/images/characters/10/50785.jpg
-  series: "Ch\xE4oS;HEAd"
+  series: "Chaos;HEAd"
 Aoki Lapis:
   lists:
   - vocaloid
@@ -519,6 +519,12 @@ Asahina Aoi:
   lists:
   - waifu
   otp image: http://cdn.myanimelist.net/images/characters/10/218019.jpg
+  series: Danganronpa The Animation
+Nanami Chiaki:
+  lists:
+  - waifu
+  - onee-chan
+  otp image: https://myanimelist.cdn-dena.com/images/characters/14/310999.jpg
   series: Danganronpa The Animation
 Asahina Kikuno:
   lists:
@@ -635,8 +641,11 @@ Ayase Chihaya:
   otp image: http://cdn.myanimelist.net/images/characters/7/136261.jpg
   series: Chihayafuru
 Ayase Eli:
-  lists: idol
-  otp image: null
+  lists:
+  - waifu 
+  - idol
+  - onee-chan
+  otp image: https://myanimelist.cdn-dena.com/images/characters/10/200925.jpg
   series: Love Live!
 Ayatsuji Tsukasa:
   lists:
@@ -1001,7 +1010,7 @@ Elizabeth Mably:
   otp image: http://cdn.myanimelist.net/images/characters/2/277793.jpg
   series: Freezing
 Elizabeth Thompson:
-  lists: onee
+  lists: onee-chan
   otp image: null
   series: Soul Eater
 Elma Leivonen:
@@ -1043,11 +1052,6 @@ Eris (asobi ni iku yo!):
   - waifu
   otp image: http://cdn.myanimelist.net/images/characters/15/94547.jpg
   series: Asobi ni Iku yo!
-Erun (granblue fantasy):
-  lists:
-  - granblue
-  otp image: null
-  series: Granblue Fantasy
 Erwin (Girls und Panzer):
   lists: tankgirl
   otp image: null
@@ -1308,6 +1312,7 @@ Fuyuumi Ai:
 GUMI:
   lists:
   - vocaloid
+  - idol
   otp image: null
   series: Vocaloid
 Ganaha Hibiki:
@@ -1466,7 +1471,7 @@ Hanna-Justina Marseille:
 Haqua d'rot Herminium:
   lists:
   - waifu
-  - onee
+  - onee-chan
   otp image: http://cdn.myanimelist.net/images/characters/15/116928.jpg
   series: Kami nomi zo Shiru Sekai
 Haramura Nodoka:
@@ -1553,6 +1558,7 @@ Hatsune Miku:
   lists:
   - waifu
   - vocaloid
+  - idol
   otp image: http://cdn.myanimelist.net/images/characters/5/194027.jpg
   series: Vocaloid
 Hatsuse Izuna:
@@ -1655,7 +1661,7 @@ Hii-chan:
   otp image: null
   series: Namiuchigiwa no Muromi-san
 Hiiragi Inori:
-  lists: onee
+  lists: onee-chan
   otp image: null
   series: Lucky Star
 Hiiragi Kagami:
@@ -1889,7 +1895,7 @@ Hoto Cocoa:
 Hoto Mocha:
   lists: 
   - waifu
-  - onee
+  - onee-chan
   otp image: https://myanimelist.cdn-dena.com/images/characters/15/293002.jpg
   series: Gochuumon wa Usagi Desu ka?
 Hotogi Shirayuki:
@@ -2331,7 +2337,7 @@ Johanna Wiese:
   series: Strike Witches
 Jougasaki Mika:
   lists:
-    - onee
+    - onee-chan
     - idol
   otp image: null
   series: Idolmaster Cinderella Girls
@@ -2985,7 +2991,7 @@ Kishimoto Ayase:
   lists:
   - waifu
   otp image: http://cdn.myanimelist.net/images/characters/8/50661.jpg
-  series: "Ch\xE4oS;HEAd"
+  series: "Chaos;HEAd"
 Kishin Sagume:
   lists:
   - touhou
@@ -3438,7 +3444,7 @@ Kusunoki Yua:
   lists:
   - waifu
   otp image: http://cdn.myanimelist.net/images/characters/3/50660.jpg
-  series: "Ch\xE4oS;HEAd"
+  series: "Chaos;HEAd"
 Kusunoki Yukimura:
   lists:
   - waifu
@@ -3522,7 +3528,7 @@ Leonmitchelli Galette des Rois:
   lists:
   - waifu
   - monstergirl
-  - onee
+  - onee-chan
   - senpai
   otp image: http://cdn.myanimelist.net/images/characters/2/245989.jpg
   series: Dog Days
@@ -3605,10 +3611,6 @@ Lucy Heartfilia:
   - waifu
   otp image: http://cdn.myanimelist.net/images/characters/7/67774.jpg
   series: Fairy Tail
-Luka (mon-musu quest!):
-  lists: monstergirl
-  otp image: null
-  series: Monster Girl Quest
 Lune (kaminomi):
   lists:
   - waifu
@@ -3728,7 +3730,7 @@ Maria (Arakawa):
   otp image: http://cdn.myanimelist.net/images/characters/6/86270.jpg
   series: Arakawa Under the Bridge
 Maria Cadenzavna Eve:
-  lists: onee
+  lists: onee-chan
   otp image: null
   series: Senki Zesshou Symphogear
 Maria Cadenzavuna Eve:
@@ -3758,6 +3760,46 @@ Maruyama Saki:
   otp image: null
   series: Girls und Panzer
 Mary (granblue fantasy):
+  lists:
+  - granblue
+  otp image: null
+  series: Granblue Fantasy
+Narumeia (Granblue Fantasy):
+  lists:
+  - granblue
+  otp image: null
+  series: Granblue Fantasy
+Augusta (Granblue Fantasy):
+  lists:
+  - granblue
+  otp image: null
+  series: Granblue Fantasy
+Rumredda:
+  lists:
+  - granblue
+  otp image: null
+  series: Granblue Fantasy
+Izmir:
+  lists:
+  - granblue
+  otp image: null
+  series: Granblue Fantasy
+Hallessena:
+  lists:
+  - granblue
+  otp image: null
+  series: Granblue Fantasy
+Forte (Shingeki no Bahamut):
+  lists:
+  - granblue
+  otp image: null
+  series: Shingeki no Bahamut
+Almeida (Granblue Fantasy):
+  lists:
+  - granblue
+  otp image: null
+  series: Granblue Fantasy
+Sarasa (Granblue Fantasy):
   lists:
   - granblue
   otp image: null
@@ -4072,6 +4114,7 @@ Kuramoto Chinatsu:
 Megurine Luka:
   lists:
   - vocaloid
+  - idol
   otp image: null
   series: Vocaloid
 Menjou Hare:
@@ -4259,7 +4302,7 @@ Misaka Imouto:
   otp image: http://cdn.myanimelist.net/images/characters/2/73911.jpg
   series: Toaru Majutsu no Index
 Misaka Kaori:
-  lists: onee
+  lists: onee-chan
   otp image: null
   series: Kanon
 Misaka Mikoto:
@@ -4330,7 +4373,7 @@ Miyakawa Hikage:
   otp image: null
   series: Lucky Star
 Miyakawa Hinata:
-  lists: onee
+  lists: onee-chan
   otp image: null
   series: Lucky Star
 Miyako (hidamari sketch):
@@ -4396,9 +4439,9 @@ Miyuki (Kantai Collection):
   otp image: null
   series: Kantai Collection
 Mizuhara Ichika:
-  lists: onee
+  lists: onee-chan
   otp image: null
-  series: Onee-chan ga Kita
+  series: onee-chan ga Kita
 Mizuhashi Parsee:
   lists:
   - touhou
@@ -4689,6 +4732,7 @@ Nami (one piece):
 Namine Ritsu:
   lists:
   - vocaloid
+  - idol
   otp image: null
   series: Vocaloid
 Nana Asta Deviluke:
@@ -4869,7 +4913,7 @@ Nishijou Nanami:
   - waifu
   - imouto
   otp image: http://cdn.myanimelist.net/images/characters/16/65828.jpg
-  series: "Ch\xE4oS;HEAd"
+  series: "Chaos;HEAd"
 Nishikino Maki:
   lists:
   - waifu
@@ -5435,7 +5479,7 @@ Sonozaki Mion:
   lists:
     - waifu
     - yandere
-    - onee
+    - onee-chan
   otp image: https://myanimelist.cdn-dena.com/images/characters/3/34750.jpg
   series: Higurashi no Naku Koro ni
 Ryuujou (Kantai Collection):
@@ -5566,7 +5610,7 @@ Sakihata Rimi:
   lists:
   - waifu
   otp image: http://cdn.myanimelist.net/images/characters/3/102213.jpg
-  series: "Ch\xE4oS;HEAd"
+  series: "Chaos;HEAd"
 Sako Makoto:
   lists: sensei
   otp image: null
@@ -5661,7 +5705,7 @@ Saotome Otome:
 Sarashiki Kanzashi:
   lists:
   - waifu
-  - onee
+  - onee-chan
   otp image: http://cdn.myanimelist.net/images/characters/7/216541.jpg
   series: Infinite Stratos
 Sarashiki Tatenashi:
@@ -6517,7 +6561,7 @@ Takanashi Sora:
 Takanashi Touka:
   lists:
   - waifu
-  - onee
+  - onee-chan
   otp image: http://cdn.myanimelist.net/images/characters/14/219051.jpg
   series: Chuunibyou demo Koi ga Shitai!
 Takao (Aoki Hagane no Arpeggio):
@@ -6561,7 +6605,7 @@ Takayama Haruka:
   otp image: http://cdn.myanimelist.net/images/characters/6/231763.jpg
   series: Sakura Trick
 Takayama Kate:
-  lists: onee
+  lists: onee-chan
   otp image: null
   series: Boku wa Tomodachi ga Sukunai
 Takayama Maria:
@@ -6945,7 +6989,7 @@ Uchiha Sarada:
   otp image: http://cdn.myanimelist.net/images/characters/3/280030.jpg
   series: Naruto
 Uesugi Mihato:
-  lists: onee
+  lists: onee-chan
   otp image: null
   series: They Are My Noble Masters
 Uiharu Kazari:
@@ -7045,7 +7089,7 @@ Uzuki (Kantai Collection):
   otp image: null
   series: Kantai Collection
 V Juri F:
-  lists: onee
+  lists: onee-chan
   otp image: null
   series: Yozakura Quartet
 V Lila F:
@@ -7191,7 +7235,7 @@ Yagami Tsurugi:
   otp image: http://cdn.myanimelist.net/images/characters/5/192489.jpg
   series: Sasami-san at Ganbaranai
 Yagiri Namie:
-  lists: onee
+  lists: onee-chan
   otp image: null
   series: Durarara!!
 Yagyuu (Senran Kagura):
@@ -7327,7 +7371,8 @@ Yayoi (Kantai Collection):
 Yazawa Nico:
   lists:
   - waifu
-  - onee
+  - idol
+  - onee-chan
   otp image: http://cdn.myanimelist.net/images/characters/9/200929.jpg
   series: Love Live!
 Yeti (muromi-san):
@@ -7423,6 +7468,11 @@ Yuigahama Yui:
   - kouhai
   otp image: http://cdn.myanimelist.net/images/characters/8/203549.jpg
   series: Oregairu
+Kawasaki Saki:
+  lists:
+  - onee-chan
+  otp image: https://myanimelist.cdn-dena.com/images/characters/4/205959.jpg
+  series: Oregairu 
 Yukihira Furano:
   lists:
   - waifu
@@ -7471,7 +7521,7 @@ Yuri (Angel Beats!):
   lists:
   - waifu
   - senpai
-  - onee
+  - onee-chan
   otp image: http://cdn.myanimelist.net/images/characters/4/74527.jpg
   series: Angel Beats!
 Yurie Sigtuna:
@@ -7573,3 +7623,14 @@ sanya v litvyak:
   lists: witchgirl
   otp image: null
   series: Strike Witches
+Kirijou Mitsuru:
+  lists:
+    - waifu
+    - senpai
+  otp image: https://myanimelist.cdn-dena.com/images/characters/12/257125.jpg
+  series: Persona 3
+Yandere-chan:
+  lists:
+    - yandere
+  otp image: null
+  series: Yandere Simulator

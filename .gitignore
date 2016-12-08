@@ -7,6 +7,7 @@ __pycache__
 Configs/Logs/
 
 # Baiscs
+cronjobs/
 .idea/
 tools/
 images/
@@ -21,6 +22,8 @@ ffmpeg.exe
 main.py
 config_example.py
 
+*.ttc
 # Twitter (Tython)
 Reddit.py
 Facebook.py
+cronjobs/Clean Image Folders.py

@@ -13,15 +13,16 @@ import re
 from config import settings, discord_settings
 from functions import (BotProcess, Source, UserContext,
                        datadog_online_check, create_token,
-                       slugify, yaml_to_list, download_file)
+                       slugify, yaml_to_list, download_file, get_global_level_cache,
+                       calculate_level, return_command_usage, write_command_usage)
 
+from discord.ext import commands
 from bs4 import BeautifulSoup
 from tabulate import tabulate
-from discord.ext import commands
+from PIL import Image
 import discord
 import asyncio
 import aiohttp
-
 
 prefix = discord_settings.get('command_prefix', ["!apb "])
 discord_bot = commands.Bot(command_prefix=prefix, pm_help=None)
@@ -35,6 +36,8 @@ settings_edits = [["active", "The bot is now online for this server!", "The bot 
                   ["mention", "Users must now @Mention the bot to use commands!", "Users don't need to @Mention to use commands!"],
                   ["music game", "This server can now use the music game!", "This server can not start the music game!"],
                   ["blacklist", "", ""], ["whitelist", "", ""], ["mods", "", ""]]
+users_discord_command = []  # bit of a cheap way to get this to work
+
 
 async def change_settings(server_settings, message):
     new_settings = copy.deepcopy(server_settings)
@@ -110,6 +113,18 @@ async def change_settings(server_settings, message):
     return
 
 
+def make_context(message, command):
+    attrs = {'bot': bot,
+         'screen_name': message.author.name,
+         'discord_id': message.author.id,
+         'command': command,
+         'message': message.content,
+         'raw_data': message,
+         'raw_bot': discord_bot
+        }
+    return UserContext(**attrs)
+
+
 def get_server_settings(server):
     # Takes server discord object
     server_settings = {'active': True,
@@ -135,10 +150,10 @@ def get_server_settings(server):
     return server_settings
 
 
-async def send_reply(reply_text, reply_media, ctx, server_settings):
+async def send_reply(reply_text, reply_media, ctx, server_settings={}):
     if not reply_text and not reply_media:
         # Silent return
-        return
+        return False
     message = ctx.raw_data
     command = ctx.command
     if command in ["mywaifu", "myhusbando"] or ctx.is_patreon_vip and command in ["myidol", "myotp"]:
@@ -152,6 +167,7 @@ async def send_reply(reply_text, reply_media, ctx, server_settings):
         destination = "#{0.channel.name} ({0.server.name})".format(message)
     log_str = "{0.timestamp}: {0.author.name} in {1} [{2}]: {0.content}".format(message, destination, command)
     bot.log.info(log_str)
+    sent_message = False
     try:
         if server_settings.get('media', True) and reply_media:
             count = 0
@@ -159,21 +175,21 @@ async def send_reply(reply_text, reply_media, ctx, server_settings):
                 if os.path.isfile(media):
                     with open(media, 'rb') as file:
                         if count == 0:
-                            await discord_bot.send_file(message.channel, file, content=reply_text)
+                            sent_message = await discord_bot.send_file(message.channel, file, content=reply_text)
                         else:
-                            await discord_bot.send_file(message.channel, file)
+                            sent_message = await discord_bot.send_file(message.channel, file)
                 else:
                     if count == 0:
                         reply_text = reply_text + " " + media
-                        await discord_bot.send_message(message.channel, reply_text)
+                        sent_message = await discord_bot.send_message(message.channel, reply_text)
                     else:
-                        await discord_bot.send_message(message.channel, media)
+                        sent_message = await discord_bot.send_message(message.channel, media)
                 count += 1
         else:
-            await discord_bot.send_message(message.channel, reply_text)
+            sent_message = await discord_bot.send_message(message.channel, reply_text)
     except discord.errors.Forbidden:
-        return
-    return
+        return sent_message
+    return sent_message
 
 
 async def change_status():
@@ -211,7 +227,7 @@ async def on_server_join(server):
             break
     if channel is None:
         return
-    await client.send_message(channel, welcome_message.format(server.owner.mention))
+    await discord_bot.send_message(channel, welcome_message.format(server.owner.mention))
 
 
 @discord_bot.event
@@ -255,7 +271,11 @@ async def on_message(message):
         # Ignore bots
         return
     # Process !apb type commands
+    if message.author.id in users_discord_command:
+        users_discord_command.remove(message.author.id)
     await discord_bot.process_commands(message)
+    if message.author.id in users_discord_command:
+        return
     # Get server settings.
     server_settings = get_server_settings(message.server)
     if message.server is not None and \
@@ -284,23 +304,21 @@ async def on_message(message):
     command = bot.uses_command(message.content)
     if not command:
         return
-
-    attrs = {'bot': bot,
-             'screen_name': message.author.name,
-             'discord_id': message.author.id,
-             'command': command,
-             'message': message.content,
-             'raw_data': message
-            }
-    ctx = UserContext(**attrs)
-    if not bot.check_rate_limit(ctx.user_id, or_seconds=120, or_per_user=10):
+    ctx = make_context(message, command)
+    if not bot.check_rate_limit(ctx, or_seconds=40, or_per_user=4):
         return
+    # TEMP
+    if message.server:
+        if message.server.id == "229372991648038913":
+            ctx.is_patreon = True
     if command in ["mywaifu", "myhusbando"]:
         if not ctx.user_ids.get('twitter', False):
             # Don't have a Twitter account linked
             reply_text = create_token(message.author.name, message.author.id, bot.source.name)
             await discord_bot.send_message(message.author, reply_text)
             return
+    elif command == "!level":
+        await discord_bot.send_typing(message.channel)
     reply_text, reply_media = bot.on_command(ctx)
     # Handle MyWaifu command as we handle it a little differently on Discord.
     # TODO: make a better way to handle this based on ctx.bot.source.get_new_mywaifu
@@ -311,10 +329,284 @@ async def on_message(message):
     bot.commands_used[ctx.command] += 1
     await send_reply(reply_text, reply_media, ctx, server_settings)
 
+##############
+# TODO:
+# Queue the songs before the rounds start (so no down time between rounds)
+# list them all in self.songs
+
+class VoiceState:
+    def __init__(self, bot):
+        self.current = None
+        self.voice = None
+        self.bot = bot
+        self.play_next_song = asyncio.Event()
+        self.songs = asyncio.Queue()
+        self.audio_player = self.bot.loop.create_task(self.audio_player_task())
+
+    def is_playing(self):
+        if self.voice is None or self.current is None:
+            return False
+        player = self.current.player
+        return not player.is_done()
+
+    @property
+    def player(self):
+        return self.current.player
+
+    def skip(self):
+        if self.is_playing():
+            self.player.stop()
+
+    def toggle_next(self):
+        self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
+
+    # Move this while True into the game part itself
+    async def audio_player_task(self):
+        while True:
+            self.play_next_song.clear()
+            self.current = await self.songs.get()
+            await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
+            self.current.player.start()
+            await self.play_next_song.wait()
 
 class Games:
     def __init__(self, bot):
-        from PIL import Image
+        self.bot = bot
+        # Guess Game
+        self.guess_current_games = []
+
+        # Music Game
+        self.MUSIC_MAX_PLAYERS = 2
+        self.music_voice_states = {}  # Can use as current_games
+        self.music_break_leave = []
+        self.music_queued_games = OrderedDict()
+        # TODO: change this and support 2 players
+        self.music_current_games = []
+        self.player = None
+        self.current_game = None
+        self.bot.loop.create_task(self.read_music_game_queue())
+
+        # All
+
+    def get_voice_state(self, server):
+        state = self.music_voice_states.get(server.id)
+        if state is None:
+            state = VoiceState(self.bot)
+            self.music_voice_states[server.id] = state
+        return state
+
+    async def create_voice_client(self, channel):
+        voice = await self.bot.join_voice_channel(channel)
+        state = self.get_voice_state(channel.server)
+        state.voice = voice
+
+    async def stop_voice(self, ctx):
+        server = ctx.message.server
+        state = self.get_voice_state(server)
+        if state.is_playing():
+            player = state.player
+            player.stop()
+        try:
+            state.audio_player.cancel()
+            del self.music_voice_states[server.id]
+            await state.voice.disconnect()
+        except:
+            pass
+
+    def __unload(self):
+        for state in self.music_voice_states.values():
+            try:
+                state.audio_player.cancle()
+                if state.voice:
+                    self.bot.loop.create_task(state.voice.disconnect())
+            except:
+                pass
+
+    async def read_music_game_queue(self):
+        """Loop queued_games and join next game when ready."""
+        while not self.bot.is_closed:
+            if self.music_queued_games:
+                while len(self.music_voice_states) >= self.MUSIC_MAX_PLAYERS:
+                    # Wait until a voice channel has left
+                    await asyncio.sleep(5)
+                new_game = self.music_queued_games.popitem(last=False)
+                self.bot.loop.create_task(self.start_music_game(new_game))
+                await asyncio.sleep(3)
+            await asyncio.sleep(1)
+
+    def check_answer(correct, guess):
+        if correct.server.channel != guess.server.channel:
+            return False
+        if guess.message.content:
+            pass
+
+    def return_settings(self, message, options):
+
+        def fix_setting(var, settings):
+            if var is None:
+                return settings[2]
+            num_min, num_max = settings[0:2]
+            if var.isdigit():
+                var = int(var)
+                if var > num_max:
+                    var = num_max
+                elif var < num_min:
+                    var = num_min
+                return var
+            else:
+                return settings[2]
+        
+        def fix_year(year, not_range=False):
+            if year == "max":
+                return datetime.now().year
+            if not year.isdigit():
+                if not_range:
+                    return range(2010, datetime.now().year)
+                year = 2010
+            year = int(year)
+            if year > datetime.now().year + 1 or year < 1970:
+                year = 2010
+            return year
+
+        user_arguments = dict(message[i:i+2] for i in range(0, len(message), 2))
+        settings = {}
+        settings['rounds'] = fix_settings(user_arguments.get('rounds'), options.get('rounds', [1, 5, 3]))
+        settings['gametype'] = fix_settings(user_arguments.get('gametype'), options.get('gametype', [1, 3, 1]))
+        settings['difficulty'] = fix_settings(user_arguments.get('difficulty'), options.get('difficulty', [1, 5, 3]))
+        settings['hints'] = options.get('hints', True)
+        if user_arguments.get('hints'):
+            if user_arguments['hints'].lower() in ["false", "off", "no"]:
+                settings['hints'] = False
+        year = range(2010, datetime.now().year)
+        if user_arguments.get('year') and options.get('year'):
+            if "-" in user_arguments['year']:
+                # Year is a range
+                year_split = user_arguments['year'].split("-")
+                year = range(fix_year(year_split[0]), fix_year(year_split[1]))
+            else:
+                year = fix_year(user_arguments['year'], not_range=True)
+                year = range(year, year)
+        settings['year'] = year
+        return settings
+
+    async def start_music_game(self, new_game):
+        # Join voice
+        try:
+            ctx = new_game[1]['ctx']
+            state = self.get_voice_state(ctx.message.server)
+            state.voice = await self.bot.join_voice_channel(new_game[1]['voice_channel'])
+            music_game_help = discord_settings.get('music_game_help')
+            help_text = ("\nYou can use any of the game settings here: " + music_game_help) if music_game_help else ""
+            reply_text = ("{0.author.mention} The bot is now ready to play!"
+                          "\nStart by saying '**start game**' in the channel you want to play in!"
+                          "{1}\n*(You have 80 seconds before the bot auto-disconnects)*".format(
+                            ctx.message, help_text))
+            await self.bot.send_message(ctx.message.channel, reply_text)
+            has_started = await self.bot.wait_for_message(
+                author=ctx.message.author, timeout=80,
+                check=lambda msg: msg.content.startswith('start game'))
+            if has_started is None:
+                # Timeout they took too long, leave.
+                reply_text = ("Sorry you took too long!"
+                              "\nYou were holding other games up :(")
+                await self.bot.send_message(ctx.message.channel, reply_text)
+                return False
+            game_options = {'_comment': ["min", "max", "default"],
+                            'rounds': [1, 5, 3], 'gametype': [1, 3, 1], 'difficulty': [1, 5, 1],
+                            'hints': True, 'year': [1970, "max"]}
+            game_settings = await self.return_settings(ctx.message.content, options=game_options)
+            print(game_settings)
+            with open(os.path.join(bot.config_path, 'Music Game.json'), 'r') as f:
+                anime_songs = json.load(f)
+        except:
+            # print error
+            pass
+        finally:
+            await self.stop_voice(ctx)
+
+
+    @commands.command(pass_context=True)
+    async def summon(self, ctx):
+        """Summons the bot to join your voice channel."""
+        summoned_channel = ctx.message.author.voice_channel
+        server = ctx.message.server
+        if summoned_channel is None:
+            await self.bot.say('You are not in a voice channel.')
+            return False
+        # Check current games to make sure not in more than 2 servers at a time.
+        if (len(self.music_voice_states) >= self.MUSIC_MAX_PLAYERS and self.music_voice_states.get(server.id) is None):
+            # 2 games running, add to queue
+            if self.music_queued_games.get(server.id):
+                # Already in queue, return current pos
+                q_pos = list(self.music_queued_games).index(server.id) + 1
+            else:
+                q_pos = len(list(self.music_queued_games)) + 1
+            reply_text = ("Games are already running, please wait!"
+                          "\nYour queue position is **{}**"
+                          "\nYour estimated wait time is **{} minutes**".format(
+                            q_pos, q_pos * 4))
+            await self.bot.say(reply_text)
+        elif self.music_voice_states.get(server.id):
+            # Server already has a game running, use this to move channel
+            state = self.get_voice_state(ctx.message.server)
+            if state.voice is not None:
+                await state.voice.move_to(summoned_channel)
+            return True
+        self.music_queued_games[server.id] = {'ctx': ctx, 'voice_channel': summoned_channel}
+        return True
+
+##############
+
+class newGames:
+
+    def __init__(self, bot):
+        self.bot = bot
+
+        # Character guess game
+        self.char_current_games = []
+        self.char_break_leave = {'server_id': None}
+
+        # Music guess game
+        self.music_current_games = []
+        self.music_queued_games = OrderedDict()
+        self.music_break_leave = {'server_id': None}
+        # TODO: change this and support 2 players
+        self.player = None
+        self.current_game = None
+
+        self.bot.loop.create_task(self.read_music_game_queue())
+
+    async def read_music_game_queue(self):
+        """Loop music_queued_games and join next game when ready."""
+        await self.bot.wait_for_ready()
+        while not self.bot.is_closed:
+            if self.music_queued_games:
+                if self.player is None:
+                    try:
+                        self.current_game = self.music_queued_games.popitem(last=False)
+                        await self.music_game_start(self.current_game[1])
+                        if self.player is not None:
+                            await self.player.disconnect()
+                    except Exception as e:
+                        # TEMP, need to find the cause of this
+                        traceback.print_tb(e.__traceback__)
+                        bot.log.info('{0.__class__.__name__}: {0}'.format(e))
+                        bot.log.warning("MUSIC GAME CLOSED {}".format(self.current_game))
+                    try:
+                        await self.player.disconnect()
+                    except Exception as e:
+                        traceback.print_tb(e.__traceback__)
+                        bot.log.info('{0.__class__.__name__}: {0}'.format(e))
+                        bot.log.warning("MUSIC GAME COULDNT LEAVE VOICE {}".format(self.current_game))
+                    self.current_game = None
+                    del self.music_break_leave[self.current_game[1].server.id]
+                    self.player = None
+            await asyncio.sleep(1)   
+
+class aGames:
+    # TODO:
+    # Rewrite all of this to support multi games without using same code all the time
+    def __init__(self, bot):
         self.bot = bot
         self.char_current_games = []
         self.char_last_used = []
@@ -491,13 +783,20 @@ class Games:
         score_string.append("\nThanks for playing!")
         return(''.join(score_string))
 
-    @commands.command(name="game", pass_context=True)
-    async def character_game_start(self, ctx):
-        
+    @commands.group(name="guess", pass_context=True)
+    async def guess_game(self, ctx):
+
         def guess_check(msg):
-            if slugify(text_guess) in slugify(msg):
-                return True
-            return '-'.join(reversed(slugify(text_guess).split("-"))) in slugify(msg)
+            if game_settings['difficulty'] == 2:
+                # only need to guess one part of this text_guessmd
+                if slugify(msg) in slugify(text_guess):
+                    return True
+                return slugify(msg) in '-'.join(reversed(slugify(text_guess).split("-")))
+            else:
+                if slugify(text_guess) in slugify(msg):
+                    return True
+                return '-'.join(reversed(slugify(text_guess).split("-"))) in slugify(msg)
+
         if ctx.message.channel.id in self.char_current_games:
             return  # Channel currently has a game running.
         self.char_current_games.append(ctx.message.channel.id)
@@ -505,8 +804,9 @@ class Games:
         otp_images_path = os.path.join(otp_path, 'OTP')
         game_settings = await self.return_settings(ctx.message, {'difficulty_default': 2, 'difficulty_max': 3})
         include_series = True
-        # cheap
+        # cheap cuns
         if game_settings['difficulty'] == 1:
+            diff_msg = "what series the character is from"
             first_top_right = 30
             first_top_left = 60
             first_bottom_right = random.randint(40, 50)
@@ -516,6 +816,7 @@ class Games:
             second_bottom_right = random.randint(40, 90)
             second_bottom_left = random.randint(60, 100)
         elif game_settings['difficulty'] == 2:
+            diff_msg = "one part of the character's name (the order of the name does not matter)"
             first_top_right = 10
             first_top_left = 40
             first_bottom_right = random.randint(20, 50)
@@ -525,6 +826,7 @@ class Games:
             second_bottom_right = random.randint(40, 70)
             second_bottom_left = random.randint(60, 80)
         elif game_settings['difficulty'] == 3:
+            diff_msg = "the character's full name (the order of the name does not matter)"
             first_top_right = 10
             first_top_left = 20
             first_bottom_right = random.randint(10, 70)
@@ -534,24 +836,12 @@ class Games:
             second_bottom_right = random.randint(20, 50)
             second_bottom_left = random.randint(30, 70)
             include_series = False
-        if game_settings['gametype'] == 1:
-            gender_random = 7
-        elif game_settings['gametype'] == 2:
-            gender_random = 11
-        elif game_settings['gametype'] == 3:
-            gender_random = 0
-        list_name = "Waifu"
-        random_gender = random.randint(0, 10)
-        if random_gender > gender_random:
-            list_name = "Husbando"
-        config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
-        path = os.path.join(config_path, '{} List.yaml'.format(list_name))
-        guess_list = yaml_to_list(path)
         help_msg = ("**How to play:**"
-                    "\nYou will have to guess the anime character's full name!"
-                    "\nRounds last for 60 seconds! The order of the name does not matter."
-                    "\nAfter **{0} round(s)** the game will end!".format(
-                    game_settings['rounds']))
+                    "\nYou will have to guess {0}!"
+                    "\nRounds last for 60 seconds!"
+                    "\nThe quicker you answer the more points you earn!"
+                    "\nAfter **{1} round(s)** the game will end!".format(
+                        diff_msg, game_settings['rounds']))
         try:
             await self.bot.send_message(ctx.message.channel, help_msg)
         except discord.errors.Forbidden:
@@ -559,6 +849,19 @@ class Games:
         player_leaderboard = {}
         current_round = 1
         while True:
+            if game_settings['gametype'] == 1:
+                gender_random = 11
+            elif game_settings['gametype'] == 2:
+                gender_random = 7
+            elif game_settings['gametype'] == 3:
+                gender_random = 0
+            list_name = "Waifu"
+            random_gender = random.randint(0, 10)
+            if random_gender > gender_random:
+                list_name = "Husbando"
+            config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
+            path = os.path.join(config_path, '{} List.yaml'.format(list_name))
+            guess_list = yaml_to_list(path)
             while True:
                 players_corrent_round = []
                 # Loop until either entry has OTP image or local images
@@ -587,7 +890,17 @@ class Games:
                                (h + 40) + second_bottom_left))
             hint_1.save('otp_{}_1.png'.format(ctx.message.channel.id))
             hint_2.save('otp_{}_2.png'.format(ctx.message.channel.id))
-            text_guess = entry[0]
+            cleaned_name = re.sub("[\(\[].*?[\)\]]", "", entry[0]).strip()
+            if game_settings['difficulty'] == 1:
+                text_guess = entry[1]['series']
+                hint_msg = ""
+            elif game_settings['difficulty'] == 2:
+                # TODO: only need to guess one part of the slugify that would happen here
+                text_guess = cleaned_name
+                hint_msg = ": They are from {}".format(entry[1]['series'])
+            elif game_settings['difficulty'] == 3:
+                text_guess = cleaned_name
+                hint_msg = ": They are from {}".format(entry[1]['series'])
             print(text_guess)
             first_correct = None
             timer = time.time()
@@ -615,11 +928,11 @@ class Games:
                             else:
                                 player_leaderboard[guess.author] += points_to_add
                             break
-                if time.time() - timer > 30 and not showed_hint:
+                if time.time() - timer > 45 and not showed_hint:
                     # Show second image.
                     showed_hint = True
                     reply_text = ":exclamation: **Hint{}**".format(
-                        "" if not include_series else ": They are from {}".format(entry[1]['series']))
+                        "" if not include_series else hint_msg)
                     with open('otp_{}_2.png'.format(ctx.message.channel.id), 'rb') as file:
                         await self.bot.send_file(ctx.message.channel, file, content=reply_text)  
                 elif time.time() - timer > 60:
@@ -639,7 +952,7 @@ class Games:
                                     first=players_corrent_round[0].name,
                                     second=second, thrid=thrid, others=others))
             round_end_msg += ("\nThe correct answer was: "
-                              "**{}**").format(entry[0])
+                              "**{}**").format(cleaned_name + " ({})".format(entry[1]['series']))
             try:
                 with open(otp_image_file, 'rb') as file:
                     await self.bot.send_file(ctx.message.channel, file, content=round_end_msg)
@@ -655,6 +968,8 @@ class Games:
             await self.bot.send_message(ctx.message.channel, game_end_msg)
         except discord.errors.Forbidden:
             return
+        os.remove('otp_{}_1.png'.format(ctx.message.channel.id))
+        os.remove('otp_{}_2.png'.format(ctx.message.channel.id))
         self.char_current_games.remove(ctx.message.channel.id)
 
     async def music_game_start(self, ctx):
@@ -911,17 +1226,18 @@ class Games:
             return
         await self.check_queue(ctx, summoned_channel, server_id)
 
-    @commands.group(pass_context=True)
+    # @commands.group(pass_context=True)
     async def leaderboard(self, ctx, *, gametype):
         this_server_only = False
         if "server" in gametype.lower():
             this_server_only = True
         if "music" in gametype.lower():
             filename = 'Global Music Game Leaderboard.json'
-        elif "character" in gametype.lower():
+        elif "guess" in gametype.lower():
             filename = 'Global Character Game Leaderboard.json'
         else:
-            await self.bot.say('Invalid gametype: "music" or "character"')
+            await self.bot.say('Invalid gametype: "music" or "guess"')
+            return
         try:
             with open(os.path.join(bot.config_path, filename), 'r') as f:
                 current_leaderboard = json.load(f)
@@ -972,12 +1288,56 @@ class Games:
         await self.bot.say(reply_text)
 
 
-@discord_bot.command()
-async def help():
-    message = discord_settings.get('help_message', False)
+@discord_bot.command(pass_context=True)
+async def help(ctx, command : str = None):
+    users_discord_command.append(ctx.message.author.id)
+    message = False
+    if command:
+        command = bot.uses_command(ctx.message.content)
+        if command:
+            message = "```" + bot.commands[command].description.replace("{OPTION}", command.title()) + "```"
     if not message:
-        return
+        message = discord_settings.get('help_message', False)
+        public_cmds = [cmd for cmd in bot.commands.keys() \
+                       if not bot.commands[cmd].patreon_only \
+                       and not cmd in bot.commands[cmd].patreon_aliases \
+                       and not bot.commands[cmd].patreon_vip_only \
+                       and not cmd in bot.commands[cmd].patreon_vip_aliases]
+        patreon_cmds = [cmd for cmd in bot.commands.keys() \
+                       if bot.commands[cmd].patreon_only \
+                       or cmd in bot.commands[cmd].patreon_aliases \
+                       or bot.commands[cmd].patreon_vip_only \
+                       or cmd in bot.commands[cmd].patreon_vip_aliases]
+        message += "\n**Full list of commands: **{}".format(', '.join(public_cmds))
+        message += "\n**Full list of Patreon only commands: **{}".format(', '.join(patreon_cmds))
+        message += "\n**For a description or help for a command use \"!apb help <command>\"**"
+        if not message:
+            return
     await discord_bot.say(message)
+
+
+@discord_bot.command(pass_context=True)
+async def benchmark(ctx, command : str):
+    """Benchmark a given command.
+    Example: !apb benchmark waifu"""
+    users_discord_command.append(ctx.message.author.id)
+    command = bot.uses_command(ctx.message.content)
+    if not command:
+        await discord_bot.say("No command given. Example:\n`!apb time waifu`")
+        return
+    before = time.time()
+    user_ctx = make_context(ctx.message, command)
+    user_ctx.args = user_ctx.args.lower().replace("!apb benchmark", "").strip()
+    reply_text, reply_media = bot.on_command(user_ctx)
+    after = time.time()
+    post_message = "```Command: {}\nArgs: {}\nTime: {}\n{} (Media: {})```".format(
+        command, user_ctx.args, after - before, reply_text, bool(reply_media))
+    before_post = time.time()
+    sent_message = await send_reply(post_message, reply_media, user_ctx)
+    after_post = time.time()
+    post_message = "```Command: {}\nArgs: {}\nTime: {}\n{} (Media: {})\nPost Time: {}```".format(
+        command, user_ctx.args, after - before, reply_text, bool(reply_media), after_post - before_post)
+    await discord_bot.edit_message(sent_message, post_message)
 
 
 @discord_bot.command()
@@ -1001,6 +1361,18 @@ async def invite():
     await discord_bot.say(msg + discord.utils.oauth_url(discord_bot.client_id, perms))
 
 
+async def is_owner(ctx):
+    app_info = await discord_bot.application_info()
+    return ctx.message.author.id == getattr(app_info, 'owner').id
+
+
+@discord_bot.command()
+@commands.check(is_owner)
+async def reload():
+    bot.reload_commands()
+    await discord_bot.say(":ok_hand:")
+
+
 @discord_bot.command(pass_context=True)
 async def debug(ctx):
     msg = ("Current Server ID: {0.server.id}"
@@ -1008,6 +1380,273 @@ async def debug(ctx):
            "\nYour ID: {0.author.id}".format(ctx.message))
     await discord_bot.send_message(ctx.message.channel, msg)
 
+##########################################
+# TODO:
+# can easily make all this into one function
+# ugly for now
+# very ugly
+# more ugly
+@discord_bot.group(pass_context=True)
+async def buy(ctx):
+    reply_text = """{}
+**List of options you can use:**
+!apb buy background <Background ID>
+!apb buy tint <HTML HEX colour/off>
+!apb buy theme <white/black/red/blue/pink>
+Full list of backgrounds you can buy, theme examples and help can be found here:
+<https://gist.github.com/ace3df/3d35fc77bde1ba0fbd3a54c370e9cfa6>
+""".format(ctx.message.author.mention)
+    if ctx.invoked_subcommand is None:
+        await discord_bot.say(reply_text)
+
+
+@buy.command(name="background", pass_context=True)
+async def buy_background(ctx, bg : int = 0):
+    if not bg:
+        reply_text = ("{} See the full list of backgrounds and pirces here: "
+                      "<https://gist.github.com/ace3df/3d35fc77bde1ba0fbd3a54c370e9cfa6#apb-buy-background-background-id>".format(
+                        ctx.message.author.mention))
+        await discord_bot.say(reply_text)
+        return
+    user_ctx = make_context(ctx.message, "!level")
+    user_level_dict = return_command_usage(ctx=user_ctx)
+    exp_data = calculate_level(user_level_dict)
+    exp_data['cash'] -= user_level_dict['level_card']['cash_spent']
+    path = settings.get('image_location', os.path.realpath(__file__))
+    background_path = os.path.join(path, 'Level Images', 'Level Backgrounds')
+    bg_list = [f for f in os.listdir(background_path) if os.path.isfile(os.path.join(background_path, f))]
+    new_bg = [f for f in bg_list if f.split("_")[1] == str(bg)]
+    if not new_bg:
+        # Invalid background number
+        await discord_bot.say('{} Invalid background number!\n'
+                              'See all the options and prices here: {}'.format(
+                                ctx.message.author.mention,
+                                "<https://gist.github.com/ace3df/3d35fc77bde1ba0fbd3a54c370e9cfa6>"))
+        return
+
+    cost = int(new_bg[0].split("_")[2].replace(".png", "")) * 100
+    if str(bg) in user_level_dict['level_card']['owned_bg']:
+        await discord_bot.say("{} You already own this background! Applying it now!".format(ctx.message.author.mention))
+    elif cost > exp_data['cash'] and not user_ctx.is_patreon:
+        # Not enough cash
+        await discord_bot.say("{} You don't have enough cash! "
+                              "Use more commands to level up and gain more!"
+                              "\nYou currently have: {}"
+                              "\nThis background costs: {}".format(ctx.message.author.mention,
+                                exp_data['cash'], cost))
+        return
+    else:
+        # Buy it here
+        if not user_ctx.is_patreon:
+            exp_data['cash'] -= cost
+            user_level_dict['level_card']['cash_spent'] += cost
+        user_level_dict['level_card']['owned_bg'].append(str(bg))
+        await discord_bot.say("{} Background {} bought and applied!\nYou now have {} cash left!".format(
+            ctx.message.author.mention, bg, exp_data['cash']))
+    user_level_dict['level_card']['background_number'] = bg
+    write_command_usage("Discord", ctx.message.author.id, user_level_dict)
+    return True
+
+
+@discord_bot.command(name="leaderboard", pass_context=True)
+async def leaderboard(ctx, game_type : str = "", is_local : str = ""):
+    options = ["Level", "Music", "Guess"]
+    to_search = [a for a in options if a.lower() in game_type.lower()]
+    if not to_search:
+        await discord_bot.say("Invalid option! Use one of these: {}\n"
+                              "You can also use add 'global' on the end for the global leaderboard!".format(', '.join(options)))
+    await discord_bot.send_typing(ctx.message.channel)
+    to_search = to_search[0]
+    rank = 1
+    user_score = 0
+    end_string = []
+    _leaderboard = {}
+    local_only = True
+    user_not_top = True
+    if any(is_global in is_local.lower() for is_global in ["global", "all"]):
+        local_only = False
+    user_ctx = make_context(ctx.message, "!level")
+    if to_search == "Level":
+        if ctx.message.server is not None and local_only:
+            for member in ctx.message.server.members:
+                if member.bot:
+                    continue
+                attrs = {'bot': user_ctx.bot,
+                         'screen_name': '',
+                         'discord_id': member.id,
+                         'command': "!level",
+                         'message': '',
+                         'raw_data': '',
+                         'raw_bot': ''
+                        }
+                member_ctx = UserContext(**attrs)
+                member_usage = return_command_usage(member_ctx)
+                if not member_usage:
+                    continue
+                member_data = calculate_level(member_usage)
+                if ctx.message.author.id == member.id:
+                    user_score = member_data['total_exp']
+                _leaderboard[member.id] = member_data['total_exp']
+        else:
+            userlevels = get_global_level_cache(user_ctx)
+            for entry in userlevels:
+                if ctx.message.author.id == entry['user_id']:
+                    user_score = entry['total_exp']
+                _leaderboard[entry['user_id']] = entry['total_exp']
+    elif to_search in ["Music", "Guess"]:
+        filename = os.path.join(bot.config_path, "Leaderboard {} Game.json".format(to_search))
+        if os.path.isfile(filename):
+            with open(filename, 'r') as f:
+                _leaderboard = json.load(f)
+        if ctx.message.server is not None and local_only:
+            # Filter out users that are not in server
+            _leaderboard = _leaderboard.get(ctx.message.server.id)
+            if _leaderboard is None:
+                if to_search in ["Music", "Guess"]:
+                    reply_text = "No games have been played yet!"
+                else:
+                    reply_text = "No entries found!"
+                await discord_bot.say(reply_text)
+                return
+            for user_id, score in _leaderboard.items():
+                if user_id != ctx.message.author.id:
+                    continue
+                user_score += score
+        else:
+            new_leaderboard = {}
+            # Combine user scores from differnt servers
+            for server, users in _leaderboard.items():
+                for user_id, score in users.items():
+                    if user_id == ctx.message.author.id:
+                        user_score += score
+                    if not new_leaderboard.get(user_id):
+                        new_leaderboard[user_id] = score
+                    else:
+                        new_leaderboard[user_id] += score
+            _leaderboard = new_leaderboard.copy()
+    ordered_leaderboard = list(reversed(sorted(_leaderboard.items(), key=itemgetter(1))))
+    if not user_not_top and (ctx.message.author.id, user_score) not in ordered_leaderboard[:10]:
+        # User not in top 10
+        user_not_top = False
+    for user_id, score in ordered_leaderboard[:10]:
+        member = discord.utils.get(discord_bot.get_all_members(), id=user_id)
+        name = user_id + " [USER ID]"
+        if member:
+            name = member.name
+        end_string.append([rank, name, score])
+        rank += 1
+    if not end_string:
+        if to_search in ["Music", "Guess"]:
+            reply_text = "No games have been played yet!"
+        else:
+            reply_text = "No entries found!"
+    else:
+        reply_text = tabulate(end_string, ["Rank", "Name", "Score" if not to_search == "Level" else "EXP"])
+        if not user_not_top:
+            reply_text += "\nYou: {} | Score: {}".format(ctx.message.author.name, user_score)
+        first_msg = "**Top 10 {} ".format(to_search)
+        first_msg += "Global**" if not local_only else "Server**"
+        reply_text = first_msg + "```\n" + reply_text + "```"
+    await discord_bot.say(reply_text)
+
+
+@discord_bot.command(name="level", pass_context=True)
+async def level(ctx):
+    from commands import user_level
+    users_discord_command.append(ctx.message.author.id)
+    await discord_bot.send_typing(ctx.message.channel)
+    user_ctx = make_context(ctx.message, "!level")
+    reply_text, reply_media = user_level.callback(user_ctx)
+    await discord_bot.send_file(ctx.message.channel, reply_media,
+                                content=ctx.message.author.mention + " " + reply_text)
+
+
+@discord_bot.command(name="airing", pass_context=True)
+async def airing(ctx):
+    from commands import airing
+    await discord_bot.send_typing(ctx.message.channel)
+    user_ctx = make_context(ctx.message, "!airing")
+    reply_text, reply_media = airing.callback(user_ctx)
+    await discord_bot.send_file(ctx.message.channel, reply_media,
+                                content=ctx.message.author.mention + " " + reply_text)
+
+
+@buy.command(name="theme", pass_context=True)
+async def buy_theme(ctx, *, theme: str):
+    user_ctx = make_context(ctx.message, "!level")
+    user_level_dict = return_command_usage(ctx=user_ctx)
+    exp_data = calculate_level(user_level_dict)
+    exp_data['cash'] -= user_level_dict['level_card']['cash_spent']
+    cost = 30
+    POSSIBLE_THEMES = ["default", "dark", "red"]
+    if not theme or theme.strip() not in POSSIBLE_THEMES:
+        await discord_bot.say('{} Invalid theme!\n'
+                              "You can use: default, dark or red.".format(ctx.message.author.mention))
+        return
+    user_ctx = make_context(ctx.message, "!level")
+    user_level_dict = return_command_usage(ctx=user_ctx)
+    exp_data = calculate_level(user_level_dict)
+    exp_data['cash'] -= user_level_dict['level_card']['cash_spent']
+    cost = 30
+    if cost > exp_data['cash'] and not user_ctx.is_patreon:
+        # Not enough cash
+        await discord_bot.say("{} You don't have enough cash! "
+                              "Use more commands to level up and gain more!"
+                              "\nYou currently have: {}"
+                              "\nThemes cost: {}".format(
+                                ctx.message.author.mention, exp_data['cash'], cost))
+        return
+    else:
+        # Buy it here
+        if not user_ctx.is_patreon:
+            exp_data['cash'] -= cost
+            user_level_dict['level_card']['cash_spent'] += cost
+        await discord_bot.say("{} Enjoy your new background tint!\nYou now have {} cash left!".format(
+            ctx.message.author.mention, exp_data['cash']))
+    user_level_dict['level_card']['theme'] = theme.strip().lower()
+    write_command_usage("Discord", ctx.message.author.id, user_level_dict)
+    return True
+
+
+@buy.command(name="tint", pass_context=True)
+async def buy_tint(ctx, *, tint: str):
+    if not tint:
+        await discord_bot.say('{} You forgot to include a HTML HEX colour for a tint!\n'
+                              "You can also use 'background tint off' to remove it!".format(ctx.message.author.mention))
+        return
+    else:
+        tint = tint.replace("#", "")
+        if not tint.lower() == "off":
+            match = re.search(r'^(?:[0-9a-fA-F]{3}){1,2}$', tint)
+            if not match:
+                await discord_bot.say('{} Invalid HTML HEX colour for a tint!\n'
+                                      "You can also use 'background tint off' to remove it!".format(ctx.message.author.mention))
+                return
+    user_ctx = make_context(ctx.message, "!level")
+    user_level_dict = return_command_usage(ctx=user_ctx)
+    exp_data = calculate_level(user_level_dict)
+    exp_data['cash'] -= user_level_dict['level_card']['cash_spent']
+    cost = int(user_level_dict['level_card']['bg_tint_count'] * 1.25 + 60)
+    if cost > exp_data['cash'] and not user_ctx.is_patreon:
+        # Not enough cash
+        await discord_bot.say("{} You don't have enough cash! "
+                              "Use more commands to level up and gain more!"
+                              "\nYou currently have: {}"
+                              "\nThis tint costs: {}".format(
+                                ctx.message.author.mention, exp_data['cash'], cost))
+        return
+    else:
+        # Buy it here
+        if not user_ctx.is_patreon:
+            exp_data['cash'] -= cost
+            user_level_dict['level_card']['cash_spent'] += cost
+        await discord_bot.say("{} Enjoy your new background tint!\nYou now have {} cash left!".format(
+            ctx.message.author.mention, exp_data['cash']))
+    user_level_dict['level_card']['bg_tint_count'] += 1
+    user_level_dict['level_card']['background_tint'] = tint.lower()
+    write_command_usage("Discord", ctx.message.author.id, user_level_dict)
+    return True
+#########################
 
 @discord_bot.command(pass_context=True)
 async def info(ctx):
@@ -1060,7 +1699,6 @@ async def on_ready():
     print('ID: ' + discord_bot.user.id)
     print('------')
 
-
 if __name__ == '__main__':
     if not bot.settings.get('token', False):
         raise Exception("Missing Discord Bot Token from Discord Settings.json in /Configs/")
@@ -1069,5 +1707,5 @@ if __name__ == '__main__':
     discord_bot.loop.create_task(change_status())
     if bot.settings.get('datadog', False):
         discord_bot.loop.create_task(datadog_data())
-    discord_bot.add_cog(Games(discord_bot))
+    #discord_bot.add_cog(aGames(discord_bot))
     discord_bot.run(bot.settings['token'])

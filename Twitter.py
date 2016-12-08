@@ -162,7 +162,7 @@ def process_tweet(data):
              'raw_data': data
             }
     ctx = UserContext(**attrs)
-    if not bot.check_rate_limit(ctx.user_id):
+    if not bot.check_rate_limit(ctx):
         return
     bot.log.info("[{}] Reading: {} ({}): [{}] {}".format(
         time.strftime("%Y-%m-%d %H:%M"), ctx.screen_name,

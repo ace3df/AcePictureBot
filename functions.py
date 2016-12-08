@@ -3,6 +3,7 @@ from inspect import getmembers, isfunction
 from datetime import datetime, timedelta
 from http.cookiejar import LWPCookieJar
 import xml.etree.ElementTree as ET
+from io import BytesIO
 import subprocess
 import mimetypes
 import difflib
@@ -21,7 +22,7 @@ from logging.handlers import TimedRotatingFileHandler
 from config import settings, update, api_keys
 from decorators import CommandGroup, Command
 
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 from yaml import load as yaml_load, dump as yaml_dump
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -44,15 +45,17 @@ class Source:
         self.max_filesize = attrs.get('max_filesize', 3145728)  # Bytes
         self.thrid_party_upload = attrs.get('thrid_party_upload', False)  # Upload to imgur
 
-    def __str__(self):
-        return self.name
-
 
 class BotProcess(CommandGroup):
-
     def __init__(self, source):
         if not isinstance(source, Source):
             raise Exception("Bot Source isn't Source class!")
+        ###########
+        # Not sure how to handle this well
+        # This will make everyone have access to patreon commands but still limited to normal limits
+        self.OPEN_PATREON_VIP = True
+        self.OPEN_PATREON = True
+        ###########
         self.source = source
         self.uptime = datetime.utcnow()
         self.commands_used = Counter()
@@ -69,6 +72,7 @@ class BotProcess(CommandGroup):
         except FileNotFoundError:
             source_settings = {}
         self.settings = global_settings
+        self.log = self.get_logging()
         self.patreon_ids = self.get_patreon_ids()
         for item in source_settings.items():
             if not self.settings.get(item[0], False):
@@ -94,25 +98,18 @@ class BotProcess(CommandGroup):
             client_secret = api_keys['imgur_client_secret']
             self.imgur_client = ImgurClient(client_id, client_secret)
 
-        import commands
-        members = getmembers(commands)
-        for name, member in members:
-            if isinstance(member, Command):
-                if member.parent is None:
-                    if member.only_allow:
-                        if self.source.name not in member.only_allow:
-                            continue
-                    self.add_command(member)
-                continue
-
+        import commands as commands_module
+        self.commands_module = commands_module
+        self.reload_commands(first_run=True)
         default_rate_limits = self.settings.get('rate_limits', {})
         rates = default_rate_limits.get(self.source.name.lower(), {})
         if not rates:
             rates = default_rate_limits.get(
                 'default',
                 {"rate_seconds": 10800, "rate_per_user": 10})
-        self.rate_limit = {'rates': OrderedDict(), **rates, 'patreon_rates': OrderedDict()}
-        self.log = self.get_logging()
+        self.rate_limit = {'rates': OrderedDict(), **rates, 'patreon_rates': OrderedDict(),
+                           'per_cmd': OrderedDict()}
+
 
     def get_logging(self):
         log_path = os.path.join(self.config_path, "Logs", self.source.name.title())
@@ -148,8 +145,6 @@ class BotProcess(CommandGroup):
         return reply_text, False
 
     def on_command(self, ctx):
-        if not ctx.command:
-            return False, False
         reply_text = None
         reply_media = None
         if self.commands[ctx.command].mod_only and not ctx.is_mod:
@@ -159,19 +154,21 @@ class BotProcess(CommandGroup):
         if self.source.name == "twitter" and ctx.command == "!source":
             ctx.command = "source"
 
-        if self.commands[ctx.command].patreon_only and not ctx.is_patreon\
-           or ctx.command in self.commands[ctx.command].patreon_aliases and not ctx.is_patreon:
-                return self.patreon_only_message()
+        if not self.OPEN_PATREON:
+            if self.commands[ctx.command].patreon_only and not ctx.is_patreon\
+               or ctx.command in self.commands[ctx.command].patreon_aliases and not ctx.is_patreon:
+                    return self.patreon_only_message()
 
-        if self.commands[ctx.command].patreon_vip_only and not ctx.is_patreon_vip\
-            or ctx.command in self.commands[ctx.command].patreon_vip_aliases and not ctx.is_patreon_vip:
-                # Don't trigger Patreon message on these as lots of people don't space "myidol"
-                if "idol" in ctx.command:
-                    ctx.command = "idol"
-                elif "otp" in ctx.command:
-                    ctx.command = "otp"
-                else:
-                    return self.patreon_only_message(is_vip=True)
+        if not self.OPEN_PATREON_VIP:
+            if self.commands[ctx.command].patreon_vip_only and not ctx.is_patreon_vip\
+                or ctx.command in self.commands[ctx.command].patreon_vip_aliases and not ctx.is_patreon_vip:
+                    # Don't trigger Patreon message on these as lots of people don't space "myidol"
+                    if "idol" in ctx.command:
+                        ctx.command = "idol"
+                    elif "otp" in ctx.command:
+                        ctx.command = "otp"
+                    else:
+                        return self.patreon_only_message(is_vip=True)
 
         if self.settings.get('datadog', False):
             if self.settings['datadog'].get('statsd_commands', False):
@@ -190,23 +187,47 @@ class BotProcess(CommandGroup):
             print(ctx.command)
             print(traceback.print_tb(e.__traceback__))
             quit()
+        ctx.add_command_usage()
         self.commands_used[ctx.command] += 1
         if update.get('auto_update', False):
             os.environ[update['is_busy_environ'] + self.source.name] = 'False'
         return reply_text, reply_media
 
+    def reload_commands(self, first_run=False):
+        self.log.info("Reloading Commands...")
+        if not first_run:
+            import imp
+            imp.reload(self.commands_module) 
+        self.commands = OrderedDict()
+        members = getmembers(self.commands_module)
+        for name, member in members:
+            if isinstance(member, Command):
+                if member.parent is None:
+                    if member.only_allow and self.source.name not in member.only_allow:
+                        continue
+                    self.add_command(member)
+                continue
+        self.log.info("Finished reloading commands!")
+
     def uses_command(self, text):
         """Check to see if text contains a command."""
         text = text.replace("🚢👧", "shipgirl").lower()
+        text = re.sub('(@[A-Za-z0-9_.+-]+)', ' ', text)
         command_list = list(self.commands.keys())
         command = [cmd for cmd in command_list if cmd in text]
         if command:
-            # Only return last from list (as waifuregister conflict can happen with waifu)
-            command = difflib.get_close_matches(text, command, n=1, cutoff=0.1)
-            if command:
-                command = command[0]
+            if "pictag" in command:
+                # difflib doesn't seem to like pictag being the closes match
+                command = "pictag"
+            else:
+                # Only return last from list (as waifuregister conflict can happen with waifu)
+                command = difflib.get_close_matches(text, command, n=1, cutoff=0.1)
+                if command:
+                    command = command[0]
         if not command:
             return False
+        if command in self.commands[command].aliases:
+            command = self.commands[command].name[0]
         return command
 
     def check_rate_patreon(self, ctx):
@@ -235,9 +256,37 @@ class BotProcess(CommandGroup):
             user_rates[ctx.user_id] = [current_time, add_on, False]
         return True
 
-    def check_rate_limit(self, user_id, or_seconds=False, or_per_user=False):
+    def check_rate_limit(self, ctx, or_seconds=False, or_per_user=False):
         """Check to see if the user is under basic ratelimit."""
-        current_time = datetime.now()
+        def calculate_user_rates(user_rates, user_id, cooldown, max_usage=1):
+            current_time = datetime.now()
+            if user_id in user_rates:
+                # User is now limited.
+                if ((current_time - user_rates[user_id][0])
+                        .total_seconds() < cooldown)\
+                    and (user_rates[user_id][1] >= max_usage):
+                    return False, user_rates
+                # User limit is over.
+                elif ((current_time - user_rates[user_id][0])
+                        .total_seconds() >= cooldown):
+                    del user_rates[user_id]
+                else:
+                    user_rates[user_id][1] += 1
+            else:
+                # User not found, add them and quickly go over removing old users.
+                for person in list(user_rates):
+                    if ((current_time - user_rates[person][0])
+                        .total_seconds() > cooldown):
+                        del user_rates[person]
+                user_rates[user_id] = [current_time, 1]
+            return True, user_rates
+
+        # First check per cmd cooldown
+        if self.commands[ctx.command].cooldown:  # Has a cooldown
+            result, self.rate_limit['per_cmd'] = calculate_user_rates(self.rate_limit['per_cmd'], ctx.user_id,
+                                                                      self.commands[ctx.command].cooldown)
+            if not result:
+                return False
         if or_seconds:
             rate_seconds = or_seconds
         else:
@@ -246,28 +295,9 @@ class BotProcess(CommandGroup):
             rate_per_user = or_per_user
         else:
             rate_per_user = self.rate_limit.get('rate_per_user', 10)
-        user_rates = self.rate_limit['rates']
-        if user_id in user_rates:
-            # User is now limited.
-            if ((current_time - user_rates[user_id][0])
-                    .total_seconds() < rate_seconds)\
-                and (user_rates[user_id][1] >= rate_per_user):
-                return False
-            # User limit is over.
-            elif ((current_time - user_rates[user_id][0])
-                    .total_seconds() >= rate_seconds):
-                del user_rates[user_id]
-            else:
-                user_rates[user_id][1] += 1
-        else:
-            # User not found, add them and quickly go over removing old users.
-            for person in list(user_rates):
-                if ((current_time - user_rates[person][0])
-                    .total_seconds() > rate_seconds):
-                    del user_rates[person]
-            user_rates[user_id] = [current_time, 1]
-        self.rate_limit['rates'] = user_rates
-        return True
+        result, self.rate_limit['rates'] = calculate_user_rates(self.rate_limit['rates'], ctx.user_id,
+                                                                rate_seconds, rate_per_user)
+        return result
 
     def check_rate_limit_per_cmd(self, ctx, remove=False):
         path = os.path.join(ctx.bot.config_path,
@@ -275,14 +305,12 @@ class BotProcess(CommandGroup):
         if not os.path.isfile(path):
             with open(path, 'w') as f:
                 f.write('')
-        while True:
-            # Wait until file is not busy
+        while True:  # Wait until file is not busy
             try:
                 with open(path, 'r', encoding="utf-8") as f:
                     current_user_limits = f.read().splitlines()
                 break
-            except (IOError):
-                # File is busy
+            except (IOError):  # File is busy
                 time.sleep(0.1)
         list_add = False
         file_changed = False
@@ -416,19 +444,26 @@ class UserContext:
         self.message = attrs.pop('message')
         self.args = self.clean_message(self.message)
         self.raw_data = attrs.pop('raw_data')
+        self.raw_bot = attrs.get('raw_bot')
         self.get_other_ids()
         self.is_mod = self.get_is_mod()
-        self.is_patreon_vip = self.get_is_patreon(is_vip=True)
+        self.is_patreon_vip = self.get_is_patreon(section="patreon_vip_ids")
         if self.is_patreon_vip:
             self.is_patreon = True
         else:
-            self.is_patreon = self.get_is_patreon()
+            self.is_patreon = self.get_is_patreon(section="patreon_ids")
+            if not self.is_patreon:  # Last check, see if guest
+                self.is_patreon = self.get_is_patreon(section="patreon_guest_ids")
         if self.is_patreon:
             self.media_repeat_for = self.patreon_reapeat_for(args=self.args, is_vip=self.is_patreon_vip)
         else:
             self.media_repeat_for = 1
 
     def clean_message(self, message):
+        message = re.sub(r'^i.?:\/\/.*[\r\n]*', '', message, flags=re.MULTILINE)
+        for cmd in [self.command] + self.bot.commands[self.command].aliases:
+            ignore_cmd_case = re.compile(re.escape(cmd), re.IGNORECASE)
+            message = ignore_cmd_case.sub("", message)
         ignore_cmd_case = re.compile(re.escape(self.command), re.IGNORECASE)
         message = ignore_cmd_case.sub("", message)
         message = re.sub('(@[A-Za-z0-9_.+-]+)', ' ', message)
@@ -441,10 +476,7 @@ class UserContext:
         mod_ids = self.bot.settings['mod_ids'].get(self.bot.source.name, [])
         return self.user_ids.get(self.bot.source.name) in mod_ids
 
-    def get_is_patreon(self, is_vip=False):
-        section = "patreon_ids"
-        if is_vip:
-            section = "patreon_vip_ids"
+    def get_is_patreon(self, section):
         if not self.bot.patreon_ids.get(section, {}):
             return False
         is_patreon = False
@@ -456,6 +488,24 @@ class UserContext:
                 is_patreon = True
                 break
         return is_patreon
+
+    def add_command_usage(self, usage=1):
+        user_cmd_path = os.path.join(self.bot.config_path, "Users", "Levels", self.bot.source.name.title())
+        if not os.path.exists(user_cmd_path):
+            os.makedirs(user_cmd_path)
+        user_cmd_file = os.path.join(user_cmd_path, self.user_id + ".json")
+        user_cmd_usage = {}
+        try:
+            with open(user_cmd_file, 'r') as f:
+                user_cmd_usage = json.load(f)
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
+            user_cmd_usage = {}
+        if user_cmd_usage.get(self.command):
+            user_cmd_usage[self.command] += usage
+        else:
+            user_cmd_usage[self.command] = usage
+        with open(user_cmd_file, 'w') as f:
+            json.dump(user_cmd_usage, f, sort_keys=True, indent=4)
 
     @staticmethod 
     def patreon_reapeat_for(args, is_vip):
@@ -483,13 +533,56 @@ class UserContext:
         try:
             with open(os.path.join(self.bot.config_path, 'Connected Accounts.json'), 'r') as f:
                 accounts = json.load(f)
-        except FileNotFoundError:
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
             accounts = {}
         for account in accounts:
             if account.get(self.bot.source.name, False) and account[self.bot.source.name] == self.user_id:
                 for source in account.items():
                     self.user_ids[source[0]] = source[1]
                 return
+
+
+def return_command_usage(ctx):
+    config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
+    total_cmd_usage = Counter({})
+    level_card = {}
+    sources = {}
+    for source, user_id in ctx.user_ids.items():
+        if not user_id:
+            continue
+        user_cmd_path = os.path.join(config_path, "Users", "Levels", source.title())
+        user_cmd_file = os.path.join(user_cmd_path, user_id + ".json")
+        try:
+            with open(user_cmd_file, 'r') as f:
+                source_cmd_usage = json.load(f)
+            sources[source] = True
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
+            source_cmd_usage = {}
+        if source == "discord":
+            if source_cmd_usage.get('level_card'):
+                level_card = source_cmd_usage.pop('level_card')
+        else:
+            if source_cmd_usage.get('level_card'):
+                source_cmd_usage.pop('level_card')
+        total_cmd_usage += Counter(source_cmd_usage)
+    if not level_card:
+        total_cmd_usage['level_card'] = {'background_number': 1, 'background_tint': "off",
+                                        'theme': 'default', 'cash_spent': 0,
+                                        'owned_bg': ["1"], 'bg_tint_count': 0}
+    else:
+        if not level_card.get('theme'):
+            level_card['theme'] = "default"
+        total_cmd_usage['level_card'] = level_card
+    total_cmd_usage['level_card']['sources'] = sources
+    return total_cmd_usage
+
+
+def write_command_usage(source, user_id, user_cmd_usage):
+    config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
+    user_cmd_path = os.path.join(config_path, "Users", "Levels", source.title())
+    user_cmd_file = os.path.join(user_cmd_path, user_id + ".json")
+    with open(user_cmd_file, 'w') as f:
+        json.dump(user_cmd_usage, f, sort_keys=True, indent=4)
 
 
 def connect_token(user_id, token, to_source):
@@ -788,6 +881,40 @@ def scrape_website(url, sess=False, content_only=False):
         return r.content
 
 
+def get_global_level_cache(ctx):
+    lb_path = os.path.join(ctx.bot.config_path, "Users", "Levels", ctx.bot.source.name.title())
+    cache_file = os.path.join(ctx.bot.config_path, "Leaderboard Level Cache.json")
+    global_leaderboard = []
+    if not os.path.isfile(cache_file) or (time.time() - os.path.getmtime(cache_file) > 10400):
+        for file in os.listdir(lb_path):
+            if not file.endswith(".json"):
+                continue
+            file = file.replace(".json", "")
+            if not file.isdigit():
+                continue
+            attrs = {'bot': ctx.bot,
+                     'screen_name': '',
+                     '{}_id'.format(ctx.bot.source.name): file,
+                     'command': "!level",
+                     'message': '',
+                     'raw_data': '',
+                     'raw_bot': ''
+                    }
+            member_ctx = UserContext(**attrs)
+            member_usage = return_command_usage(member_ctx)
+            if not member_usage:
+                continue
+            member_data = calculate_level(member_usage)
+            member_data['user_id'] = file
+            global_leaderboard.append(member_data)
+        with open(cache_file, 'w') as f:
+            json.dump(global_leaderboard, f)
+    else:
+        with open(cache_file, 'r') as f:
+            global_leaderboard = json.load(f)
+    return global_leaderboard
+
+
 def get_media_online(path=None, ctx=None, media_args={}, ignore_used=False):
     print(media_args)
     if path is not None and not os.path.exists(path):
@@ -890,7 +1017,6 @@ def get_media_online(path=None, ctx=None, media_args={}, ignore_used=False):
                         while True:
                             a_break += 1
                             if a_break == 3:
-                                print(333)
                                 return False
                             soup = scrape_website(url, sess)
                             if not soup:
@@ -961,7 +1087,6 @@ def upload_media(file, ctx=None):
             imgur_client = ImgurClient(client_id, client_secret)
             image = imgur_client.upload_from_path(file)
         else:
-            print(file)
             image = ctx.bot.imgur_client.upload_from_path(file)
         if image.get('link', False):
             return image['link']
@@ -1004,56 +1129,59 @@ def return_page_info(url, get_extra_info=False):
     # doesn't support per post details yet
     info = {}
     login_with = None
-    if "gelbooru" in url:
-        login_with = "gelbooru"
-    elif "safebooru" in url:
-        login_with = "safebooru"
-    with requests.Session() as sess:
-        if login_with is None:
-            sess = login_website(login_with, sess)
-        soup = scrape_website(url, sess)
-        if not soup:
-            return False
-        artists, characters, series, tags = [], [], [], []
-        if "gelbooru" in url and "page=dapi" not in url:
-            index_value = 3
-            search_url = ("http://gelbooru.com/index.php?tags="
-                          "{}%20rating:safe&pid=0&page=dapi"
-                          "&s=post&q=index")
-        elif "safebooru" in url and "page=dapi" not in url:
-            index_value = 2
-            search_url = ("http://safebooru.org/index.php?tags="
-                          "{}%20rating:safe&pid=0&page=dapi"
-                          "&s=post&q=index")
-        if "gelbooru" in url or "safebooru" in url:
-            artist_html = soup.find_all('li', attrs={'class': 'tag-type-artist'})
-            if artist_html:
-                artists = [tag.find_all('a')[index_value].text.title() for tag in artist_html]
-            character_html = soup.find_all('li', attrs={'class': 'tag-type-character'})
-            if character_html:
-                characters = [tag.find_all('a')[index_value].text.title() for tag in character_html]
-            series_html = soup.find_all('li', attrs={'class': 'tag-type-copyright'})
-            if series_html:
-                series = [tag.find_all('a')[index_value].text.title() for tag in series_html]
-            if "s=list" in url and get_extra_info:
-                tags = url.split("&tags=")[1]
-                safe_break = 0
-                while True:
-                    safe_break += 1
-                    if safe_break == 3:
-                        return False
-                    search_url = search_url.format(tags)
-                    soup = scrape_website(search_url, sess, content_only=True)
-                    if not soup:
-                        time.sleep(0.5)
-                        continue
-                    xml_parse = ET.fromstring(soup)
-                    break
-                info['image_count'] = xml_parse.get('count')
-        info['artists'] = artists
-        info['characters'] = characters
-        info['series'] = series
-    return info
+    try:
+        if "gelbooru" in url:
+            login_with = "gelbooru"
+        elif "safebooru" in url:
+            login_with = "safebooru"
+        with requests.Session() as sess:
+            if login_with is None:
+                sess = login_website(login_with, sess)
+            soup = scrape_website(url, sess)
+            if not soup:
+                return False
+            artists, characters, series, tags = [], [], [], []
+            if "gelbooru" in url and "page=dapi" not in url:
+                index_value = 3
+                search_url = ("http://gelbooru.com/index.php?tags="
+                              "{}%20rating:safe&pid=0&page=dapi"
+                              "&s=post&q=index")
+            elif "safebooru" in url and "page=dapi" not in url:
+                index_value = 2
+                search_url = ("http://safebooru.org/index.php?tags="
+                              "{}%20rating:safe&pid=0&page=dapi"
+                              "&s=post&q=index")
+            if "gelbooru" in url or "safebooru" in url:
+                artist_html = soup.find_all('li', attrs={'class': 'tag-type-artist'})
+                if artist_html:
+                    artists = [tag.find_all('a')[index_value].text.title() for tag in artist_html]
+                character_html = soup.find_all('li', attrs={'class': 'tag-type-character'})
+                if character_html:
+                    characters = [tag.find_all('a')[index_value].text.title() for tag in character_html]
+                series_html = soup.find_all('li', attrs={'class': 'tag-type-copyright'})
+                if series_html:
+                    series = [tag.find_all('a')[index_value].text.title() for tag in series_html]
+                if "s=list" in url and get_extra_info:
+                    tags = url.split("&tags=")[1]
+                    safe_break = 0
+                    while True:
+                        safe_break += 1
+                        if safe_break == 3:
+                            return False
+                        search_url = search_url.format(tags)
+                        soup = scrape_website(search_url, sess, content_only=True)
+                        if not soup:
+                            time.sleep(0.5)
+                            continue
+                        xml_parse = ET.fromstring(soup)
+                        break
+                    info['image_count'] = xml_parse.get('count')
+            info['artists'] = artists
+            info['characters'] = characters
+            info['series'] = series
+        return info
+    except:
+        return False
 
 # TODO: Test this more
 # Commonly get file not found convert_to .gif
@@ -1252,3 +1380,220 @@ def check_if_name_in_list(name, gender, search_list=None):
             found_entry = entry
             break
     return found_entry
+
+
+def create_level_image(ctx, exp_data):
+    
+    def add_corners(im, rad, skip_bottom=False, new_alpha=255):
+        circle = Image.new('L', (rad * 2, rad * 2), 0)
+        draw = ImageDraw.Draw(circle)
+        draw.ellipse((0, 0, rad * 2, rad * 2), fill=255)
+        alpha = Image.new('L', im.size, new_alpha)
+        w, h = im.size
+        if not skip_bottom:
+            alpha.paste(circle.crop((0, 0, rad, rad)), (0, 0))  #
+            alpha.paste(circle.crop((rad, 0, rad * 2, rad)), (w - rad, 0))  #
+        alpha.paste(circle.crop((0, rad, rad, rad * 2)), (0, h - rad))
+        alpha.paste(circle.crop((rad, rad, rad * 2, rad * 2)), (w - rad, h - rad))
+        im.putalpha(alpha)
+        return im
+
+    def tint_image(src, color="#FFFFFF"):
+        src.load()
+        try:
+            r, g, b = src.split()
+        except ValueError:
+            r, g, b, alpha = src.split()
+        gray = ImageOps.grayscale(src)
+        result = ImageOps.colorize(gray, (0, 0, 0, 0), color) 
+        return result
+
+    def draw_text_outline(draw, w, h, text, font, fill):      
+        draw.text((w-1, h-1), text, font=font, fill=fill)
+        draw.text((w+1, h-1), text, font=font, fill=fill)
+        draw.text((w-1, h+1), text, font=font, fill=fill)
+        draw.text((w+1, h+1), text, font=font, fill=fill)
+
+    def draw_outline(draw, pos, width, outline_colour):
+        for i in range(width):
+           draw.rectangle(pos, outline=outline_colour)   
+           pos = (pos[0] + 1,pos[1] + 1, pos[2] + 1,pos[3] + 1) 
+
+    path = os.path.join(settings.get('image_location', os.path.realpath(__file__)), "Level Images")
+    try:
+        if ctx.bot.source.name == "twitter":
+            profile_image_url = ctx.raw_data['user']['profile_image_url'].replace("_normal", "")
+        elif ctx.bot.source.name == "discord":
+            profile_image_url = ctx.raw_data.author.avatar_url
+        response = requests.get(profile_image_url)
+        profile_im = Image.open(BytesIO(response.content))
+    except:
+        profile_im = Image.open(os.path.join(path, "default_profilepic.jpg"))
+    if exp_data['theme'] == "dark":
+        name_colour = (85, 85, 85, 255)
+        name_colour_outline = (255, 255, 255, 255)
+        back_colour = (85, 85, 85, 255)
+        exp_bar_colour = (193, 30, 120, 150)
+        text_outline = (255, 255, 255, 255)
+    elif exp_data['theme'] == "red":
+        name_colour = (255, 255, 255, 255)
+        name_colour_outline = (85, 85, 85, 255)
+        back_colour = (255, 51, 51, 255)
+        exp_bar_colour = (128, 0, 0, 150)
+        text_outline = (255, 255, 255, 255)
+    else:
+        # Default
+        name_colour = (255, 255, 255, 255)
+        name_colour_outline = (85, 85, 85, 255)
+        back_colour = (255, 255, 255, 255)
+        exp_bar_colour = (255, 102, 204, 150)
+        text_outline = (51, 51, 51, 255)
+    width = 335
+    height = 160
+    complete_im = Image.new('RGB', (width, height), color=(182, 19, 117))
+    background_folder_path = os.path.join(path, 'Level Backgrounds')
+    bg_list = [f for f in os.listdir(background_folder_path) if os.path.isfile(os.path.join(background_folder_path, f))]
+    new_bg = [f for f in bg_list if f.split("_")[1] == str(exp_data['background_number'])][0]
+    background_path = os.path.join(path, 'Level Backgrounds', new_bg)
+    background_im = Image.open(background_path)
+    if exp_data['background_tint'] != "off":
+        background_im = tint_image(background_im, color="#{}".format(exp_data['background_tint']))
+    d = ImageDraw.Draw(complete_im)
+    complete_im.paste(background_im, (0, 0))
+    profile_im.thumbnail((76, 76), Image.ANTIALIAS)
+    profile_im = add_corners(profile_im, 20)
+    bottom_border = Image.new('RGB', (325, 75), color=back_colour)
+    bottom_border = add_corners(bottom_border, 10, skip_bottom=True, new_alpha=150)
+    complete_im.paste(bottom_border, (5, 80), mask=bottom_border)
+    complete_im.paste(profile_im, (5, 37), mask=profile_im)
+    # EXP Level
+    bar_full = int(((exp_data['current_level_exp'] / exp_data['next_level_exp']) * 100) / 230)
+    bar_full_percent = exp_data['current_level_exp'] / exp_data['next_level_exp']
+    bar_full = bar_full_percent * 230
+    exp_size = (int(bar_full), 20)
+    exp_size_outline = (234, 24)
+    # Exp bar outline
+    draw_outline(d, pos=(88, 86, 319, 107), width=3, outline_colour=exp_bar_colour)
+    # Exp Bar
+    exp_border = Image.new("RGBA", exp_size, color=exp_bar_colour)
+    complete_im.paste(exp_border, (90, 88), mask=exp_border)
+    # Fonts
+    config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
+    f = os.path.join(config_path, 'YuGothM.ttc')
+    fb = os.path.join(config_path, 'YuGothB.ttc')
+    text_colour = (85, 85, 85, 255)
+    fnt = ImageFont.truetype(fb, 16)
+    d.text((94, 90), "{}/{}".format(
+            exp_data['current_level_exp'],
+            exp_data['next_level_exp']),
+            font=fnt, fill=text_outline)  # Exp
+    fnt = ImageFont.truetype(fb, 18)
+    screen_name = ctx.screen_name
+    if len(screen_name) > 18:
+        screen_name = screen_name[:15] + "[...]"
+    draw_text_outline(d, 85, 62, screen_name, fnt, name_colour_outline)
+    d.text((85, 62), screen_name, font=fnt, fill=name_colour)  # Username
+    # Global Rank
+    fnt = ImageFont.truetype(f, 14)
+    if exp_data.get('server_leaderboard'):
+        leaderboard_str = u"#{} (#{})".format(exp_data['global_leaderboard'],
+                                              exp_data['server_leaderboard'])
+    else:
+        leaderboard_str = u"#{}".format(exp_data['global_leaderboard'])
+    draw_text_outline(d, 249, 65, leaderboard_str, fnt, name_colour_outline)
+    d.text((249, 65), leaderboard_str, font=fnt, fill=name_colour, align="right")
+    draw_text_outline(d, 249, 50, u"₱{}".format(exp_data['cash']), fnt, name_colour_outline)
+    d.text((249, 50), u"₱{}".format(exp_data['cash']), font=fnt, fill=name_colour, align="right")  # Cash
+    # Total used command
+    fnt = ImageFont.truetype(f, 13)
+    d.text((90, 116), u"Commands Used", font=fnt, fill=text_outline)
+    d.text((280, 116), u"{}".format(exp_data['total_cmds_used']), font=fnt, fill=text_outline, align="right")
+    # Most used command
+    d.text((90, 134), u"Most Used [{}]".format(exp_data['highest_cmd'][0]), font=fnt, fill=text_outline)
+    d.text((280, 134), u"{}".format(exp_data['highest_cmd'][1]), font=fnt, fill=text_outline)
+    # Level
+    bottom_border = Image.new('RGBA', (76, 36), color=back_colour)
+    bottom_border = add_corners(bottom_border, 6, skip_bottom=False, new_alpha=150)
+    complete_im.paste(bottom_border, (5, 114), mask=bottom_border)
+    fnt = ImageFont.truetype(fb, 16)
+    d.text((10, 116), u"Level: {}".format(exp_data['level']), font=fnt, fill=text_outline)
+    # Connected accounts
+    icon_pos_x = 10
+    icon_pos_y = 134
+    icon_y_space = 20
+    if exp_data['sources'].get('discord'):
+        discord_icon = Image.open(os.path.join(path, "discord_small.png"))
+        complete_im.paste(discord_icon, (icon_pos_x, icon_pos_y))
+        icon_pos_x += icon_y_space
+    if exp_data['sources'].get('twitter'):
+        twitter_icon = Image.open(os.path.join(path, "twitter_small.png"))
+        complete_im.paste(twitter_icon, (icon_pos_x, icon_pos_y))
+        icon_pos_x += icon_y_space
+    if exp_data['sources'].get('twitch'):
+        twitch_icon = Image.open(os.path.join(path, "twitch_small.png"))
+        complete_im.paste(twitch_icon, (icon_pos_x, icon_pos_y))
+        icon_pos_x += icon_y_space
+    if exp_data['sources'].get('reddit'):
+        reddit_icon = Image.open(os.path.join(path, "reddit_small.png"))
+        complete_im.paste(reddit_icon, (icon_pos_x, icon_pos_y))
+        icon_pos_x += icon_y_space
+    complete_im = add_corners(complete_im, 8, skip_bottom=False)
+    save_path = os.path.join(path, "userlevel_card_{}_{}.png".format(
+            ctx.bot.source.name, ctx.user_id))
+    complete_im.save(save_path)
+    return save_path
+
+
+def calculate_level(user_level_dict):
+    from math import pow
+    # Need to come up with a better way to do this
+    # I think for now it's best to wait for the global cmd
+    # usage to grow before making this more automatic
+    exp_cmd = {'default': 3,
+               '!level': 0,
+               'my{GENDER}': 6,
+               '{GENDER}': 4,
+               'shipgirl': 10,
+               'otp': 6,
+               'vocaloid': 9,
+               'imouto': 9,
+               'senpai': 9,
+               '{GENDER}register': 30,
+               'monstergirl': 15,
+               'yandere': 15}
+    IGNORE = ["_comment", "settings", "profile", "level_card"]
+    result = {}
+    result['total_exp'] = 0
+    result['total_cmds_used'] = 0
+    result['highest_cmd'] = ("", 0)
+    for command in user_level_dict.items():
+        if command[0] in IGNORE:
+            continue
+        if command[1] > result['highest_cmd'][1]:
+            result['highest_cmd'] = command
+        result['total_cmds_used'] += command[1]
+        cmd_str = command[0].replace("waifu", "{GENDER}").replace("husbando", "{GENDER}")
+        for i in range(0, command[1]):
+            result['total_exp'] += exp_cmd[cmd_str] if exp_cmd.get(cmd_str) else exp_cmd.get('default', 2)
+    total_cash = result['total_cmds_used']
+    skill_points = 5  # TODO: Look into some type of rpg pvp thing, could be fun
+    points = 0
+    past_points = 0
+    for level in range(1, 1000):
+        if str(level).endswith("0"):
+            total_cash += 120
+        elif str(level).endswith("5"):
+            skill_points += 3
+        else:
+            total_cash += 40
+            skill_points += 1
+        diff = int(level + 300 * pow(2, float(level)/7))
+        past_points = int(points/4)
+        points += diff
+        if result['total_exp'] <= (points/4):
+            break
+    result['level'] = level
+    result['current_level_exp'] = result['total_exp'] - past_points
+    result['next_level_exp'] = int(points / 4) - past_points
+    result['cash'] = total_cash
+    return result

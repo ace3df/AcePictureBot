@@ -48,7 +48,7 @@ class TwitchBot():
     def parse_irc_msg(self, msg):
         keys = ['sender', 'type', 'target']
         result = dict((key, value.lstrip(':')) for key, value in zip(keys, msg.split()))
-        if result['type'] != "PRIVMSG":
+        if result.get('type') != "PRIVMSG":
             return False
         result['message'] = msg.split("PRIVMSG {} :".format(result['target'], 1))[1].replace("\r\n", "")
         result['sender'] = result['sender'].split("!", 1)[0]
@@ -181,7 +181,7 @@ class TwitchBot():
                      'raw_data': response
                     }
             ctx = UserContext(**attrs)
-            if not bot.check_rate_limit(ctx.user_id, or_seconds=120, or_per_user=5):
+            if not bot.check_rate_limit(ctx, or_seconds=120, or_per_user=5):
                 continue
             if command in ["mywaifu", "myhusbando"]:
                 if not ctx.user_ids.get('twitter', False):
