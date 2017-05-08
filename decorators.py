@@ -46,14 +46,14 @@ class CommandGroup:
         for cmd in command_list:
             if cmd == "unwrap":
                 t = datetime.date.today()
-                if not (t >= datetime.date(t.year, 12, 20) and t <= datetime.date(t.year, 12, 27)):
+                if not (datetime.date(t.year, 12, 20) <= t <= datetime.date(t.year, 12, 30)):
                     continue
             if command.prefix + cmd in self.commands:
                 raise TypeError('Command {0.name} is already registered.'.format(command))
             self.commands[command.prefix + cmd] = command
 
     def get_command(self, name):
-        return self.commands.get(name, None)
+        return self.commands.get(name)
 
     def command(self, *args, **kwargs):
         def decorator(func):

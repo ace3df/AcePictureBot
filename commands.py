@@ -86,8 +86,8 @@ def waifu(ctx, gender=None, search_for=None, is_otp=False):
     if not result:
         result = random.choice(char_list)
     name = re.sub("[\(\[].*?[\)\]]", "", result[0]).strip()  # Remove () and []
-    series = result[1].get('series', None)
-    otp_image = result[1].get('otp image', None)
+    series = result[1].get('series')
+    otp_image = result[1].get('otp image')
     if is_otp:
         return name, series, otp_image
     start_path = settings.get('image_location', os.path.join(os.path.realpath(__file__), 'images'))
@@ -179,7 +179,7 @@ def random_list(ctx):
             rng = random.randint(1, 1000)
             if rng <= 700:
                 card_rank = range(1, 4)
-            elif rng >= 701 and rng <= 900:
+            elif 701 <= rng <= 900:
                 card_rank = range(4, 5)
             elif rng >= 901:
                 card_rank = range(5, 6)
@@ -196,8 +196,8 @@ def random_list(ctx):
         else:
             result = random.choice(char_list)
     print(result)
-    series = result[1].get('series', None)
-    otp_image = result[1].get('otp image', None)
+    series = result[1].get('series')
+    otp_image = result[1].get('otp image')
     start_path = settings.get('image_location', os.path.join(os.path.realpath(__file__), 'images'))
     if list_name == "OTP":
         name_one, name_two = result[0].split("(x)")
@@ -402,9 +402,8 @@ def direct_source(ctx):
     # Easy, simple way to handle Patreon version from other sources.
     image_url = None
     message = None
-    if ctx.bot.source.name == "discord":
-        if ctx.raw_data.attachments:
-            image_url = ctx.raw_data.attachments[0]['url']
+    if ctx.bot.source.name == "discord" and ctx.raw_data.attachments:
+        image_url = ctx.raw_data.attachments[0]['url']
     else:
         message = ctx.message
     if image_url is None and message:
@@ -419,8 +418,9 @@ def direct_source(ctx):
 @command("source", only_allow=["twitter"], aliases=["sauce", "anime?", "manga?"])
 def source(ctx, image_url=None):
     is_gif = False
-    if image_url is None and ctx.bot.source.name == "twitter" and ctx.raw_data.get('extended_entities', []):
-        if ctx.raw_data['extended_entities'].get('media', []):
+    if image_url is None and ctx.bot.source.name == "twitter"\
+        and ctx.raw_data.get('extended_entities', [])\
+        and ctx.raw_data['extended_entities'].get('media', []):
             image_url = ctx.raw_data['extended_entities']['media'][0].get('media_url_https', None)
     if image_url is None:
         status_id = ctx.raw_data.get('in_reply_to_status_id', False)
@@ -512,81 +512,6 @@ def source(ctx, image_url=None):
     return reply_text + "\n" + sauce_nao_url
 
 
-@command("!info", cooldown=10)
-def info(ctx):
-    return False
-
-    def user_level_file(ctx, user_id):
-        user_cmd_path = os.path.join(ctx.bot.config_path, "Users", "Levels", ctx.bot.source.name.title())
-        user_cmd_file = os.path.join(user_cmd_path, user_id + ".json")
-        if not os.path.exists(user_cmd_file):
-            return False
-        user_cmd_usage = {}
-        try:
-            with open(user_cmd_file, 'r') as f:
-                user_cmd_usage = json.load(f)
-        except FileNotFoundError:
-            user_cmd_usage = {}
-        return user_cmd_usage
-
-    def handle_file(file):
-        if not file.endswith(".json"):
-            return False
-        file = file.replace(".json", "")
-        if not file.isdigit():
-            return False
-        attrs = {'bot': ctx.bot,
-                 'screen_name': '',
-                 '{}_id'.format(ctx.bot.source.name): file,
-                 'command': "!level",
-                 'message': '',
-                 'raw_data': '',
-                 'raw_bot': ''
-                }
-        member_ctx = UserContext(**attrs)
-        member_usage = return_command_usage(member_ctx)
-        if not member_usage:
-            return False
-        member_data = calculate_level(member_usage)
-        if not member_data:
-            return False
-        return member_data, member_usage
-
-    command_info = ctx.bot.uses_command(ctx.args)
-
-
-
-    if "waifu" in ctx.command:
-        list_name = "Waifu"
-    else:
-        list_name = "Husbando"
-    if not ctx.user_ids.get('twitter', False):
-        reply_text = "You don't have your account linked to Twitter!"
-        return reply_text
-    user_path = os.path.join(ctx.bot.config_path, 'Users', '{}Register'.format(list_name))
-    if not os.path.exists(user_path):
-        os.makedirs(user_path)
-    user_file = os.path.join(user_path, ctx.user_ids['twitter'] + ".json")
-    if not os.path.isfile(user_file):
-        reply_text = "Have you used {}Register before?".format(list_name)
-        return reply_text
-    with open(user_file, 'r', encoding="utf-8") as f:
-        user_data = json.load(f)
-    clearn_name = re.sub("[\(\[].*?[\)\]]", "", user_data[0]['name'].replace("_", " ").title()).strip()
-    m = "You first registered {} on {}!\n".format(clearn_name, user_data[0]['date'])
-    m_append = []
-    if len(user_data) > 1:
-        for entry in user_data[1:]:
-            clean_name = re.sub("[\(\[].*?[\)\]]", "", entry['name'].replace("_", " ").title()).strip()
-            m_append.append("{} on {}".format(clean_name, entry['date']))
-    reply_text = m + '\n'.join(m_append)
-    if (len(reply_text) + 23) > ctx.bot.source.character_limit:
-        paste_title = "{user} {gender} Data".format(user=ctx.user_ids['twitter'], gender=list_name)
-        paste_link = make_paste(reply_text, paste_title)
-        reply_text = "Your {}Register data: {}".format(list_name, paste_link)
-    return reply_text
-
-
 @command(["mywaifu", "myhusbando"],
          patreon_aliases=["myidol"],
          patreon_vip_aliases=["myotp"])
@@ -655,9 +580,8 @@ def mywaifu(ctx):
         clean_name = re.sub("[\(\[].*?[\)\]]", "", user_entry['name'].replace("_", " ").title()).strip()
     tags = list(filter(None, tags))
     reply_text = ""
-    if ctx.bot.source.name == "twitter":
-        if datetime.now().isoweekday() == 3:
-            reply_text = "#{0}Wednesday".format(list_name)
+    if ctx.bot.source.name == "twitter" and datetime.now().isoweekday() == 3::
+        reply_text = "#{0}Wednesday".format(list_name)
     else:
         reply_text = "{gender} is {name}".format(gender=list_name, name=clean_name)
     reply_media = []
@@ -868,25 +792,24 @@ def waifuregister(ctx):
                 reply_text = ("No images found for '{}'!{}".format(
                               ctx.args, "\nHelp: " + url_help if url_help else ""))
                 return reply_text
-            if "_" not in name:
-                if not any(text == name for text in characters_lower):
-                    # Found multi single names, return help
-                    found = [text.replace("_", " ").title() for text in characters_lower if name in text]
-                    if len(found) > 1:
-                        url_help = help_urls.get('waifuregister_no_images', False)
-                        help_string = """English: {gender}Reigster one of these names!
-    French: {gender}Register un de ces noms!
-    Spanish: {gender}Register!
+            if "_" not in name and not any(text == name for text in characters_lower):
+                # Found multi single names, return help
+                found = [text.replace("_", " ").title() for text in characters_lower if name in text]
+                if len(found) > 1:
+                    url_help = help_urls.get('waifuregister_no_images', False)
+                    help_string = """English: {gender}Reigster one of these names!
+French: {gender}Register un de ces noms!
+Spanish: {gender}Register!
 
-    {found_names}
-    {help_url}
-    """.format(
-        gender=list_name,
-        found_names='\n'.join(found),
-        help_url="" if not url_help else "\nDon't see the name you are looking for here?\nHelp: " + url_help)
-                        paste_link = make_paste(help_string, name)
-                        reply_text = "More than one name was found: " + paste_link
-                        return reply_text
+{found_names}
+{help_url}
+""".format(
+    gender=list_name,
+    found_names='\n'.join(found),
+    help_url="" if not url_help else "\nDon't see the name you are looking for here?\nHelp: " + url_help)
+                    paste_link = make_paste(help_string, name)
+                    reply_text = "More than one name was found: " + paste_link
+                    return reply_text
             # Check if there are any images
             try:
                 img_count = int(info.get('image_count', 0))

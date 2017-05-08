@@ -45,7 +45,6 @@ initial_extensions = [
     'cogs.repl',
     'cogs.tags',
     'cogs.rss',
-    'cogs.granblue',
     'cogs.alterakiba',
     'cogs.otakuuniverse',
 ]

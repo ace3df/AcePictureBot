@@ -30,12 +30,12 @@ This is bot is currently designed around my own environment. I would prefer if y
 - Async version of discord.py
 - tabulate
 
-#### Facebook
-- facebook-sdk
-
 #### Twitch
 - irc
 - imgurpython
 
+#### Facebook
+- facebook-sdk
+
 #### Reddit
--praw
+- praw
