@@ -50,12 +50,9 @@ class BotProcess(CommandGroup):
     def __init__(self, source):
         if not isinstance(source, Source):
             raise Exception("Bot Source isn't Source class!")
-        ###########
-        # Not sure how to handle this well
-        # This will make everyone have access to patreon commands but still limited to normal limits
-        self.OPEN_PATREON_VIP = True
-        self.OPEN_PATREON = True
-        ###########
+        # Use these to allow anyone to use Patreon commands but still follow basic limits.
+        self.OPEN_PATREON = False
+        self.OPEN_PATREON_VIP = False
         self.source = source
         self.uptime = datetime.utcnow()
         self.commands_used = Counter()
@@ -151,6 +148,8 @@ class BotProcess(CommandGroup):
             # Mod only command, return nothing
             return False, False
 
+        self.reload_patreon_file()
+
         if self.source.name == "twitter" and ctx.command == "!source":
             ctx.command = "source"
 
@@ -194,7 +193,10 @@ class BotProcess(CommandGroup):
         return reply_text, reply_media
 
     def reload_commands(self, first_run=False):
-        self.log.info("Reloading Commands...")
+        if not first_run:
+            self.log.info("Reloading Commands...")
+        else:
+            self.log.info("Loading Commands...")
         if not first_run:
             import imp
             imp.reload(self.commands_module) 
@@ -207,27 +209,38 @@ class BotProcess(CommandGroup):
                         continue
                     self.add_command(member)
                 continue
-        self.log.info("Finished reloading commands!")
+        if not first_run:
+            self.log.info("Finished reloading commands!")
+        else:
+            self.log.info("Finished loading commands!")
 
     def uses_command(self, text):
         """Check to see if text contains a command."""
         text = text.replace("🚢👧", "shipgirl").lower()
         text = re.sub('(@[A-Za-z0-9_.+-]+)', ' ', text)
+        today = datetime.today()  # Use this for special event stuff
+        command = False
         command_list = list(self.commands.keys())
-        command = [cmd for cmd in command_list if cmd in text]
-        if command:
-            if "pictag" in command:
+        found_commands = [cmd for cmd in command_list if cmd in text]
+        if found_commands:
+            if "pictag" in found_commands:
                 # difflib doesn't seem to like pictag being the closes match
                 command = "pictag"
+            elif "!info" in found_commands:
+                command = "!info"
+            elif "harem" in found_commands:
+                command = "harem"
             else:
                 # Only return last from list (as waifuregister conflict can happen with waifu)
-                command = difflib.get_close_matches(text, command, n=1, cutoff=0.1)
+                command = difflib.get_close_matches(text, found_commands, n=1, cutoff=0.1)
                 if command:
                     command = command[0]
         if not command:
             return False
         if command in self.commands[command].aliases:
             command = self.commands[command].name[0]
+        if today.month == 4 and today.day == 1:
+            pass
         return command
 
     def check_rate_patreon(self, ctx):
@@ -299,8 +312,15 @@ class BotProcess(CommandGroup):
                                                                 rate_seconds, rate_per_user)
         return result
 
+    def reload_patreon_file(self):
+        self.patreon_ids = self.get_patreon_ids()
+
+    def update_patreon_file(self, new_ids):
+        with open(os.path.join(self.config_path, 'Patreons.json'), 'w') as f:
+            json.dump(new_ids, f, sort_keys=False, indent=4)
+
     def check_rate_limit_per_cmd(self, ctx, remove=False):
-        path = os.path.join(ctx.bot.config_path,
+        path = os.path.join(self.config_path,
                             '{} User Ratelimits.txt'.format(ctx.bot.source.name))
         if not os.path.isfile(path):
             with open(path, 'w') as f:
@@ -397,7 +417,7 @@ class BotProcess(CommandGroup):
                     break
                 except (IOError):
                     # File is busy
-                    time.sleep(1)
+                    time.sleep(0.5)
         if tweet_warning:
             elapsed = current_time - datetime.strptime(
                 first_time, '%Y-%m-%d %H:%M:%S')
@@ -413,8 +433,9 @@ class BotProcess(CommandGroup):
                 fmt = '{m} minutes'
             else:
                 fmt = '{s} seconds'
-            msg = "You can not use {} for another {}\nTry other commands: ace3df.github.io/AcePictureBot/commands/"
-            return msg.format(command, fmt.format(d=days, h=hours, m=minutes, s=seconds))
+            end_msg = "Try other commands: ace3df.github.io/AcePictureBot/commands/"
+            msg = "You can not use {} for another {}\n{}"
+            return msg.format(command, fmt.format(d=days, h=hours, m=minutes, s=seconds), end_msg)
         return True
 
     def get_uptime(self):
@@ -454,6 +475,9 @@ class UserContext:
             self.is_patreon = self.get_is_patreon(section="patreon_ids")
             if not self.is_patreon:  # Last check, see if guest
                 self.is_patreon = self.get_is_patreon(section="patreon_guest_ids")
+        if not self.is_patreon and self.bot.source.name == "discord":
+            # Check if server.id is in server patreon list form $15 tier
+            self.is_patreon = self.get_is_patreon_server(self.raw_data.server.id)
         if self.is_patreon:
             self.media_repeat_for = self.patreon_reapeat_for(args=self.args, is_vip=self.is_patreon_vip)
         else:
@@ -475,6 +499,16 @@ class UserContext:
             return False
         mod_ids = self.bot.settings['mod_ids'].get(self.bot.source.name, [])
         return self.user_ids.get(self.bot.source.name) in mod_ids
+
+    def get_is_patreon_server(self, server_id):
+        if not self.bot.patreon_ids.get("patreon_server_ids", []):
+            return False
+        for entry in self.bot.patreon_ids["patreon_server_ids"]:
+            if len(entry) < 2:
+                continue
+            if entry[0] == server_id:
+                return True
+        return False
 
     def get_is_patreon(self, section):
         if not self.bot.patreon_ids.get(section, {}):
@@ -812,6 +846,10 @@ def append_warnings(user_id, source, reason=""):
 
 
 def download_file(url, path=None, filename=None):
+    print("Download File: ")
+    print(url)
+    if not url.startswith("http"):
+        url = "http:" + url
     if path is None:
         path = settings.get('default_dl_locaction', os.path.realpath(__file__))
     if filename is None:
@@ -1104,7 +1142,7 @@ def get_media(path=None, ctx=False, media_args={}):
         media = get_media_local(path=path, ctx=ctx, media_args=media_args)
     if media and ctx and ctx.bot.source.thrid_party_upload:
         return upload_media(media, ctx)
-    if ctx and not ctx.bot.source.download_media:
+    if ctx and not ctx.bot.source.download_media or media_args.get('skip_online'):
         return media
     if not media and media_args:
         media = get_media_online(path=path, media_args=media_args, ctx=ctx, ignore_used=False)
@@ -1282,13 +1320,17 @@ def compress_media(media):
     return convert_media(media, convert_to)
 
 
-def create_otp_image(otp_results=[]):
+def create_otp_image(otp_results=[], width_size=225, height_size=350, support_gif=True):
     overlay = False
     if settings.get('otp_overlay_location', False):
         overlay = get_media_local(path=os.path.join(settings['otp_overlay_location']))
     path = settings.get('image_location', os.path.realpath(__file__))
-    filename = os.path.join(path, str(random.randint(0, 999)) + ".jpg")
-    img_size = (225 * len(otp_results), 350)
+    is_gif = [file for file in otp_results if ".gif" in file]
+    to_save_filetype = ".jpg"
+    if is_gif:
+        to_save_filetype = ".gif"
+    filename = os.path.join(path, str(random.randint(0, 999)) + to_save_filetype)
+    img_size = (width_size * len(otp_results), height_size)
     otp_images_path = os.path.join(path, 'OTP')
     with Image.new("RGB", img_size) as otp_image:
         for result in otp_results:
@@ -1301,7 +1343,7 @@ def create_otp_image(otp_results=[]):
                 if not otp_image_file:
                     return False
             with Image.open(otp_image_file) as temp_img:
-                otp_image.paste(temp_img, (225 * otp_results.index(result), 0))
+                otp_image.paste(temp_img, (width_size * otp_results.index(result), 0))
         if overlay:
             with Image.open(overlay) as ol:
                 overlay_open = ol.resize((img_size), Image.ANTIALIAS)
@@ -1597,3 +1639,12 @@ def calculate_level(user_level_dict):
     result['next_level_exp'] = int(points / 4) - past_points
     result['cash'] = total_cash
     return result
+
+
+def find_between(s, first, last):
+    try:
+        start = s.index(first) + len(first)
+        end = s.index(last, start)
+        return s[start:end]
+    except ValueError:
+        return ""

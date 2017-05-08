@@ -131,7 +131,10 @@ class TwitchBot():
     def main_loop(self):
         bot.log.info("IRC Connected.")
         while self.connected:
-            response = self.s.recv(1024).decode("utf-8")
+            try:
+                response = self.s.recv(1024).decode("utf-8")
+            except UnicodeDecodeError:
+                continue
             if response == "PING :tmi.twitch.tv\r\n":
                 self.s.send("PONG :tmi.twitch.tv\r\n".encode())
                 continue

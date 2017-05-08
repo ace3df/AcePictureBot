@@ -3,6 +3,7 @@ i used it badly because i can't into decorators but it works so w/e
 pls no sue or bully
 """
 import inspect
+import datetime
 
 class Command:
     def __init__(self, name, callback, **kwargs):
@@ -43,6 +44,10 @@ class CommandGroup:
             command.name = [command.name]
         command_list = command.name + command.aliases + command.patreon_aliases + command.patreon_vip_aliases
         for cmd in command_list:
+            if cmd == "unwrap":
+                t = datetime.date.today()
+                if not (t >= datetime.date(t.year, 12, 20) and t <= datetime.date(t.year, 12, 27)):
+                    continue
             if command.prefix + cmd in self.commands:
                 raise TypeError('Command {0.name} is already registered.'.format(command))
             self.commands[command.prefix + cmd] = command

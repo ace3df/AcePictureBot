@@ -192,9 +192,24 @@ def process_tweet(data):
     if reply_text is None:
         bot.commands_used[ctx.command] += 1
         reply_text, reply_media = bot.on_command(ctx)
+
+    if ctx.command == "unwrap":
+        import random
+        import re
+        chance = random.randint(0, 50)
+        if chance >= 48:
+            # Give them 1 free week of patreon only commands
+            current_ids = [user_id[0] for user_id in bot.patreon_ids['patreon_guest_ids']['twitter']]
+            if ctx.user_id not in current_ids:
+                bot.patreon_ids['patreon_guest_ids']['twitter'].append([ctx.user_id, "Christmas Special"])
+                bot.update_patreon_file(bot.patreon_ids)
+                reply_text = re.sub(r'\([^)]*\)', '', reply_text)
+                reply_text += "\nYou unwrapped commands for the week! https://gist.github.com/ace3df/9dcbd9ff4f540351927f66a5c2aba78d"
+
     if reply_text or reply_media:
         reply_text = "@{0} {1}".format(ctx.screen_name, reply_text)
         post_tweet(ctx, reply_text, reply_media)
+
     # Store read tweets so we don't dup later on, don't let it get too big as well.
     if len(tweets_read) > 150:
         tweets_read = tweets_read[50:]

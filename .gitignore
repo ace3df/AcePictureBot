@@ -4,6 +4,9 @@ __pycache__
 # Config files to ignore
 *.txt
 *.json
+*.png
+*.jpeg
+*.jpg
 Configs/Logs/
 
 # Baiscs

@@ -21,7 +21,7 @@ from functions import (yaml_to_list, slugify, get_media, get_media_online,
                        filter_per_series, connect_token, scrape_website,
                        append_warnings, check_if_name_in_list, create_level_image,
                        calculate_level, return_command_usage, write_command_usage,
-                       UserContext, upload_media, get_global_level_cache)
+                       UserContext, upload_media, get_global_level_cache, find_between)
 
 from bs4 import BeautifulSoup
 
@@ -50,6 +50,8 @@ def pictag(ctx):
         image = get_media_online(path=None, ctx=False, media_args=media_args)
         if not image:
             return ("Sorry, no images could be found! Try different tags!")
+        if not image.startswith("http:"):
+            image = "http:" + image
         reply_media.append(image)
     reply_text = "Result(s) for: {}".format(' '.join(tags).replace("-asian", "").replace("-photo", ""))
     return reply_text, reply_media
@@ -66,7 +68,10 @@ def waifu(ctx, gender=None, search_for=None, is_otp=False):
         end_tag = ["-1girl", "-genderbend", "1boy", "solo"]
     result = ()
     path = os.path.join(ctx.bot.config_path, '{} List.yaml'.format(list_name))
-    char_list = yaml_to_list(path, list_name.lower())
+    if "video game" in ctx.args.lower() and list_name == "Waifu":
+        char_list = yaml_to_list(path, "video game")
+    else: 
+        char_list = yaml_to_list(path, list_name.lower())
     # This is used so they can't get aroun dbeing limited with x cmd
     # Plus to the odd series to make people actually use other cmds 😠.
     ignore = ["high-school-dxd", "love-live", "love-live-sunshine"
@@ -87,7 +92,7 @@ def waifu(ctx, gender=None, search_for=None, is_otp=False):
         return name, series, otp_image
     start_path = settings.get('image_location', os.path.join(os.path.realpath(__file__), 'images'))
     path_name = os.path.join(start_path, list_name, slugify(result[0]))
-    end_tag.append(name.replace(" ", "_"))
+    end_tag.append(result[0].replace(" ", "_"))
     reply_text = "Your {} is {} ({})".format(list_name, name, series)
     media_args = {'tags': end_tag}
     reply_media = get_media(path=path_name, ctx=ctx, media_args=media_args)
@@ -97,17 +102,17 @@ def waifu(ctx, gender=None, search_for=None, is_otp=False):
 @command(["shipgirl", "idol", "touhou", "vocaloid", "sensei", "senpai",
           "kouhai", "imouto", "shota", "onii", "onee",
           "monstergirl", "tankgirl", "witchgirl", "granblue",
-          "yandere"],
-    patreon_aliases=["tsundere", "kuudere", "himedere"])
+          "yandere", "unwrap"],
+    patreon_aliases=["tsundere", "kuudere", "himedere", "okaa", "fate/servant"])
 def random_list(ctx):
     male_only_lists = ["shota", "onii"]
     # Both female and male can be under these.
-    both_gender_lists = ["idol", "sensei", "senpai", "kouhai", "yandere", "tsundere"]
+    both_gender_lists = ["idol", "sensei", "senpai", "kouhai", "yandere", "tsundere", "fate/servant"]
     # Simple way to make sure to not load male list if one of these are used.
     possible_search = ["love", "idolmaster", "cinderella",
                        "akb0048", "wake", "aikatsu"] 
     # List of lists that don't need to show the series.
-    ignore_series_lists = ["shipgirl", "touhou", "witchgirl", "tankgirl", "vocaloid"]
+    ignore_series_lists = ["shipgirl", "touhou", "witchgirl", "tankgirl", "vocaloid", "unwrap"]
     list_name = "Waifu"
     end_tag = ["1girl", "solo"]
     args = ctx.message.lower()
@@ -115,6 +120,7 @@ def random_list(ctx):
     search_for = ""
     show_series = False if ctx.command in ignore_series_lists else True
     support_otp = False
+    skip_online = False
     # Special per list stuff
     if ctx.command == "shipgirl":
         # Default shipgirl to kantai collection only
@@ -141,6 +147,11 @@ def random_list(ctx):
             search_for = "Wake Up Girls!"
         elif "aikatsu" in args:
             search_for = "Aikatsu!"
+    elif ctx.command == "unwrap":
+        show_series = True
+        end_tag.append("santa_costume")
+    elif ctx.command == "fate/servant":
+        skip_online = True
     if (ctx.command in both_gender_lists and "male" in args and not "female" in args and not search_for)\
         or ctx.command in male_only_lists:
             list_name = "Husbando"
@@ -157,12 +168,34 @@ def random_list(ctx):
         list_name = "OTP"
     if ctx.command == "onee" or ctx.command == "onii":
         ctx.command = ctx.command + "-chan"
+    if ctx.command == "okaa":
+        ctx.command = ctx.command + "-san"
     path = os.path.join(ctx.bot.config_path, '{} List.yaml'.format(list_name))
     char_list = yaml_to_list(path, ctx.command.lower())
     if search_for:
         result = filter_per_series(char_list, search_for, 4)
     if not result:
-        result = random.choice(char_list)
+        if ctx.command == "fate/servant":
+            rng = random.randint(1, 1000)
+            if rng <= 700:
+                card_rank = range(1, 4)
+            elif rng >= 701 and rng <= 900:
+                card_rank = range(4, 5)
+            elif rng >= 901:
+                card_rank = range(5, 6)
+            break_count = 0
+            print("CARD RANK")
+            print(card_rank)
+            while True:
+                if break_count == 10:
+                    break
+                result = random.choice(char_list)
+                if result[1].get('get_rate', 1) in card_rank:
+                    break
+                break_count += 1
+        else:
+            result = random.choice(char_list)
+    print(result)
     series = result[1].get('series', None)
     otp_image = result[1].get('otp image', None)
     start_path = settings.get('image_location', os.path.join(os.path.realpath(__file__), 'images'))
@@ -178,14 +211,21 @@ def random_list(ctx):
         name = re.sub("[\(\[].*?[\)\]]", "", result[0]).strip()  # Remove () and []
         end_tag.append(result[0].replace(" ", "_"))
         path_name = os.path.join(start_path, list_name, slugify(result[0]))
+        if ctx.command == "unwrap":
+            path_name = os.path.join(path_name, "christmas")
     if ctx.command == "granblue":
         reply_text = "{} has joined your party!".format(name)
-    else:    
+    elif ctx.command == "unwrap":
+        merry_ran_end = ["Merry Christmas!", "Happy Holidays!", "Season's Greetings!", "Merii Kurisumasu!"]
+        reply_text = "{} was in your present ({}). {}".format(name, series, random.choice(merry_ran_end))
+    elif ctx.command == "fate/servant":
+        reply_text = "Your {} is {} {}".format(list_title, name, "")
+    else:
         reply_text = "Your {} is {}{}".format(
-            list_title.replace("-C", "-c"),  # w/e
+            list_title.replace("-C", "-c").replace("-S", "-s"),  # w/e
             name,
             "" if not show_series else " ({})".format(series))
-    media_args = {'tags': end_tag}
+    media_args = {'tags': end_tag, 'skip_online': skip_online}
     reply_media = get_media(path=path_name, ctx=ctx, media_args=media_args)
     return reply_text, reply_media
 
@@ -194,7 +234,8 @@ def random_list(ctx):
 def otp(ctx):
     args = ctx.args.lower()
     max_harem = random.randint(3, 5)
-    is_harem = True if ctx.command == "harem" else False
+    is_harem = True if ctx.command == "harem" else  False
+    is_special = False
     otp_genders = []
     if "yuri" in args:
         args = args.replace("yuri", "")
@@ -210,11 +251,18 @@ def otp(ctx):
         if is_harem:
             for person in range(0, max_harem):
                 otp_genders.append("husbando")
+    elif "granblue" in args:
+        search_for = "Granblue Fantasy"
+        is_special = True
+        args = args.replace("granblue", "")
+        end_msg = "Granblue "
+        # 960 x 800
+        otp_genders = ["waifu" for x in range(max_harem)]
     else:
         end_msg = ""
         if is_harem:
             for person in range(0, max_harem):
-                otp_genders.append("waifu" if random.randint(0, 10) < 9 else "husbando")
+                otp_genders.append("waifu" if random.randint(0, 100) < 95 else "husbando")
         else:
             otp_genders.append("waifu")
             otp_genders.append("husbando")
@@ -242,9 +290,13 @@ def otp(ctx):
             elif safe_loop == 5:
                 search = ""
             name, series, image = waifu.callback(ctx, gender=gender, 
-                                                search_for=search, is_otp=True)
+                                                 search_for=search, is_otp=True)
             result = [name, series, image]
             safe_loop += 1
+            try:
+                result[2].split("/")[-1]
+            except:
+                continue
             if result not in results:
                 break
         results.append(result)
@@ -263,6 +315,8 @@ def otp(ctx):
     end_msg_series = "(" + ' / '.join(series_list) + ")"
     reply_text = "Your {} is {} {}".format(end_msg, end_msg_names, end_msg_series)
     reply_media = create_otp_image(results)
+    if reply_media and ctx and ctx.bot.source.thrid_party_upload:
+        reply_media = upload_media(reply_media, ctx)
     if len(reply_text) > ctx.bot.source.character_limit:
         reply_text = reply_text.split("(")[0].strip()
     return reply_text, reply_media
@@ -289,7 +343,9 @@ def airing(ctx):
                 return "{anime}\nNo air date set!".format(anime=show.text)
             episode_time = episode_number.find_next('time')['datetime'].replace("T", " ").replace("Z", "")
             next_ep_time = datetime.strptime(episode_time, '%Y-%m-%d %H:%M:%S') - today
-            episode_number = re.findall(r'\d+', episode_number.text.split(":")[0])[0]
+            episode_number = re.findall(r'\d+', episode_number.text.split(":")[0])
+            if episode_number:
+                episode_number = episode_number[0]
             hours, remainder = divmod(int(next_ep_time.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)
             days, hours = divmod(hours, 24)
@@ -358,100 +414,6 @@ def direct_source(ctx):
     if image_url is None and ctx.bot.source.name != "twitter":
         return False
     return source.callback(ctx, image_url=image_url)
-
-
-@command("!level", cooldown=120)
-def user_level(ctx):
-
-    def user_level_file(ctx, user_id):
-        user_cmd_path = os.path.join(ctx.bot.config_path, "Users", "Levels", ctx.bot.source.name.title())
-        user_cmd_file = os.path.join(user_cmd_path, user_id + ".json")
-        if not os.path.exists(user_cmd_file):
-            return False
-        user_cmd_usage = {}
-        try:
-            with open(user_cmd_file, 'r') as f:
-                user_cmd_usage = json.load(f)
-        except FileNotFoundError:
-            user_cmd_usage = {}
-        return user_cmd_usage
-
-    def handle_file(file):
-        if not file.endswith(".json"):
-            return False
-        file = file.replace(".json", "")
-        if not file.isdigit():
-            return False
-        attrs = {'bot': ctx.bot,
-                 'screen_name': '',
-                 '{}_id'.format(ctx.bot.source.name): file,
-                 'command': "!level",
-                 'message': '',
-                 'raw_data': '',
-                 'raw_bot': ''
-                }
-        member_ctx = UserContext(**attrs)
-        member_usage = return_command_usage(member_ctx)
-        if not member_usage:
-            return False
-        member_data = calculate_level(member_usage)
-        if not member_data:
-            return False
-        return member_data['total_exp']
-
-    user_level_dict = return_command_usage(ctx)
-    exp_data = calculate_level(user_level_dict)
-    lb_path = os.path.join(ctx.bot.config_path, "Users", "Levels", ctx.bot.source.name.title())
-    a = time.time()
-    global_leaderboard = get_global_level_cache(ctx)
-    # Only need the exp
-    global_leaderboard = [user['total_exp'] for user in global_leaderboard]
-    print("Time to process Global Leaderboard: {}".format(time.time() - a))
-    server_leaderboard = []
-    if ctx.bot.source.name == "discord":
-        # Get server_leaderboard
-        if ctx.raw_data.server is not None:
-            for member in ctx.raw_data.server.members:
-                if member.id == ctx.user_id:
-                    continue
-                elif member.bot:
-                    continue
-                attrs = {'bot': ctx.bot,
-                         'screen_name': '',
-                         'discord_id': member.id,
-                         'command': "!level",
-                         'message': '',
-                         'raw_data': '',
-                         'raw_bot': ''
-                        }
-                member_ctx = UserContext(**attrs)
-                member_usage = return_command_usage(member_ctx)
-                if not member_usage:
-                    continue
-                member_data = calculate_level(member_usage)
-                server_leaderboard.append(member_data['total_exp'])
-    global_leaderboard.append(exp_data['total_exp'])
-    global_leaderboard.sort(reverse=True)
-    try:
-        exp_data['global_leaderboard'] = global_leaderboard.index(exp_data['total_exp']) + 1
-    except ValueError:
-        exp_data['global_leaderboard'] = len(global_leaderboard) + 1
-    if server_leaderboard:
-        server_leaderboard.append(exp_data['total_exp'])
-        server_leaderboard.sort(reverse=True)
-        try:
-            exp_data['server_leaderboard'] = server_leaderboard.index(exp_data['total_exp']) + 1
-        except ValueError:
-            exp_data['server_leaderboard'] = len(server_leaderboard) + 1
-    exp_data['cash'] -= user_level_dict['level_card']['cash_spent']
-    exp_data['background_number'] = user_level_dict['level_card']['background_number']
-    exp_data['background_tint'] = user_level_dict['level_card']['background_tint']
-    exp_data['theme'] = user_level_dict['level_card']['theme']
-    exp_data['sources'] = user_level_dict['level_card']['sources']
-    reply_media = create_level_image(ctx, exp_data)
-    if reply_media and ctx and ctx.bot.source.thrid_party_upload:
-        return "", upload_media(reply_media, ctx)
-    return "", reply_media
 
 
 @command("source", only_allow=["twitter"], aliases=["sauce", "anime?", "manga?"])
@@ -550,8 +512,50 @@ def source(ctx, image_url=None):
     return reply_text + "\n" + sauce_nao_url
 
 
-@command("mywaifu data", aliases=["myhusbando data"])
-def mywaifu_data(ctx):
+@command("!info", cooldown=10)
+def info(ctx):
+    return False
+
+    def user_level_file(ctx, user_id):
+        user_cmd_path = os.path.join(ctx.bot.config_path, "Users", "Levels", ctx.bot.source.name.title())
+        user_cmd_file = os.path.join(user_cmd_path, user_id + ".json")
+        if not os.path.exists(user_cmd_file):
+            return False
+        user_cmd_usage = {}
+        try:
+            with open(user_cmd_file, 'r') as f:
+                user_cmd_usage = json.load(f)
+        except FileNotFoundError:
+            user_cmd_usage = {}
+        return user_cmd_usage
+
+    def handle_file(file):
+        if not file.endswith(".json"):
+            return False
+        file = file.replace(".json", "")
+        if not file.isdigit():
+            return False
+        attrs = {'bot': ctx.bot,
+                 'screen_name': '',
+                 '{}_id'.format(ctx.bot.source.name): file,
+                 'command': "!level",
+                 'message': '',
+                 'raw_data': '',
+                 'raw_bot': ''
+                }
+        member_ctx = UserContext(**attrs)
+        member_usage = return_command_usage(member_ctx)
+        if not member_usage:
+            return False
+        member_data = calculate_level(member_usage)
+        if not member_data:
+            return False
+        return member_data, member_usage
+
+    command_info = ctx.bot.uses_command(ctx.args)
+
+
+
     if "waifu" in ctx.command:
         list_name = "Waifu"
     else:

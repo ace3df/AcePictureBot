@@ -952,6 +952,12 @@ Masakaki:
   - husbando
   otp image: http://cdn.myanimelist.net/images/characters/14/118413.jpg
   series: '[C] - CONTROL'
+Sakaki Yuuya:
+  lists:
+  - husbando
+  - onii-chan
+  otp image: https://myanimelist.cdn-dena.com/images/characters/2/236975.jpg
+  series: 'Yu☆Gi☆Oh! Arc-V'
 Mashima Taichi:
   lists:
   - husbando
@@ -1918,3 +1924,27 @@ Zen Wistalia:
   - husbando
   otp image: http://cdn.myanimelist.net/images/characters/5/229453.jpg
   series: Akagami no Shirayuki-hime
+Siegfried:
+  lists:
+    - fate/servant
+  get_rate: 4
+Gaius Julius Caesar:
+  lists:
+    - fate/servant
+  get_rate: 3
+Gilles de Rais (Saber):
+  lists:
+    - fate/servant
+  get_rate: 3
+Le Chevalier d'Eon:
+  lists:
+    - fate/servant
+  get_rate: 4
+Rama (Fate/Grand Order):
+  lists:
+    - fate/servant
+  get_rate: 4
+Lancelot (Fate/Grand Order):
+  lists:
+    - fate/servant
+  get_rate: 4
