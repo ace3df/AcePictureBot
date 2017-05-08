@@ -318,11 +318,10 @@ async def on_message(message):
     ctx = make_context(message, command)
     if not bot.check_rate_limit(ctx, or_seconds=40, or_per_user=4):
         return
-    if command in ["mywaifu", "myhusbando"]:
-        if not ctx.user_ids.get('twitter', False):  # Don't have a Twitter account linked
-            reply_text = create_token(message.author.name, message.author.id, bot.source.name)
-            await discord_bot.send_message(message.author, reply_text)
-            return
+    if command in ["mywaifu", "myhusbando"] and not ctx.user_ids.get('twitter', False):  # Don't have a Twitter account linked
+        reply_text = create_token(message.author.id, bot.source.name)
+        await discord_bot.send_message(message.author, reply_text)
+        return
     reply_text, reply_media = bot.on_command(ctx)
     # Handle MyWaifu command as we handle it a little differently on Discord.
     # TODO: make a better way to handle this based on ctx.bot.source.get_new_mywaifu

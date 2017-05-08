@@ -654,7 +654,7 @@ def connect_token(user_id, token, to_source):
     return "You can now use MyWaifu / MyHusbando on {}!".format(to_source.title())
 
 
-def create_token(screen_name, user_id, from_source):    
+def create_token(user_id, from_source):    
     config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
     try:
         with open(os.path.join(config_path, 'Connected Accounts.json'), 'r') as f:
@@ -682,8 +682,7 @@ def create_token(screen_name, user_id, from_source):
             new_token = token[0]
             break
     if new_token is None:
-        new_token = ''.join(random.choice(list(slugify(screen_name)) +\
-                                    list(from_source) +\
+        new_token = ''.join(random.choice(list(from_source) +\
                                     list(map(str, range(0, 10)))) for _ in range(15)).lower().replace(" ", "")
         tokens[new_token] = user_id
     with open(os.path.join(config_path, "Connect Tokens.json"), 'w') as f:
