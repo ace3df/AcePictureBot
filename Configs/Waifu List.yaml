@@ -6,6 +6,22 @@ A (Show By Rock!!):
   lists: idol
   otp image: null
   series: Show By Rock!!
+Neptune (Choujigen Game Neptune):
+  lists: 
+    - waifu
+    - monstergirl
+    - imouto
+    - kouhai
+  otp image: https://myanimelist.cdn-dena.com/images/characters/6/206111.jpg
+  series: Choujigen Game Neptune The Animation
+Vanilla (Sayori):
+  lists: 
+  - waifu
+  - monstergirl
+  - imouto
+  - dandere
+  otp image: https://myanimelist.cdn-dena.com/images/characters/14/274109.jpg
+  series: Nekopara
 Abe Nana:
   lists: idol
   otp image: null
@@ -14,6 +30,13 @@ Abukuma (Kantai Collection):
   lists: shipgirl
   otp image: null
   series: Kantai Collection
+Miyazono Kawori:
+  lists: 
+    - waifu
+    - kouhai
+    - kuudere
+  otp image: https://myanimelist.cdn-dena.com/images/characters/14/269375.jpg
+  series: Shigatsu wa Kimi no Uso
 Acerola (Pokemon):
   lists:
   - video game
@@ -1147,7 +1170,8 @@ Ebina Nana:
 Ebisuzawa Kurumi:
   lists:
   - waifu
-  otp image: http://cdn.myanimelist.net/images/characters/13/286725.jpg
+  - senpai
+  otp image: https://myanimelist.cdn-dena.com/images/characters/13/286725.jpg
   series: Gakkougurashi!
 Eclair Martinozzi:
   lists:
@@ -1495,6 +1519,75 @@ Futaba Anzu:
   lists: idol
   otp image: null
   series: Idolmaster
+Nyarlathotep (Nyaruko-san):
+  lists: 
+    - waifu
+    - monstergirl
+  otp image: https://myanimelist.cdn-dena.com/images/characters/2/217623.jpg
+  series: Haiyoru! Nyaruani
+Cthugha (Nyaruko-san):
+  lists: 
+    - waifu
+    - monstergirl
+  otp image: https://myanimelist.cdn-dena.com/images/characters/10/165533.jpg
+  series: Haiyoru! Nyaruani
+Matsushima Michiru:
+  lists: 
+    - waifu
+    - tsundere
+  otp image: https://myanimelist.cdn-dena.com/images/characters/5/277996.jpg
+  series: Grisaia no Kajitsu
+Suou Amane:
+  lists: 
+    - waifu
+    - onee-chan
+  otp image: https://myanimelist.cdn-dena.com/images/characters/14/277995.jpg
+  series: Grisaia no Kajitsu
+Sakaki Yumiko:
+  lists: 
+    - waifu
+    - senpai
+  otp image: https://myanimelist.cdn-dena.com/images/characters/16/199467.jpg
+  series: Grisaia no Kajitsu
+Komine Sachi:
+  lists: 
+    - waifu
+    - kouhai
+  otp image: https://myanimelist.cdn-dena.com/images/characters/13/199473.jpg
+  series: Grisaia no Kajitsu
+Irisu Makina:
+  lists: 
+    - waifu
+    - imouto
+    - kouhai
+  otp image: https://myanimelist.cdn-dena.com/images/characters/7/277994.jpg
+  series: Grisaia no Kajitsu
+Kazami Kazuki:
+  lists: 
+    - waifu
+    - onee-chan
+  otp image: https://myanimelist.cdn-dena.com/images/characters/6/318429.jpg
+  series: Grisaia no Kajitsu
+Kusakabe Asako:
+  lists: 
+    - waifu
+    - sensei
+  otp image: https://myanimelist.cdn-dena.com/images/characters/10/318069.jpg
+  series: Grisaia no Kajitsu
+Sakura Futaba:
+  lists: 
+    - waifu
+    - video game
+    - kouhai
+  otp image: https://myanimelist.cdn-dena.com/images/characters/2/309253.jpg
+  series: Persona 5
+Niijima Makoto:
+  lists: 
+    - waifu
+    - video game
+    - senpai
+  otp image: https://myanimelist.cdn-dena.com/images/characters/11/309846.jpg
+  series: Persona 5
 Futami Ami:
   lists:
   - waifu
@@ -2641,8 +2734,29 @@ Izumi Kyouka (Bungou Stray Dogs):
 Izumi Reina:
   lists:
   - waifu
+  - monstergirl
   otp image: https://myanimelist.cdn-dena.com/images/characters/4/290365.jpg
   series: Musaigen no Phantom World
+Kousaka Reina:
+  lists:
+  - waifu
+  - kouhai
+  - kuudere
+  otp image: https://myanimelist.cdn-dena.com/images/characters/16/317352.jpg
+  series: Hibike! Euphonium
+Oumae Kumiko:
+  lists:
+  - waifu
+  - kouhai
+  - imouto
+  otp image: https://myanimelist.cdn-dena.com/images/characters/8/280130.jpg
+  series: Hibike! Euphonium
+Miyamizu Mitsuha:
+  lists: 
+  - waifu
+  - onee-chan
+  otp image: https://myanimelist.cdn-dena.com/images/characters/6/306631.jpg
+  series: Kimi no Na wa.
 Jacqueline (Show By Rock!!):
   lists: idol
   otp image: null
@@ -2977,9 +3091,16 @@ Kasumi (pokemon):
   series: Pokemon
 Kasumigaoka Utaha:
   lists:
-  - senpai
-  - unwrap
-  otp image: null
+    - waifu
+    - senpai
+    - unwrap
+  otp image: https://myanimelist.cdn-dena.com/images/characters/8/325309.jpg
+  series: Saenai Heroine no Sodatekata
+Katou Megumi:
+  lists:
+    - waifu
+    - kuudere
+  otp image: https://myanimelist.cdn-dena.com/images/characters/5/325307.jpg
   series: Saenai Heroine no Sodatekata
 Katagiri Sanae:
   lists: idol
@@ -8221,6 +8342,7 @@ Yoshikawa Chinatsu:
 Yoshino (Date A Live):
   lists:
   - waifu
+  - dandere
   otp image: http://cdn.myanimelist.net/images/characters/4/215469.jpg
   series: Date A Live
 Yoshinoya:

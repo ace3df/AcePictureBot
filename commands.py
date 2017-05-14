@@ -580,8 +580,10 @@ def mywaifu(ctx):
         clean_name = re.sub("[\(\[].*?[\)\]]", "", user_entry['name'].replace("_", " ").title()).strip()
     tags = list(filter(None, tags))
     reply_text = ""
-    if ctx.bot.source.name == "twitter" and datetime.now().isoweekday() == 3::
+    if ctx.bot.source.name == "twitter" and datetime.now().isoweekday() == 3:
         reply_text = "#{0}Wednesday".format(list_name)
+    elif ctx.bot.source.name == "twitter":
+        reply_text = "#{0}AnyDay".format(list_name)
     else:
         reply_text = "{gender} is {name}".format(gender=list_name, name=clean_name)
     reply_media = []
