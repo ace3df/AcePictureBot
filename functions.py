@@ -1098,18 +1098,20 @@ def get_media_local(path, ctx=None, media_args={}):
     if ctx and not ignore_used:
         ignore_list = get_user_ignore_list(ctx.user_id, ctx.bot.source.name)
     files = [p.as_posix() for p in pathlib.Path(path).iterdir() if p.is_file()]
+    if not files:
+        return False
     random.shuffle(files)
-    media = None
-    for file in files:
-        md5_hash = md5_file(file)
-        if md5_hash not in ignore_list:
-            media = file
-            break
-    if media is not None and ignore_used is False:
-        if media not in ignore_list and ctx:
-            if os.path.isfile(media):
-                md5_hash = md5_file(media)
-                ignore_list.append(md5_hash)
+    media = random.choice(files)
+    if ignore_used:
+        md5_hash = md5_file(media)
+        if ctx and md5_hash in ignore_list:
+            for file in files:
+                md5_hash = md5_file(file)
+                if md5_hash not in ignore_list:
+                    media = file
+                    break
+        if ctx and md5_hash not in ignore_list:
+            ignore_list.append(md5_hash)
             write_user_ignore_list(ctx.user_id, ctx.bot.source.name, ignore_list)
     return media
 
@@ -1137,7 +1139,7 @@ def get_media(path=None, ctx=False, media_args={}):
     """Uses get_media_local and if False, use get_media_online."""
     # TODO: Clean this up to handle all the new ifs
     media = False
-    if path is not None:
+    if path:
         media = get_media_local(path=path, ctx=ctx, media_args=media_args)
     if media and ctx and ctx.bot.source.thrid_party_upload:
         return upload_media(media, ctx)
