@@ -149,6 +149,8 @@ Araragi Koyomi:
 Archer:
   lists:
   - husbando
+  - fate/servant
+  - fate/servant/archer
   otp image: http://cdn.myanimelist.net/images/characters/15/265629.jpg
   series: Fate (Series)
 Arita Haruyuki:
@@ -1927,24 +1929,24 @@ Zen Wistalia:
 Siegfried:
   lists:
     - fate/servant
-  get_rate: 4
+    - fate/servant/saber
 Gaius Julius Caesar:
   lists:
     - fate/servant
-  get_rate: 3
+    - fate/servant/saber
 Gilles de Rais (Saber):
   lists:
     - fate/servant
-  get_rate: 3
+    - fate/servant/saber
 Le Chevalier d'Eon:
   lists:
     - fate/servant
-  get_rate: 4
+    - fate/servant/saber
 Rama (Fate/Grand Order):
   lists:
     - fate/servant
-  get_rate: 4
+    - fate/servant/saber
 Lancelot (Fate/Grand Order):
   lists:
     - fate/servant
-  get_rate: 4
+    - fate/servant/saber

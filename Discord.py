@@ -15,7 +15,8 @@ from config import settings, discord_settings
 from functions import (BotProcess, Source, UserContext,
                        datadog_online_check, create_token,
                        slugify, yaml_to_list, download_file, get_global_level_cache,
-                       calculate_level, return_command_usage, write_command_usage)
+                       calculate_level, return_command_usage, return_command_usage_date,
+                       write_command_usage)
 
 from discord.ext import commands
 from bs4 import BeautifulSoup
@@ -333,50 +334,75 @@ async def on_message(message):
 
 
 @discord_bot.command(pass_context=True)
-async def info(ctx):
-    now = datetime.utcnow()
-    delta = now - bot.uptime
-    hours, remainder = divmod(int(delta.total_seconds()), 3600)
-    minutes, seconds = divmod(remainder, 60)
-    days, hours = divmod(hours, 24)
-    if days > 1:
-        fmt = '{d} days\n{h} hours\n{m} minutes\n{s} seconds'
-    elif days:
-        fmt = '{d} day\n{h} hours\n{m} minutes\n{s} seconds'
+async def info(ctx, member : discord.Member = None):
+    if not member:
+        now = datetime.utcnow()
+        delta = now - bot.uptime
+        hours, remainder = divmod(int(delta.total_seconds()), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        days, hours = divmod(hours, 24)
+        if days > 1:
+            fmt = '{d} days\n{h} hours\n{m} minutes\n{s} seconds'
+        elif days:
+            fmt = '{d} day\n{h} hours\n{m} minutes\n{s} seconds'
+        else:
+            fmt = '{h} hours\n{m} minutes\n{s} seconds'
+
+        embed = discord.Embed(description="Bot Infomation:")
+        embed.title = "Click here for a full list of commands!"
+        embed.url = "http://ace3df.github.io/AcePictureBot/commands/"
+        embed.color = 0x1f8b4c
+        total_members = sum(len(s.members) for s in discord_bot.servers)
+        total_online  = sum(1 for m in discord_bot.get_all_members() if m.status != discord.Status.offline)
+        unique_members = set(discord_bot.get_all_members())
+        channel_types = Counter(c.type for c in discord_bot.get_all_channels())
+        voice = channel_types[discord.ChannelType.voice]
+        text = channel_types[discord.ChannelType.text]
+
+        members = '%s total\n%s online\n%s unique' % (total_members, total_online, len(unique_members),)
+        embed.add_field(name='Members', value=members)
+        embed.add_field(name='Channels', value='{} total\n{} text\n{} voice'.format(text + voice, text, voice))
+        embed.add_field(name='Uptime', value=fmt.format(d=days, h=hours, m=minutes, s=seconds))
+        embed.timestamp = bot.uptime
+        embed.add_field(name='Servers',
+                        value='{} (In Shard: {})\n{} Total'.format(
+                            len(discord_bot.servers),
+                            sys.argv[1].strip(), "xd"))
+        embed.add_field(name='Commands Run', value=sum(bot.commands_used.values()))
+        most_used = ["{}: {}".format(a.title(), b) for a, b in bot.commands_used.most_common(3)]
+        if most_used:
+            embed.add_field(name='Most Used Commands', value='\n'.join(most_used))
+        debug_info = ("Current Server ID: {0.server.id}"
+                      "\nCurrent Channel ID: {0.channel.id}"
+                      "\nYour ID: {0.author.id}".format(ctx.message))
+        embed.add_field(name='Debug Info', value=debug_info)
+        embed.set_footer(text="Follow @AcePictureBot on Twitter!",
+                        icon_url='https://cdn2.iconfinder.com/data/icons/minimalism/512/twitter.png')
     else:
-        fmt = '{h} hours\n{m} minutes\n{s} seconds'
-
-    embed = discord.Embed(description="Bot Infomation:")
-    embed.title = "Click here for a full list of commands!"
-    embed.url = "http://ace3df.github.io/AcePictureBot/commands/"
-    embed.color = 0x1f8b4c
-    total_members = sum(len(s.members) for s in discord_bot.servers)
-    total_online  = sum(1 for m in discord_bot.get_all_members() if m.status != discord.Status.offline)
-    unique_members = set(discord_bot.get_all_members())
-    channel_types = Counter(c.type for c in discord_bot.get_all_channels())
-    voice = channel_types[discord.ChannelType.voice]
-    text = channel_types[discord.ChannelType.text]
-
-    members = '%s total\n%s online\n%s unique' % (total_members, total_online, len(unique_members),)
-    embed.add_field(name='Members', value=members)
-    embed.add_field(name='Channels', value='{} total\n{} text\n{} voice'.format(text + voice, text, voice))
-    embed.add_field(name='Uptime', value=fmt.format(d=days, h=hours, m=minutes, s=seconds))
-    embed.timestamp = bot.uptime
-    embed.add_field(name='Servers',
-                    value='{} (In Shard: {})\n{} Total'.format(
-                        len(discord_bot.servers),
-                        sys.argv[1].strip(), "xd"))
-    embed.add_field(name='Commands Run', value=sum(bot.commands_used.values()))
-    most_used = ["{}: {}".format(a.title(), b) for a, b in bot.commands_used.most_common(3)]
-    if most_used:
-        embed.add_field(name='Most Used Commands', value='\n'.join(most_used))
-    debug_info = ("Current Server ID: {0.server.id}"
-                  "\nCurrent Channel ID: {0.channel.id}"
-                  "\nYour ID: {0.author.id}".format(ctx.message))
-    embed.add_field(name='Debug Info', value=debug_info)
-    embed.set_footer(text="Follow @AcePictureBot on Twitter!",
-                    icon_url='https://cdn2.iconfinder.com/data/icons/minimalism/512/twitter.png')
-
+        embed = discord.Embed(description="Discord Information only")
+        embed.title = "Infomation for Member: {}".format(member)
+        embed.color = 0x1f8b4c
+        attrs = {'bot': bot,
+             'screen_name': member.name,
+             'discord_id': member.id,
+             'command': "waifu",
+             'message': ctx.message.content,
+             'raw_data': ctx.message,
+             'raw_bot': discord_bot
+            }
+        user_ctx = UserContext(**attrs)
+        cmd_usage = return_command_usage(user_ctx)
+        most_used = ["{}: {}".format(a.title(), b) for a, b in cmd_usage.most_common(5)]
+        least_used = ["{}: {}".format(a.title(), b) for a, b in list(reversed(cmd_usage.most_common()[-5:]))]
+        if most_used:
+            embed.add_field(name='Most Used Commands', value='\n'.join(most_used))
+        if least_used:
+            embed.add_field(name='Least Used Commands', value='\n'.join(least_used))
+        embed.set_thumbnail(url=member.avatar_url)
+        first_used = return_command_usage_date(user_ctx)
+        embed.add_field(name='Commands Run', value=sum(cmd_usage.values()))
+        embed.add_field(name='First recorded use', value=time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(first_used)))
+        embed.add_field(name='Connected Accounts', value=', '.join(["{}".format(a.title()) for a, b in user_ctx.user_ids.items() if b]))
     await discord_bot.say(embed=embed)
 
 

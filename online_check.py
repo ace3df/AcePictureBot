@@ -3,6 +3,8 @@ import time
 import os
 import re
 
+# nohup python3 online_check.py >online_check.out &
+
 def call_process(process_line):
     ps = subprocess.Popen(process_line, shell=True, stdout=subprocess.PIPE)
     output = ps.stdout.read()
@@ -28,7 +30,7 @@ while True:
         if not is_running("python3 " + process):
           # Start process
           print("Process: {} was not running ({})".format(process, time.strftime("%Y-%m-%d %H:%M")))
-          print_name = process.split(".py")[0].lower()
+          print_name = process.split(".py")[0].replace(" ", "_").lower()
           to_call = "nohup python3 {0} >{1}.out &".format(process, print_name)
           print("Running:")
           print(to_call)

@@ -538,6 +538,11 @@ class UserContext:
             user_cmd_usage[self.command] += usage
         else:
             user_cmd_usage[self.command] = usage
+        # Temp
+        if user_cmd_usage.get("!level"):
+            del user_cmd_usage["!level"]
+        if user_cmd_usage.get("level_card"):
+            del user_cmd_usage["level_card"]
         with open(user_cmd_file, 'w') as f:
             json.dump(user_cmd_usage, f, sort_keys=True, indent=4)
 
@@ -579,7 +584,6 @@ class UserContext:
 def return_command_usage(ctx):
     config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
     total_cmd_usage = Counter({})
-    level_card = {}
     sources = {}
     for source, user_id in ctx.user_ids.items():
         if not user_id:
@@ -592,23 +596,24 @@ def return_command_usage(ctx):
             sources[source] = True
         except (FileNotFoundError, json.decoder.JSONDecodeError):
             source_cmd_usage = {}
-        if source == "discord":
-            if source_cmd_usage.get('level_card'):
-                level_card = source_cmd_usage.pop('level_card')
-        else:
-            if source_cmd_usage.get('level_card'):
-                source_cmd_usage.pop('level_card')
         total_cmd_usage += Counter(source_cmd_usage)
-    if not level_card:
-        total_cmd_usage['level_card'] = {'background_number': 1, 'background_tint': "off",
-                                        'theme': 'default', 'cash_spent': 0,
-                                        'owned_bg': ["1"], 'bg_tint_count': 0}
-    else:
-        if not level_card.get('theme'):
-            level_card['theme'] = "default"
-        total_cmd_usage['level_card'] = level_card
-    total_cmd_usage['level_card']['sources'] = sources
     return total_cmd_usage
+
+
+def return_command_usage_date(ctx):
+    config_path = settings.get('config_path', os.path.join(os.path.realpath(__file__), 'Configs'))
+    sources = {}
+    earlest_date = time.time()
+    for source, user_id in ctx.user_ids.items():
+        if not user_id:
+            continue
+        user_cmd_path = os.path.join(config_path, "Users", "Levels", source.title())
+        user_cmd_file = os.path.join(user_cmd_path, user_id + ".json")
+        if os.path.isfile(user_cmd_file):
+            c_d = os.stat(user_cmd_file).st_mtime
+            if earlest_date > c_d:
+                earlest_date = c_d
+    return earlest_date
 
 
 def write_command_usage(source, user_id, user_cmd_usage):
@@ -1321,30 +1326,47 @@ def compress_media(media):
     return convert_media(media, convert_to)
 
 
-def create_otp_image(otp_results=[], width_size=225, height_size=350, support_gif=True):
+def create_otp_image(otp_results=[], width_size=225, height_size=350, support_gif=True, is_otp=True):
     overlay = False
     if settings.get('otp_overlay_location', False):
         overlay = get_media_local(path=os.path.join(settings['otp_overlay_location']))
     path = settings.get('image_location', os.path.realpath(__file__))
     is_gif = [file for file in otp_results if ".gif" in file]
-    to_save_filetype = ".jpg"
+    to_save_filetype = ".png"
     if is_gif:
         to_save_filetype = ".gif"
-    filename = os.path.join(path, str(random.randint(0, 999)) + to_save_filetype)
-    img_size = (width_size * len(otp_results), height_size)
-    otp_images_path = os.path.join(path, 'OTP')
-    with Image.new("RGB", img_size) as otp_image:
+    if width_size == 0 or height_size == 0:
+        for image in otp_results:
+            img = Image.open(image)
+            width_size += img.size[0]
+            if img.size[1] < height_size:
+                height_size = img.size[1]
+        img_size = (width_size, height_size)
+    else:
+        img_size = (width_size * len(otp_results), height_size)
+    otp_images_path = os.path.join(path, 'otp')
+    filename = os.path.join(otp_images_path, str(random.randint(0, 20)) + to_save_filetype)
+    current_width = 0
+    with Image.new("RGBA", img_size) as otp_image:
         for result in otp_results:
-            # check if file is in download folder first
-            # split download link to get just the id then check
-            otp_filename = result[2].split("/")[-1]
-            otp_image_file = os.path.join(otp_images_path, otp_filename)
-            if not os.path.isfile(otp_image_file):
-                otp_image_file = download_file(result[2], path=otp_images_path)
-                if not otp_image_file:
-                    return False
-            with Image.open(otp_image_file) as temp_img:
-                otp_image.paste(temp_img, (width_size * otp_results.index(result), 0))
+            if is_otp:
+                # check if file is in download folder first
+                # split download link to get just the id then check
+                otp_filename = result[2].split("/")[-1]
+                otp_image_file = os.path.join(otp_images_path, otp_filename)
+                if not os.path.isfile(otp_image_file):
+                    otp_image_file = download_file(result[2], path=otp_images_path)
+                    if not otp_image_file:
+                        return False
+                with Image.open(otp_image_file) as temp_img:
+                    otp_image.paste(temp_img, (width_size * otp_results.index(result), 0))
+            else:
+                with Image.open(result) as temp_img:
+                    if temp_img.size[1] < height_size:
+                        temp_img.thumbnail((temp_img.size[0] / 1.5, temp_img.size[1] / 1.5), Image.ANTIALIAS)
+                    otp_image.paste(temp_img, (current_width, 0))
+                    current_width += temp_img.size[0]
+
         if overlay:
             with Image.open(overlay) as ol:
                 overlay_open = ol.resize((img_size), Image.ANTIALIAS)

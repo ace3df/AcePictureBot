@@ -26,6 +26,16 @@ from functions import (yaml_to_list, slugify, get_media, get_media_online,
 from bs4 import BeautifulSoup
 
 
+@command("reload", mod_only=True, prefix="!")
+def reload(ctx):
+    try:
+        ctx.bot.reload_commands()
+    except Exception as e:
+        return('{}: {}'.format(type(e).__name__, e))
+    else:
+        return("All done!")
+
+
 @command("pictag", patreon_only=True, cooldown=10)
 def pictag(ctx):
     """ Search Safebooru or Gelbooru and return random results.
@@ -99,15 +109,65 @@ def waifu(ctx, gender=None, search_for=None, is_otp=False):
     return reply_text, reply_media
 
 
+@command(name="fate/servant", patreon_only=True)
+def fate_servant_cmd(ctx):
+    # NOTE: Still not finished on the list side.
+    start_path = settings.get('image_location', os.path.join(os.path.realpath(__file__), 'images'))
+    team = []
+    for x in range(0, 3):
+        picked = False
+        while True:
+            rand = random.randint(0, 100)
+            if rand <= 50:
+                picked = random.choice(["Saber", "Archer", "Lancer"])
+            elif 51 <= rand <= 70:
+                picked = random.choice(["Rider", "Caster", "Assassin"])
+            elif 71 <= rand <= 90:
+                picked = random.choice(["Berserker", "Alter Ego", "Shielder"])
+            elif 91 <= rand <= 100:
+                picked = random.choice(["Ruler", "Avenger", "Moon Cancer"])
+            if picked in team:
+                continue
+            team.append(picked)
+            break
+
+    final_entries = []
+    final_images = []
+    had_false = False
+    for member in team:
+        list_name = "Waifu"
+        # temp no male 
+        if member in ["Saber", "Archer", "Lancer", "Rider", "Caster", "Assassin"] and random.randint(0, 100) > 195:
+            list_name = "Husbando"
+        path = os.path.join(ctx.bot.config_path, '{} List.yaml'.format(list_name))
+        char_list = yaml_to_list(path, "fate/servant/{}".format(member.lower().replace(" ", "_")))
+        char = random.choice(char_list)
+        path_name = os.path.join(start_path, list_name, slugify(char[0]))
+        image = get_media(path=path_name, media_args={})
+        if not image:
+            had_false = True
+        final_entries.append(char)
+        final_images.append(image)
+
+    reply_media = False
+    if not had_false:
+        reply_media = create_otp_image(otp_results=final_images, width_size=0, height_size=1000, is_otp=False)
+    reply_text = "Your Fate/Grand Order Team is:\n{} ({})\n{} ({})\n{} ({})".format(
+        re.sub("[\(\[].*?[\)\]]", "", final_entries[0][0]).strip(), team[0],
+        re.sub("[\(\[].*?[\)\]]", "", final_entries[1][0]).strip(), team[1],
+        re.sub("[\(\[].*?[\)\]]", "", final_entries[2][0]).strip(), team[2])
+    return reply_text, reply_media
+
+
 @command(["shipgirl", "idol", "touhou", "vocaloid", "sensei", "senpai",
           "kouhai", "imouto", "shota", "onii", "onee",
           "monstergirl", "tankgirl", "witchgirl", "granblue",
           "yandere", "unwrap"],
-    patreon_aliases=["tsundere", "kuudere", "himedere", "okaa", "fate/servant"])
+    patreon_aliases=["tsundere", "kuudere", "himedere", "okaa"])
 def random_list(ctx):
     male_only_lists = ["shota", "onii"]
     # Both female and male can be under these.
-    both_gender_lists = ["idol", "sensei", "senpai", "kouhai", "yandere", "tsundere", "fate/servant"]
+    both_gender_lists = ["idol", "sensei", "senpai", "kouhai", "yandere", "tsundere"]
     # Simple way to make sure to not load male list if one of these are used.
     possible_search = ["love", "idolmaster", "cinderella",
                        "akb0048", "wake", "aikatsu"] 
@@ -150,8 +210,6 @@ def random_list(ctx):
     elif ctx.command == "unwrap":
         show_series = True
         end_tag.append("santa_costume")
-    elif ctx.command == "fate/servant":
-        skip_online = True
     if (ctx.command in both_gender_lists and "male" in args and not "female" in args and not search_for)\
         or ctx.command in male_only_lists:
             list_name = "Husbando"
@@ -175,27 +233,7 @@ def random_list(ctx):
     if search_for:
         result = filter_per_series(char_list, search_for, 4)
     if not result:
-        if ctx.command == "fate/servant":
-            rng = random.randint(1, 1000)
-            if rng <= 700:
-                card_rank = range(1, 4)
-            elif 701 <= rng <= 900:
-                card_rank = range(4, 5)
-            elif rng >= 901:
-                card_rank = range(5, 6)
-            break_count = 0
-            print("CARD RANK")
-            print(card_rank)
-            while True:
-                if break_count == 10:
-                    break
-                result = random.choice(char_list)
-                if result[1].get('get_rate', 1) in card_rank:
-                    break
-                break_count += 1
-        else:
-            result = random.choice(char_list)
-    print(result)
+        result = random.choice(char_list)
     series = result[1].get('series')
     otp_image = result[1].get('otp image')
     start_path = settings.get('image_location', os.path.join(os.path.realpath(__file__), 'images'))
@@ -218,8 +256,6 @@ def random_list(ctx):
     elif ctx.command == "unwrap":
         merry_ran_end = ["Merry Christmas!", "Happy Holidays!", "Season's Greetings!", "Merii Kurisumasu!"]
         reply_text = "{} was in your present ({}). {}".format(name, series, random.choice(merry_ran_end))
-    elif ctx.command == "fate/servant":
-        reply_text = "Your {} is {} {}".format(list_title, name, "")
     else:
         reply_text = "Your {} is {}{}".format(
             list_title.replace("-C", "-c").replace("-S", "-s"),  # w/e

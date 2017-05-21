@@ -607,17 +607,17 @@ Arisugawa Otome:
   otp image: null
   series: Aikatsu!
 Artoria Pendragon:
-  get_rate: 5
   lists:
   - fate/servant
+  - fate/servant/saber
 Artoria Pendragon Alter:
-  get_rate: 4
   lists:
   - fate/servant
+  - fate/servant/saber
 Artoria Pendragon Lily:
-  get_rate: 4
   lists:
   - fate/servant
+  - fate/servant/saber
 Aruka Schild:
   lists:
   - waifu
@@ -744,9 +744,9 @@ Atarashi Ako:
   otp image: http://cdn.myanimelist.net/images/characters/6/231845.jpg
   series: Saki
 Attila:
-  get_rate: 5
   lists:
   - fate/servant
+  - fate/servant/saber
 Augusta (Granblue Fantasy):
   lists:
   - granblue
@@ -2512,6 +2512,8 @@ Illyasviel von Einzbern:
   - waifu
   - imouto
   - unwrap
+  - fate/servant
+  - fate/servant/caster
   otp image: http://cdn.myanimelist.net/images/characters/6/31610.jpg
   series: Fate (Series)
 Imaizumi Kagerou:
@@ -2616,6 +2618,8 @@ Iris (pokemon):
 Irisviel von Einzbern:
   lists:
   - waifu
+  - fate/servant
+  - fate/servant/archer
   otp image: http://cdn.myanimelist.net/images/characters/15/112995.jpg
   series: Fate (Series)
 Isabelle du Monceau de Bergendal:
@@ -4887,9 +4891,9 @@ Miyamoto Konatsu:
   otp image: http://cdn.myanimelist.net/images/characters/14/166703.jpg
   series: Tari Tari
 Miyamoto Musashi (Fate/Grand Order):
-  get_rate: 5
   lists:
   - fate/servant
+  - fate/servant/saber
 Miyamoto Rei:
   lists:
   - waifu
@@ -5019,9 +5023,9 @@ Mononobe no Futo:
   otp image: null
   series: Touhou
 Mordred:
-  get_rate: 5
   lists:
   - fate/servant
+  - fate/servant/saber
 Morgiana:
   lists:
   - waifu
@@ -5411,13 +5415,13 @@ Nerine:
   otp image: null
   series: Shuffle!
 Nero Claudius:
-  get_rate: 4
   lists:
   - fate/servant
+  - fate/servant/saber
 Nero Claudius Bride:
-  get_rate: 5
   lists:
   - fate/servant
+  - fate/servant/saber
 Nibutani Shinka:
   lists:
   - waifu
@@ -5649,9 +5653,9 @@ Okita Sawa:
   otp image: http://cdn.myanimelist.net/images/characters/13/193627.jpg
   series: Tari Tari
 Okita Souji:
-  get_rate: 5
   lists:
   - fate/servant
+  - fate/servant/saber
 Olga Janetine:
   lists: sensei
   otp image: null
@@ -6016,6 +6020,8 @@ Ricotta Elmar:
 Rider:
   lists:
   - waifu
+  - fate/servant
+  - fate/servant/rider
   otp image: http://cdn.myanimelist.net/images/characters/2/31612.jpg
   series: Fate (Series)
 Rindou Ranmaru:
@@ -6097,10 +6103,11 @@ Ryomou Shimei:
   otp image: null
   series: Ikkitousen
 Ryougi Shiki:
-  get_rate: 5
   lists:
   - waifu
   - fate/servant
+  - fate/servant/saber
+  - fate/servant/assassin
   otp image: https://myanimelist.cdn-dena.com/images/characters/8/79870.jpg
   series: Kara no Kyoukai
 Ryuugajou Nanana:
@@ -6437,11 +6444,6 @@ Sazanami (Kantai Collection):
   lists: shipgirl
   otp image: null
   series: Kantai Collection
-Scathach (fate/grand order):
-  lists:
-  - unwrap
-  otp image: null
-  series: Fate/Grand Order
 Seaport Hime:
   lists: monstergirl
   otp image: null
@@ -6605,11 +6607,11 @@ Shidou Irina:
   otp image: http://cdn.myanimelist.net/images/characters/6/211643.jpg
   series: High School DxD
 Shielder (Fate/Grand Order):
-  get_rate: 3
   lists:
   - waifu
   - video game
   - fate/servant
+  - fate/servant/shielder
   - unwrap
   otp image: https://myanimelist.cdn-dena.com/images/characters/15/321820.jpg
   series: Fate/Grand Order
@@ -7107,9 +7109,9 @@ Suwa Amaki:
   otp image: null
   series: Strike Witches
 Suzuka Gozen:
-  get_rate: 4
   lists:
   - fate/servant
+  - fate/servant/saber
 Suzukaze (Kantai Collection):
   lists: shipgirl
   otp image: null
@@ -7449,6 +7451,8 @@ Tamamo (mon-musu quest!):
 Tamamo Cat (Fate/Grand Order):
   lists:
   - unwrap
+  - fate/servant
+  - fate/servant/berserker
   otp image: null
   series: Fate/Grand Order
 Tanamachi Kaoru:
@@ -8525,11 +8529,138 @@ Zuikaku (Kantai Collection):
   - shipgirl
   otp image: http://cdn.myanimelist.net/images/characters/2/275480.jpg
   series: Kantai Collection
-katharine ohare:
+Katharine Ohare:
   lists: witchgirl
   otp image: null
   series: Strike Witches
-sanya v litvyak:
+Sanya v Litvyak:
   lists: witchgirl
   otp image: null
   series: Strike Witches
+Meltlilith:
+  lists:
+    - fate/servant
+    - fate/servant/alter_ego
+  otp image: null
+  series: Fate (Series)
+Passion lip:
+  lists:
+    - fate/servant
+    - fate/servant/alter_ego
+  otp image: null
+  series: Fate (Series)
+Sesshouin Kiara:
+  lists:
+    - fate/servant
+    - fate/servant/alter_ego
+  otp image: null
+  series: Fate (Series)
+BB (Fate/Extra ccc):
+  lists:
+    - fate/servant
+    - fate/servant/moon_cancer
+  otp image: null
+  series: Fate (Series)
+Gorgon (Fate):
+  lists:
+    - fate/servant
+    - fate/servant/avenger
+  otp image: null
+  series: Fate (Series)
+Jeanne d'Arc:
+  lists:
+    - fate/servant
+    - fate/servant/ruler
+  otp image: null
+  series: Fate (Series)
+Saint Martha:
+  lists:
+    - fate/servant
+    - fate/servant/ruler
+  otp image: null
+  series: Fate (Series)
+Kiyohime (Fate/Grand Order):
+  lists:
+    - fate/servant
+    - fate/servant/berserker
+  otp image: null
+  series: Fate (Series)
+Minamoto no Yorimitsu (Fate/Grand Order):
+  lists:
+    - fate/servant
+    - fate/servant/berserker
+  otp image: null
+  series: Fate (Series)
+Florence Nightingale (Fate/Grand Order):
+  lists:
+    - fate/servant
+    - fate/servant/berserker
+  otp image: null
+  series: Fate (Series)
+Ibaraki Douji:
+  lists:
+    - fate/servant
+    - fate/servant/berserker
+  otp image: null
+  series: Fate (Series)
+Heroine X (Alter):
+  lists:
+    - fate/servant
+    - fate/servant/berserker
+  otp image: null
+  series: Fate (Series)
+Stheno:
+  lists:
+    - fate/servant
+    - fate/servant/assassin
+  otp image: null
+  series: Fate (Series)
+Mata Hari (Fate/Grand Order):
+  lists:
+    - fate/servant
+    - fate/servant/assassin
+  otp image: null
+  series: Fate (Series)
+Carmilla (Fate/Grand Order):
+  lists:
+    - fate/servant
+    - fate/servant/assassin
+  otp image: null
+  series: Fate (Series)
+Heroine X:
+  lists:
+    - fate/servant
+    - fate/servant/assassin
+  otp image: null
+  series: Fate (Series)
+Shuten Douji (Fate/Grand Order):
+  lists:
+    - fate/servant
+    - fate/servant/assassin
+  otp image: null
+  series: Fate (Series)
+Assassin (Fate/Prototype Fragments):
+  lists:
+    - fate/servant
+    - fate/servant/assassin
+  otp image: null
+  series: Fate (Series)
+Scathach (Fate/Grand Order):
+  lists:
+    - unwrap
+    - fate/servant
+    - fate/servant/assassin
+  otp image: null
+  series: Fate (Series)
+Caster (Fate/Extra):
+  lists:
+    - fate/servant
+    - fate/servant/caster
+  otp image: null
+  series: Fate (Series)
+Lancer (Fate/Extra ccc):
+  lists:
+    - fate/servant
+    - fate/servant/lancer
+  otp image: null
+  series: Fate (Series)  
